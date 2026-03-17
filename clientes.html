@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GR7 — Clientes</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#07080d;--s1:#0e1018;--s2:#161820;--s3:#1e2030;--bdr:#252738;
+  --text:#dde1f0;--muted:#5a5e78;--r:14px;
+  --green:#00e5a0;--green2:#059669;
+  --c0:#818cf8;--c1:#38bdf8;--c2:#34d399;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;
+  --sb-w:240px;--sb-w-collapsed:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;padding-left:var(--sb-w);transition:padding-left .25s cubic-bezier(.4,0,.2,1)}
+body.sb-collapsed{padding-left:var(--sb-w-collapsed)}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+.blob{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0;opacity:.12}
+.blob1{width:600px;height:600px;top:-200px;left:-100px;background:var(--c0)}
+.blob2{width:500px;height:500px;bottom:-200px;right:-100px;background:var(--c1)}
+
+/* ===== SIDEBAR ===== */
+.sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sb-w);background:#0e1018;border-right:1px solid #1e2030;display:flex;flex-direction:column;z-index:999;transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.sidebar.collapsed{width:var(--sb-w-collapsed)}
+.sb-logo{display:flex;align-items:center;gap:13px;padding:22px 16px 18px;border-bottom:1px solid #1e2030;flex-shrink:0;min-width:var(--sb-w);overflow:hidden}
+.sb-logo-mark{width:36px;height:36px;flex-shrink:0;background:linear-gradient(135deg,#818cf8,#e879f9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:#fff;box-shadow:0 0 20px rgba(129,140,248,.35)}
+.sb-logo-text{white-space:nowrap;overflow:hidden}
+.sb-logo-text h2{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.3px;color:#fff}
+.sb-logo-text p{font-size:10px;color:#5a5e78;margin-top:2px}
+.sb-nav{flex:1;padding:12px 0;overflow-y:auto;overflow-x:hidden}
+.sb-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#3a3e58;padding:10px 20px 4px;white-space:nowrap;opacity:1;transition:opacity .2s}
+.sidebar.collapsed .sb-label{opacity:0}
+.sb-item{display:flex;align-items:center;gap:12px;padding:11px 16px;color:#5a5e78;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;border-left:2px solid transparent;margin:1px 0}
+.sb-item:hover{color:#dde1f0;background:rgba(255,255,255,.04)}
+.sb-item.active{color:#00e5a0;background:rgba(0,229,160,.07);border-left-color:#00e5a0}
+.sb-icon{font-size:17px;flex-shrink:0;width:24px;display:flex;align-items:center;justify-content:center}
+.sb-text{transition:opacity .2s}
+.sidebar.collapsed .sb-text{opacity:0;pointer-events:none}
+.sb-footer{border-top:1px solid #1e2030;padding:12px 16px;flex-shrink:0}
+.sb-toggle{display:flex;align-items:center;gap:12px;background:transparent;border:1px solid #1e2030;border-radius:8px;padding:9px 12px;color:#5a5e78;font-size:12px;cursor:pointer;width:100%;transition:all .15s;white-space:nowrap;overflow:hidden}
+.sb-toggle:hover{border-color:#3a3e58;color:#dde1f0}
+.sb-toggle-icon{font-size:15px;flex-shrink:0;transition:transform .25s}
+.sidebar.collapsed .sb-toggle-icon{transform:rotate(180deg)}
+.sb-toggle-text{transition:opacity .2s}
+.sidebar.collapsed .sb-toggle-text{opacity:0}
+
+/* ===== LAYOUT ===== */
+.shell{position:relative;z-index:10;max-width:1400px;margin:0 auto;padding:0 44px 80px}
+header{display:flex;align-items:center;justify-content:space-between;padding:32px 0 36px;flex-wrap:wrap;gap:16px}
+.hd-title h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.3px}
+.hd-title p{font-size:12px;color:var(--muted);margin-top:3px}
+.hd-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--s1);border:1px solid var(--bdr);padding:6px 14px;border-radius:99px;color:var(--muted);user-select:none}
+.chip.btn{cursor:pointer;transition:all .15s}.chip.btn:hover{border-color:var(--c0);color:var(--c0)}
+.chip.green{background:rgba(0,229,160,.1);border-color:rgba(0,229,160,.3);color:var(--green);cursor:pointer;transition:all .15s}
+.chip.green:hover{background:rgba(0,229,160,.18)}
+.sec{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+
+/* ===== SEARCH & FILTER BAR ===== */
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.search-wrap{flex:1;min-width:220px;position:relative}
+.search-wrap input{width:100%;background:var(--s1);border:1px solid var(--bdr);border-radius:10px;padding:10px 14px 10px 38px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
+.search-wrap input:focus{border-color:var(--c0)}
+.search-wrap input::placeholder{color:var(--muted)}
+.search-wrap::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px}
+.filter-btn{background:var(--s1);border:1px solid var(--bdr);border-radius:10px;padding:10px 16px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.filter-btn:hover,.filter-btn.active{border-color:var(--c0);color:var(--c0);background:rgba(129,140,248,.08)}
+.filter-btn.active-green{border-color:var(--green);color:var(--green);background:rgba(0,229,160,.08)}
+
+/* ===== TABLE ===== */
+.table-box{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden}
+.tbl-head{display:grid;grid-template-columns:2fr 1.5fr 130px 120px 100px 90px 60px;align-items:center;gap:12px;padding:12px 20px;background:var(--s2);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--bdr)}
+.tbl-row{display:grid;grid-template-columns:2fr 1.5fr 130px 120px 100px 90px 60px;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--bdr);transition:background .15s;cursor:pointer}
+.tbl-row:last-child{border-bottom:none}
+.tbl-row:hover{background:rgba(255,255,255,.025)}
+.tbl-name{font-size:14px;font-weight:700;color:var(--text)}
+.tbl-fantasy{font-size:11px;color:var(--muted);margin-top:2px}
+.tbl-cnpj{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
+.tbl-resp{font-size:13px;color:var(--text)}
+.tbl-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
+.tbl-modules{display:flex;flex-wrap:wrap;gap:3px}
+.mod-chip{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(129,140,248,.12);color:var(--c0);border:1px solid rgba(129,140,248,.2);white-space:nowrap}
+.mod-more{font-size:9px;color:var(--muted);padding:2px 4px}
+.tbl-actions{display:flex;gap:6px;justify-content:flex-end}
+.act-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--bdr);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.act-btn:hover{border-color:var(--c0);color:var(--c0);background:rgba(129,140,248,.08)}
+.act-btn.del:hover{border-color:var(--c4);color:var(--c4);background:rgba(248,113,113,.08)}
+.tbl-empty{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
+
+/* Status badge */
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.status-badge.novo{background:rgba(129,140,248,.12);color:var(--c0);border:1px solid rgba(129,140,248,.25)}
+.status-badge.implantando{background:rgba(251,191,36,.1);color:var(--c3);border:1px solid rgba(251,191,36,.25)}
+.status-badge.ativo{background:rgba(0,229,160,.1);color:var(--green);border:1px solid rgba(0,229,160,.25)}
+
+/* ===== MODAL CADASTRO ===== */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(6px);padding:20px}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--s1);border:1px solid var(--bdr);border-radius:20px;width:100%;max-width:720px;max-height:92vh;overflow-y:auto;animation:mIn .2s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.mh{padding:24px 28px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:sticky;top:0;background:var(--s1);z-index:1}
+.mh-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
+.mh-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.m-close{width:32px;height:32px;border-radius:9px;border:1px solid var(--bdr);background:transparent;color:var(--muted);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.m-close:hover{border-color:var(--c4);color:var(--c4)}
+.mbody{padding:24px 28px}
+.form-section{margin-bottom:28px}
+.form-section-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.form-section-title::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid.cols3{grid-template-columns:1fr 1fr 1fr}
+.form-grid.full{grid-template-columns:1fr}
+.fg{display:flex;flex-direction:column;gap:6px}
+.fg label{font-size:11px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase}
+.fg input,.fg select{background:#161820;border:1.5px solid var(--bdr);border-radius:9px;padding:11px 13px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
+.fg input:focus,.fg select:focus{border-color:var(--c0)}
+.fg input::placeholder{color:#3a3e58}
+.fg select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
+.fg select option{background:#161820}
+.qty-input{display:flex;align-items:center;gap:0}
+.qty-input button{width:36px;height:40px;background:var(--s2);border:1.5px solid var(--bdr);color:var(--text);font-size:18px;cursor:pointer;transition:all .15s;flex-shrink:0}
+.qty-input button:first-child{border-radius:9px 0 0 9px;border-right:none}
+.qty-input button:last-child{border-radius:0 9px 9px 0;border-left:none}
+.qty-input button:hover{background:var(--s3);color:var(--green)}
+.qty-input input{flex:1;background:#161820;border:1.5px solid var(--bdr);border-left:none;border-right:none;padding:11px 0;color:var(--text);font-size:14px;font-weight:700;text-align:center;font-family:'IBM Plex Mono',monospace;outline:none;min-width:0}
+
+/* MÓDULOS CHECKBOXES */
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.mod-check{position:relative}
+.mod-check input{position:absolute;opacity:0;width:0;height:0}
+.mod-check label{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center;color:var(--muted)}
+.mod-check label:hover{border-color:#3a3e58;color:var(--text)}
+.mod-check input:checked+label{background:rgba(0,229,160,.08);border-color:var(--green);color:var(--green)}
+.mod-check input:checked+label::before{content:'✓ ';font-size:11px}
+
+/* MODAL FOOTER */
+.m-footer{padding:16px 28px 24px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--bdr);margin-top:4px}
+.btn-cancel{background:transparent;border:1.5px solid var(--bdr);border-radius:9px;padding:11px 22px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-cancel:hover{border-color:#666;color:var(--text)}
+.btn-save{background:var(--green);border:none;border-radius:9px;padding:11px 28px;color:#000;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-save:hover{background:#00ffb3}
+.btn-save:disabled{opacity:.5;cursor:not-allowed}
+
+/* ===== MODAL DETALHE CLIENTE ===== */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.detail-card{background:var(--s2);border-radius:10px;padding:12px 14px}
+.detail-card-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.detail-card-value{font-size:13px;font-weight:600;color:var(--text)}
+.detail-section{margin-bottom:20px}
+.detail-section-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.detail-section-title::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.detail-modules{display:flex;flex-wrap:wrap;gap:6px}
+.detail-mod{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;background:rgba(0,229,160,.08);color:var(--green);border:1px solid rgba(0,229,160,.2)}
+.detail-tech{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.detail-tech-item{background:var(--s2);border-radius:10px;padding:14px;text-align:center}
+.detail-tech-num{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:600;color:var(--c0)}
+.detail-tech-lbl{font-size:11px;color:var(--muted);margin-top:4px}
+.detail-actions{display:flex;gap:10px;margin-top:8px}
+.detail-btn{flex:1;padding:11px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:1.5px solid var(--bdr);background:transparent;color:var(--muted)}
+.detail-btn:hover{border-color:var(--c0);color:var(--c0);background:rgba(129,140,248,.08)}
+.detail-btn.primary{background:rgba(0,229,160,.1);border-color:var(--green);color:var(--green)}
+.detail-btn.primary:hover{background:rgba(0,229,160,.2)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#1e2030;border:1px solid #333;border-radius:10px;padding:12px 18px;font-size:13px;color:#ccc;z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s;max-width:320px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{border-color:rgba(0,229,160,.4);color:var(--green)}
+.toast.error{border-color:rgba(248,113,113,.4);color:var(--c4)}
+
+/* SPINNER */
+.spin{width:16px;height:16px;border:2px solid var(--bdr);border-top-color:var(--c0);border-radius:50%;animation:sp .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loader{padding:40px;text-align:center;color:var(--muted)}
+
+@media(max-width:900px){
+  .tbl-head,.tbl-row{grid-template-columns:2fr 1fr 100px 60px}
+  .tbl-head>*:nth-child(2),.tbl-row>*:nth-child(2),
+  .tbl-head>*:nth-child(4),.tbl-row>*:nth-child(4),
+  .tbl-head>*:nth-child(5),.tbl-row>*:nth-child(5){display:none}
+  .shell{padding:0 16px 60px}
+  .form-grid{grid-template-columns:1fr}
+  .form-grid.cols3{grid-template-columns:1fr 1fr}
+  .detail-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- BLOB -->
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">GR7</div>
+    <div class="sb-logo-text"><h2>GR7</h2><p>Sistema de Instalações</p></div>
+  </div>
+  <nav class="sb-nav">
+    
+      <div class="sb-label">Menu</div>
+      <a class="sb-item " href="index.html"><span class="sb-icon">🏠</span><span class="sb-text">Dashboard</span></a>
+      <a class="sb-item active" href="clientes.html"><span class="sb-icon">🏢</span><span class="sb-text">Clientes</span></a>
+      <a class="sb-item " href="implantacao.html"><span class="sb-icon">🚀</span><span class="sb-text">Implantação</span></a>
+      <a class="sb-item " href="Checklist.html"><span class="sb-icon">✅</span><span class="sb-text">Checklist</span></a>
+      <a class="sb-item " href="relatorios-checklist.html"><span class="sb-icon">📊</span><span class="sb-text">Relatórios</span></a>
+    </nav>
+  <div class="sb-footer">
+    <button class="sb-toggle" onclick="toggleSidebar()">
+      <span class="sb-toggle-icon">◀</span>
+      <span class="sb-toggle-text">Recolher menu</span>
+    </button>
+  </div>
+</aside>
+
+<!-- SHELL -->
+<div class="shell">
+  <header>
+    <div class="hd-title">
+      <h1>🏢 Clientes</h1>
+      <p>Cadastro e gestão de clientes GR7</p>
+    </div>
+    <div class="hd-right">
+      <div class="chip" id="dateChip"></div>
+      <div class="chip btn" onclick="loadClientes()">↺ Atualizar</div>
+      <div class="chip green" onclick="openCadastro()">+ Novo Cliente</div>
+    </div>
+  </header>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Buscar por razão social, fantasia ou CNPJ..." oninput="filterTable()">
+    </div>
+    <button class="filter-btn active" id="fAll" onclick="setFilter('all')">Todos</button>
+    <button class="filter-btn" id="fNovo" onclick="setFilter('novo')">🔵 Novo</button>
+    <button class="filter-btn" id="fImplant" onclick="setFilter('implantando')">🟡 Implantando</button>
+    <button class="filter-btn" id="fAtivo" onclick="setFilter('ativo')">🟢 Ativo</button>
+  </div>
+
+  <!-- TABLE -->
+  <p class="sec">Lista de clientes</p>
+  <div class="table-box">
+    <div class="tbl-head">
+      <div>Razão Social / Fantasia</div>
+      <div>CNPJ</div>
+      <div>Responsável</div>
+      <div>Data Venda</div>
+      <div>Status</div>
+      <div>Módulos</div>
+      <div></div>
+    </div>
+    <div id="tableBody">
+      <div class="loader"><div class="spin"></div>Carregando clientes...</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL CADASTRO / EDIÇÃO -->
+<div class="modal-bg" id="modalCadastro">
+  <div class="modal-box">
+    <div class="mh">
+      <div>
+        <div class="mh-title" id="modalTitle">Novo Cliente</div>
+        <div class="mh-sub">Preencha os dados do cliente GR7</div>
+      </div>
+      <button class="m-close" onclick="closeCadastro()">✕</button>
+    </div>
+    <div class="mbody">
+
+      <!-- DADOS DO CLIENTE -->
+      <div class="form-section">
+        <div class="form-section-title">Dados do Cliente</div>
+        <div class="form-grid">
+          <div class="fg">
+            <label>Razão Social *</label>
+            <input type="text" id="fRazao" placeholder="Ex: Frutaria Boa Vista Ltda">
+          </div>
+          <div class="fg">
+            <label>Nome Fantasia</label>
+            <input type="text" id="fFantasia" placeholder="Ex: WF Frutaria">
+          </div>
+          <div class="fg">
+            <label>CNPJ *</label>
+            <input type="text" id="fCnpj" placeholder="00.000.000/0000-00" maxlength="18" oninput="maskCnpj(this)">
+          </div>
+          <div class="fg">
+            <label>Responsável *</label>
+            <input type="text" id="fResponsavel" placeholder="Nome do responsável">
+          </div>
+          <div class="fg">
+            <label>Telefone</label>
+            <input type="text" id="fTelefone" placeholder="(00) 00000-0000" maxlength="15" oninput="maskPhone(this)">
+          </div>
+          <div class="fg">
+            <label>Data da Venda</label>
+            <input type="date" id="fDataVenda">
+          </div>
+        </div>
+      </div>
+
+      <!-- INFORMAÇÕES TÉCNICAS -->
+      <div class="form-section">
+        <div class="form-section-title">Informações Técnicas</div>
+        <div class="form-grid cols3">
+          <div class="fg">
+            <label>Servidores</label>
+            <div class="qty-input">
+              <button type="button" onclick="changeQty('qServidor',-1)">−</button>
+              <input type="number" id="qServidor" value="1" min="0" max="99">
+              <button type="button" onclick="changeQty('qServidor',1)">+</button>
+            </div>
+          </div>
+          <div class="fg">
+            <label>Retaguardas</label>
+            <div class="qty-input">
+              <button type="button" onclick="changeQty('qRetaguarda',-1)">−</button>
+              <input type="number" id="qRetaguarda" value="0" min="0" max="99">
+              <button type="button" onclick="changeQty('qRetaguarda',1)">+</button>
+            </div>
+          </div>
+          <div class="fg">
+            <label>Caixas (NFCe)</label>
+            <div class="qty-input">
+              <button type="button" onclick="changeQty('qCaixas',-1)">−</button>
+              <input type="number" id="qCaixas" value="0" min="0" max="99">
+              <button type="button" onclick="changeQty('qCaixas',1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MÓDULOS CONTRATADOS -->
+      <div class="form-section">
+        <div class="form-section-title">Módulos Contratados</div>
+        <div class="modules-grid" id="modulosGrid">
+          <!-- gerado via JS -->
+        </div>
+      </div>
+
+      <!-- STATUS -->
+      <div class="form-section" style="margin-bottom:0">
+        <div class="form-section-title">Status</div>
+        <div class="form-grid cols3">
+          <div class="fg">
+            <label>Status do Cliente</label>
+            <select id="fStatus">
+              <option value="novo">🔵 Novo</option>
+              <option value="implantando">🟡 Implantando</option>
+              <option value="ativo">🟢 Ativo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="m-footer">
+      <button class="btn-cancel" onclick="closeCadastro()">Cancelar</button>
+      <button class="btn-save" id="btnSalvar" onclick="salvarCliente()">💾 Salvar Cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHE -->
+<div class="modal-bg" id="modalDetalhe">
+  <div class="modal-box">
+    <div class="mh">
+      <div>
+        <div class="mh-title" id="detTitle">—</div>
+        <div class="mh-sub" id="detSub">—</div>
+      </div>
+      <button class="m-close" onclick="closeDetalhe()">✕</button>
+    </div>
+    <div class="mbody" id="detBody">
+    </div>
+    <div class="m-footer">
+      <button class="btn-cancel" onclick="closeDetalhe()">Fechar</button>
+      <button class="btn-save" style="background:var(--c0);color:#fff" onclick="editarFromDetalhe()">✏️ Editar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SUPABASE ──
+const SURL = 'https://nhzjkahbkeusgntheyug.supabase.co';
+const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oemprYWhia2V1c2dudGhleXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjYwMDQsImV4cCI6MjA4ODg0MjAwNH0.hB2bJBMoJoztuNrb4xCRIgWmwMlayBpVOMWq3mI4nH4';
+const SH = {'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY,'Prefer':'return=representation'};
+
+async function dbGet(path){ const r=await fetch(SURL+'/rest/v1/'+path,{headers:SH}); return r.json(); }
+async function dbPost(table,body){ const r=await fetch(SURL+'/rest/v1/'+table,{method:'POST',headers:SH,body:JSON.stringify(body)}); return r.json(); }
+async function dbPatch(table,id,body){ const r=await fetch(SURL+'/rest/v1/'+table+'?id=eq.'+id,{method:'PATCH',headers:{...SH,Prefer:'return=representation'},body:JSON.stringify(body)}); return r.json(); }
+async function dbDelete(table,id){ await fetch(SURL+'/rest/v1/'+table+'?id=eq.'+id,{method:'DELETE',headers:SH}); }
+
+// ── SIDEBAR ──
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  sb.classList.toggle('collapsed');
+  document.body.classList.toggle('sb-collapsed');
+  localStorage.setItem('sb_collapsed',sb.classList.contains('collapsed'));
+}
+(function(){
+  if(localStorage.getItem('sb_collapsed')==='true'){
+    document.getElementById('sidebar').classList.add('collapsed');
+    document.body.classList.add('sb-collapsed');
+  }
+})();
+
+// ── MÓDULOS ──
+const MODULOS = ['PIX','IMG','TEF','BKP','F. VENDAS','DASHBOARD','COLETOR','MATRIZ','T.DIGITAL','VPN','GRAZI','VDA','COTAÇÃO'];
+
+function buildModulos(selected=[]){
+  document.getElementById('modulosGrid').innerHTML = MODULOS.map(m => {
+    const id = 'mod_'+m.replace(/[^a-z0-9]/gi,'_');
+    const checked = selected.includes(m) ? 'checked' : '';
+    return `<div class="mod-check">
+      <input type="checkbox" id="${id}" value="${m}" ${checked}>
+      <label for="${id}">${m}</label>
+    </div>`;
+  }).join('');
+}
+
+function getSelectedModulos(){
+  return MODULOS.filter(m => {
+    const el = document.getElementById('mod_'+m.replace(/[^a-z0-9]/gi,'_'));
+    return el && el.checked;
+  });
+}
+
+// ── MÁSCARAS ──
+function maskCnpj(el){
+  let v=el.value.replace(/\D/g,'').substring(0,14);
+  if(v.length>12) v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/,'$1.$2.$3/$4-$5');
+  else if(v.length>8) v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d*)/,'$1.$2.$3/$4');
+  else if(v.length>5) v=v.replace(/^(\d{2})(\d{3})(\d*)/,'$1.$2.$3');
+  else if(v.length>2) v=v.replace(/^(\d{2})(\d*)/,'$1.$2');
+  el.value=v;
+}
+function maskPhone(el){
+  let v=el.value.replace(/\D/g,'').substring(0,11);
+  if(v.length>10) v=v.replace(/^(\d{2})(\d{5})(\d{4}).*/,'($1) $2-$3');
+  else if(v.length>6) v=v.replace(/^(\d{2})(\d{4,5})(\d*)/,'($1) $2-$3');
+  else if(v.length>2) v=v.replace(/^(\d{2})(\d*)/,'($1) $2');
+  el.value=v;
+}
+
+// ── QTY ──
+function changeQty(id, delta){
+  const el = document.getElementById(id);
+  const val = Math.max(0, Math.min(99, (parseInt(el.value)||0) + delta));
+  el.value = val;
+}
+
+// ── TOAST ──
+function toast(msg, type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type+' show';
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ── STATE ──
+let allClientes = [];
+let filtroAtual = 'all';
+let editingId = null;
+let detalheId = null;
+
+// ── FILTER ──
+function setFilter(f){
+  filtroAtual = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active','active-green'));
+  const map={'all':'fAll','novo':'fNovo','implantando':'fImplant','ativo':'fAtivo'};
+  const btn = document.getElementById(map[f]);
+  if(btn){ btn.classList.add(f==='ativo'?'active-green':'active'); }
+  renderTable();
+}
+
+function filterTable(){ renderTable(); }
+
+function renderTable(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let list = allClientes.filter(c => {
+    if(filtroAtual !== 'all' && (c.status||'novo') !== filtroAtual) return false;
+    if(q){
+      const hay = ((c.razao_social||'')+(c.nome_fantasia||'')+(c.cnpj||'')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if(!list.length){
+    document.getElementById('tableBody').innerHTML = '<div class="tbl-empty">Nenhum cliente encontrado.</div>';
+    return;
+  }
+
+  const statusMap = {
+    novo: '<span class="status-badge novo">🔵 Novo</span>',
+    implantando: '<span class="status-badge implantando">🟡 Implantando</span>',
+    ativo: '<span class="status-badge ativo">🟢 Ativo</span>'
+  };
+
+  document.getElementById('tableBody').innerHTML = list.map(c => {
+    const mods = (c.modulos||[]);
+    const modsHtml = mods.slice(0,3).map(m=>`<span class="mod-chip">${m}</span>`).join('')
+      + (mods.length>3?`<span class="mod-more">+${mods.length-3}</span>`:'');
+    const status = c.status || 'novo';
+    const dataVenda = c.data_venda ? new Date(c.data_venda).toLocaleDateString('pt-BR') : '—';
+
+    return `<div class="tbl-row" onclick="openDetalhe('${c.id}')">
+      <div>
+        <div class="tbl-name">${c.razao_social||'—'}</div>
+        <div class="tbl-fantasy">${c.nome_fantasia||''}</div>
+      </div>
+      <div class="tbl-cnpj">${c.cnpj||'—'}</div>
+      <div class="tbl-resp">${c.responsavel||'—'}</div>
+      <div class="tbl-date">${dataVenda}</div>
+      <div>${statusMap[status]||statusMap.novo}</div>
+      <div class="tbl-modules">${modsHtml}</div>
+      <div class="tbl-actions" onclick="event.stopPropagation()">
+        <button class="act-btn" title="Editar" onclick="openEditar('${c.id}')">✏️</button>
+        <button class="act-btn del" title="Excluir" onclick="excluirCliente('${c.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── LOAD ──
+async function loadClientes(){
+  document.getElementById('tableBody').innerHTML = '<div class="loader"><div class="spin"></div>Carregando...</div>';
+  try{
+    const data = await dbGet('clientes_gr7?order=created_at.desc');
+    if(Array.isArray(data)){
+      allClientes = data.map(c => ({...c, modulos: typeof c.modulos === 'string' ? JSON.parse(c.modulos||'[]') : (c.modulos||[])}));
+    } else {
+      allClientes = [];
+    }
+    renderTable();
+  }catch(e){
+    document.getElementById('tableBody').innerHTML = '<div class="tbl-empty" style="color:var(--c4)">❌ Erro ao carregar: '+e.message+'</div>';
+  }
+}
+
+// ── CADASTRO ──
+function openCadastro(){
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'Novo Cliente';
+  document.getElementById('fRazao').value = '';
+  document.getElementById('fFantasia').value = '';
+  document.getElementById('fCnpj').value = '';
+  document.getElementById('fResponsavel').value = '';
+  document.getElementById('fTelefone').value = '';
+  document.getElementById('fDataVenda').valueAsDate = new Date();
+  document.getElementById('qServidor').value = 1;
+  document.getElementById('qRetaguarda').value = 0;
+  document.getElementById('qCaixas').value = 0;
+  document.getElementById('fStatus').value = 'novo';
+  buildModulos([]);
+  document.getElementById('modalCadastro').classList.add('open');
+}
+
+function closeCadastro(){
+  document.getElementById('modalCadastro').classList.remove('open');
+  editingId = null;
+}
+
+function openEditar(id){
+  const c = allClientes.find(x=>x.id===id);
+  if(!c) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Editar Cliente';
+  document.getElementById('fRazao').value = c.razao_social||'';
+  document.getElementById('fFantasia').value = c.nome_fantasia||'';
+  document.getElementById('fCnpj').value = c.cnpj||'';
+  document.getElementById('fResponsavel').value = c.responsavel||'';
+  document.getElementById('fTelefone').value = c.telefone||'';
+  document.getElementById('fDataVenda').value = c.data_venda||'';
+  document.getElementById('qServidor').value = c.qtd_servidor||1;
+  document.getElementById('qRetaguarda').value = c.qtd_retaguarda||0;
+  document.getElementById('qCaixas').value = c.qtd_caixas||0;
+  document.getElementById('fStatus').value = c.status||'novo';
+  buildModulos(c.modulos||[]);
+  document.getElementById('modalCadastro').classList.add('open');
+}
+
+function editarFromDetalhe(){
+  closeDetalhe();
+  if(detalheId) openEditar(detalheId);
+}
+
+async function salvarCliente(){
+  const razao = document.getElementById('fRazao').value.trim();
+  const cnpj = document.getElementById('fCnpj').value.trim();
+  const responsavel = document.getElementById('fResponsavel').value.trim();
+  if(!razao){ toast('Razão Social é obrigatória.','error'); return; }
+  if(!cnpj){ toast('CNPJ é obrigatório.','error'); return; }
+  if(!responsavel){ toast('Responsável é obrigatório.','error'); return; }
+
+  const btn = document.getElementById('btnSalvar');
+  btn.disabled = true; btn.textContent = '⏳ Salvando...';
+
+  const payload = {
+    razao_social: razao,
+    nome_fantasia: document.getElementById('fFantasia').value.trim(),
+    cnpj,
+    responsavel,
+    telefone: document.getElementById('fTelefone').value.trim(),
+    data_venda: document.getElementById('fDataVenda').value || null,
+    qtd_servidor: parseInt(document.getElementById('qServidor').value)||0,
+    qtd_retaguarda: parseInt(document.getElementById('qRetaguarda').value)||0,
+    qtd_caixas: parseInt(document.getElementById('qCaixas').value)||0,
+    modulos: JSON.stringify(getSelectedModulos()),
+    status: document.getElementById('fStatus').value
+  };
+
+  try{
+    let result;
+    if(editingId){
+      result = await dbPatch('clientes_gr7', editingId, payload);
+    } else {
+      result = await dbPost('clientes_gr7', payload);
+    }
+
+    if(result && result.code){
+      throw new Error(result.message || result.hint || 'Erro ao salvar');
+    }
+
+    toast(editingId ? '✅ Cliente atualizado!' : '✅ Cliente cadastrado!', 'success');
+    closeCadastro();
+    await loadClientes();
+  }catch(e){
+    toast('❌ '+e.message,'error');
+  }finally{
+    btn.disabled = false; btn.textContent = '💾 Salvar Cliente';
+  }
+}
+
+async function excluirCliente(id){
+  if(!confirm('Tem certeza que deseja excluir este cliente?')) return;
+  try{
+    await dbDelete('clientes_gr7', id);
+    toast('Cliente excluído.','success');
+    await loadClientes();
+  }catch(e){
+    toast('Erro ao excluir: '+e.message,'error');
+  }
+}
+
+// ── DETALHE ──
+function openDetalhe(id){
+  const c = allClientes.find(x=>x.id===id);
+  if(!c) return;
+  detalheId = id;
+
+  document.getElementById('detTitle').textContent = c.razao_social||'—';
+  document.getElementById('detSub').textContent = (c.nome_fantasia?c.nome_fantasia+' · ':'')+( c.cnpj||'');
+
+  const statusLabel = {novo:'🔵 Novo',implantando:'🟡 Implantando',ativo:'🟢 Ativo'};
+  const dataVenda = c.data_venda ? new Date(c.data_venda).toLocaleDateString('pt-BR') : '—';
+  const mods = (c.modulos||[]);
+
+  document.getElementById('detBody').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-card"><div class="detail-card-label">Responsável</div><div class="detail-card-value">${c.responsavel||'—'}</div></div>
+      <div class="detail-card"><div class="detail-card-label">Telefone</div><div class="detail-card-value">${c.telefone||'—'}</div></div>
+      <div class="detail-card"><div class="detail-card-label">Data da Venda</div><div class="detail-card-value">${dataVenda}</div></div>
+      <div class="detail-card"><div class="detail-card-label">CNPJ</div><div class="detail-card-value" style="font-family:monospace;font-size:12px">${c.cnpj||'—'}</div></div>
+      <div class="detail-card"><div class="detail-card-label">Status</div><div class="detail-card-value">${statusLabel[c.status||'novo']}</div></div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Infraestrutura</div>
+      <div class="detail-tech">
+        <div class="detail-tech-item"><div class="detail-tech-num" style="color:var(--c0)">${c.qtd_servidor||0}</div><div class="detail-tech-lbl">🖥️ Servidores</div></div>
+        <div class="detail-tech-item"><div class="detail-tech-num" style="color:var(--c1)">${c.qtd_retaguarda||0}</div><div class="detail-tech-lbl">🗄️ Retaguardas</div></div>
+        <div class="detail-tech-item"><div class="detail-tech-num" style="color:var(--green)">${c.qtd_caixas||0}</div><div class="detail-tech-lbl">🧾 Caixas</div></div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Módulos Contratados (${mods.length})</div>
+      <div class="detail-modules">
+        ${mods.length ? mods.map(m=>`<span class="detail-mod">${m}</span>`).join('') : '<span style="color:var(--muted);font-size:13px">Nenhum módulo selecionado</span>'}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('modalDetalhe').classList.add('open');
+}
+
+function closeDetalhe(){
+  document.getElementById('modalDetalhe').classList.remove('open');
+  detalheId = null;
+}
+
+// Fechar modal clicando fora
+document.getElementById('modalCadastro').addEventListener('click',function(e){if(e.target===this)closeCadastro();});
+document.getElementById('modalDetalhe').addEventListener('click',function(e){if(e.target===this)closeDetalhe();});
+
+// Data chip
+document.getElementById('dateChip').textContent = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+
+// Init
+buildModulos();
+loadClientes();
+</script>
+</body>
+</html>
