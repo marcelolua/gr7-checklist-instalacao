@@ -491,6 +491,9 @@
       align-items: center;
       gap: 0;
       height: 52px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     .client-info {
@@ -945,9 +948,56 @@
       flex-shrink: 0;
     }
   </style>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 </head>
 
 <body>
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">GR7</div>
+      <div class="sb-logo-text">
+        <h2>GR7</h2>
+        <p>Sistema de Instalações</p>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-label">Menu</div>
+      <a class="sb-item " href="index.html">
+        <span class="sb-icon">🏠</span>
+        <span class="sb-text">Dashboard</span>
+      </a>
+      <a class="sb-item active" href="Checklist.html">
+        <span class="sb-icon">✅</span>
+        <span class="sb-text">Checklist</span>
+      </a>
+      <a class="sb-item " href="relatorios-checklist.html">
+        <span class="sb-icon">📊</span>
+        <span class="sb-text">Relatórios</span>
+      </a>
+    </nav>
+    <div class="sb-footer">
+      <button class="sb-toggle" onclick="toggleSidebar()">
+        <span class="sb-toggle-icon">◀</span>
+        <span class="sb-toggle-text">Recolher menu</span>
+      </button>
+    </div>
+  </aside>
+  <script>
+    function toggleSidebar(){
+      const sb=document.getElementById('sidebar');
+      sb.classList.toggle('collapsed');
+      document.body.classList.toggle('sb-collapsed');
+      localStorage.setItem('sb_collapsed', sb.classList.contains('collapsed'));
+    }
+    (function(){
+      if(localStorage.getItem('sb_collapsed')==='true'){
+        document.getElementById('sidebar').classList.add('collapsed');
+        document.body.classList.add('sb-collapsed');
+      }
+    })();
+  </script>
+
 
   <!-- --------------------------- TOAST --------------------------- -->
   <div class="toast" id="toast"></div>
