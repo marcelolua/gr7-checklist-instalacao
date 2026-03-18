@@ -6,21 +6,14 @@
 <title>GR7 — Implantação</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-:root{
-  --bg:#07080d;--s1:#0e1018;--s2:#161820;--s3:#1e2030;--bdr:#252738;
-  --text:#dde1f0;--muted:#5a5e78;--r:14px;
-  --green:#00e5a0;--green2:#059669;
-  --c0:#818cf8;--c1:#38bdf8;--c2:#34d399;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;
-  --sb-w:240px;--sb-w-collapsed:64px;
-}
+:root{--bg:#07080d;--s1:#0e1018;--s2:#161820;--s3:#1e2030;--bdr:#252738;--text:#dde1f0;--muted:#5a5e78;--r:14px;--green:#00e5a0;--green2:#059669;--c0:#818cf8;--c1:#38bdf8;--c2:#34d399;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;--sb-w:240px;--sb-w-collapsed:64px;}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;padding-left:var(--sb-w);transition:padding-left .25s cubic-bezier(.4,0,.2,1)}
 body.sb-collapsed{padding-left:var(--sb-w-collapsed)}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
 .blob{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0;opacity:.1}
-.blob1{width:600px;height:600px;top:-200px;left:0;background:var(--c0)}
-.blob2{width:500px;height:500px;bottom:-150px;right:-100px;background:var(--c5)}
-
+.blob1{width:700px;height:700px;top:-200px;left:0;background:var(--c0)}
+.blob2{width:500px;height:500px;bottom:-200px;right:-100px;background:var(--c5)}
 /* SIDEBAR */
 .sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sb-w);background:#0e1018;border-right:1px solid #1e2030;display:flex;flex-direction:column;z-index:999;transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden}
 .sidebar.collapsed{width:var(--sb-w-collapsed)}
@@ -45,169 +38,68 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .sidebar.collapsed .sb-toggle-icon{transform:rotate(180deg)}
 .sb-toggle-text{transition:opacity .2s}
 .sidebar.collapsed .sb-toggle-text{opacity:0}
-
 /* LAYOUT */
-.shell{position:relative;z-index:10;padding:0 36px 80px}
+.shell{position:relative;z-index:10;padding:0 44px 80px}
 header{display:flex;align-items:center;justify-content:space-between;padding:32px 0 28px;flex-wrap:wrap;gap:16px}
 .hd-title h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.3px}
 .hd-title p{font-size:12px;color:var(--muted);margin-top:3px}
-.hd-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hd-right{display:flex;align-items:center;gap:10px}
 .chip{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--s1);border:1px solid var(--bdr);padding:6px 14px;border-radius:99px;color:var(--muted);user-select:none}
 .chip.btn{cursor:pointer;transition:all .15s}.chip.btn:hover{border-color:var(--c0);color:var(--c0)}
-
-/* SEARCH */
-.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+/* SUMMARY */
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
+.sc{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:20px 22px;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sc.tot::before{background:linear-gradient(90deg,var(--c0),var(--c5))}
+.sc.sn::before{background:linear-gradient(90deg,var(--c1),var(--c0))}
+.sc.si::before{background:linear-gradient(90deg,var(--c3),#f97316)}
+.sc.sa::before{background:linear-gradient(90deg,var(--green),var(--green2))}
+.sc-num{font-family:'IBM Plex Mono',monospace;font-size:36px;font-weight:600;line-height:1;margin-bottom:4px}
+.sc.tot .sc-num{color:var(--c0)}.sc.sn .sc-num{color:var(--c1)}.sc.si .sc-num{color:var(--c3)}.sc.sa .sc-num{color:var(--green)}
+.sc-lbl{font-size:12px;color:var(--muted)}
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap}
 .search-wrap{flex:1;min-width:200px;position:relative}
 .search-wrap input{width:100%;background:var(--s1);border:1px solid var(--bdr);border-radius:10px;padding:10px 14px 10px 38px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
 .search-wrap input:focus{border-color:var(--c0)}
 .search-wrap input::placeholder{color:var(--muted)}
 .search-wrap::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px}
+.fbtn{background:var(--s1);border:1px solid var(--bdr);border-radius:10px;padding:9px 16px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.fbtn:hover,.fbtn.on{border-color:var(--c0);color:var(--c0);background:rgba(129,140,248,.08)}
+.fbtn.on-green{border-color:var(--green);color:var(--green);background:rgba(0,229,160,.08)}
 .sec{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:20px}
-
-/* GRID DE CARDS */
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
+/* CARDS GRID */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
+/* CLIENT CARD */
+.cli-card{background:var(--s1);border:1.5px solid var(--bdr);border-radius:18px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding-bottom:18px}
+.cli-card:hover{border-color:var(--c0);transform:translateY(-5px);box-shadow:0 20px 48px rgba(0,0,0,.45)}
+.cli-card-topbar{height:3px;width:100%;position:absolute;top:0;left:0;border-radius:18px 18px 0 0}
+.cli-avatar-area{padding:28px 16px 0;display:flex;flex-direction:column;align-items:center;width:100%}
+.avatar-ring-wrap{position:relative;width:90px;height:90px;flex-shrink:0}
+.avatar-ring-wrap svg{position:absolute;top:-7px;left:-7px;width:104px;height:104px;pointer-events:none}
+.avatar-ring-wrap svg circle{fill:none;stroke-width:3.5;stroke-linecap:round}
+.ring-bg{stroke:#1e2030;transform:rotate(-90deg);transform-origin:52px 52px}
+.ring-fill{stroke-linecap:round;transform:rotate(-90deg);transform-origin:52px 52px;transition:stroke-dashoffset .7s cubic-bezier(.4,0,.2,1)}
+.cli-av{width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:#fff;border:2px solid rgba(255,255,255,.08)}
+.cli-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;text-align:center;line-height:1.35;margin-top:13px;padding:0 14px;word-break:break-word}
+.cli-razao{font-size:10px;color:var(--muted);text-align:center;margin-top:3px;padding:0 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.cli-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:3px 9px;border-radius:99px;margin-top:9px}
+.cli-badge.novo{background:rgba(129,140,248,.12);color:var(--c0);border:1px solid rgba(129,140,248,.25)}
+.cli-badge.implantando{background:rgba(251,191,36,.1);color:var(--c3);border:1px solid rgba(251,191,36,.25)}
+.cli-badge.ativo{background:rgba(0,229,160,.1);color:var(--green);border:1px solid rgba(0,229,160,.25)}
+.cli-pct{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;margin-top:6px}
+/* empty / loader */
 .empty-state{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--muted)}
-.empty-state .empty-icon{font-size:48px;margin-bottom:16px}
-.empty-state p{font-size:14px}
-
-/* PROJECT CARD */
-.proj-card{background:var(--s1);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;transition:border-color .2s,transform .2s;display:flex;flex-direction:column}
-.proj-card:hover{border-color:#3a3e58;transform:translateY(-2px)}
-
-/* Card top bar colorida por progresso */
-.card-bar{height:3px;width:100%;background:var(--s3)}
-.card-bar-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-
-.card-head{padding:18px 18px 14px;border-bottom:1px solid var(--bdr)}
-.card-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.card-fantasy{font-size:12px;color:var(--muted)}
-.card-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;margin-top:8px}
-.card-status.novo{background:rgba(129,140,248,.12);color:var(--c0);border:1px solid rgba(129,140,248,.25)}
-.card-status.implantando{background:rgba(251,191,36,.1);color:var(--c3);border:1px solid rgba(251,191,36,.25)}
-.card-status.ativo{background:rgba(0,229,160,.1);color:var(--green);border:1px solid rgba(0,229,160,.25)}
-
-.card-contact{padding:12px 18px;border-bottom:1px solid var(--bdr);display:flex;flex-direction:column;gap:5px}
-.card-contact-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
-.card-contact-row span{color:var(--text);font-weight:500}
-
-/* PROGRESSO GERAL */
-.card-progress{padding:12px 18px;border-bottom:1px solid var(--bdr)}
-.prog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
-.prog-label{font-size:11px;color:var(--muted)}
-.prog-pct{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600}
-.prog-track{height:6px;background:var(--s3);border-radius:99px;overflow:hidden}
-.prog-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-
-/* SEÇÕES DO CARD */
-.card-section{padding:12px 18px;border-bottom:1px solid var(--bdr)}
-.card-section:last-child{border-bottom:none}
-.card-section-title{font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-.card-section-title .count{font-size:10px;color:var(--muted)}
-
-/* LINKS DE INSTALAÇÃO */
-.install-links{display:flex;flex-direction:column;gap:6px}
-.install-link{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border:1px solid var(--bdr);border-radius:9px;padding:9px 12px;cursor:pointer;transition:all .15s;text-decoration:none}
-.install-link:hover{border-color:var(--c0);background:rgba(129,140,248,.06)}
-.install-link.done{border-color:rgba(0,229,160,.3);background:rgba(0,229,160,.05)}
-.install-link-left{display:flex;align-items:center;gap:9px}
-.install-link-icon{font-size:15px}
-.install-link-name{font-size:12px;font-weight:600;color:var(--text)}
-.install-link-sub{font-size:10px;color:var(--muted);margin-top:1px}
-.install-link-pct{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600}
-.install-link.done .install-link-pct{color:var(--green)}
-
-/* MÓDULOS */
-.modules-list{display:flex;flex-wrap:wrap;gap:5px}
-.mod-item{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 8px;border-radius:6px;background:var(--s2);border:1px solid var(--bdr);color:var(--muted);cursor:pointer;transition:all .15s;user-select:none}
-.mod-item.done{background:rgba(0,229,160,.08);border-color:rgba(0,229,160,.3);color:var(--green)}
-.mod-item .mod-check{width:14px;height:14px;border-radius:3px;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .15s;flex-shrink:0}
-.mod-item.done .mod-check{background:var(--green);border-color:var(--green);color:#000}
-.mod-item .mod-date{font-size:9px;color:var(--green);margin-left:2px;font-weight:400}
-
-/* TAREFAS */
-.tasks-list{display:flex;flex-direction:column;gap:5px}
-.task-item{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--s2);border:1px solid var(--bdr);border-radius:8px;transition:all .15s}
-.task-item.done{opacity:.6}
-.task-item.done .task-text{text-decoration:line-through;color:var(--muted)}
-.task-cb{width:18px;height:18px;border-radius:5px;border:1.5px solid #444;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;flex-shrink:0;transition:all .15s}
-.task-item.done .task-cb{background:var(--green);border-color:var(--green);color:#000}
-.task-text{flex:1;font-size:12px;color:var(--text)}
-.task-del{width:20px;height:20px;border:none;background:transparent;color:#3a3e58;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s;flex-shrink:0}
-.task-del:hover{color:var(--c4);background:rgba(248,113,113,.1)}
-.add-task-row{display:flex;gap:7px;margin-top:6px}
-.add-task-input{flex:1;background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;color:var(--text);font-size:12px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
-.add-task-input:focus{border-color:var(--c0)}
-.add-task-input::placeholder{color:var(--muted)}
-.add-task-btn-sm{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);border-radius:8px;padding:8px 12px;color:var(--green);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
-.add-task-btn-sm:hover{background:rgba(0,229,160,.18)}
-
-/* CARD FOOTER */
-.card-footer{padding:12px 18px;display:flex;align-items:center;justify-content:space-between;background:var(--s2)}
-.card-footer-pct{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
-.card-footer-pct strong{color:var(--text)}
-.status-btn{font-size:11px;font-weight:600;padding:5px 12px;border-radius:99px;cursor:pointer;border:1px solid;transition:all .15s}
-.status-btn.avancar{background:rgba(0,229,160,.1);border-color:rgba(0,229,160,.3);color:var(--green)}
-.status-btn.avancar:hover{background:rgba(0,229,160,.2)}
-.status-btn.concluido{background:rgba(129,140,248,.1);border-color:rgba(129,140,248,.3);color:var(--c0);cursor:default}
-
-/* MODAL CHECKLIST */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:flex-start;justify-content:center;z-index:1000;backdrop-filter:blur(6px);padding:20px;overflow-y:auto}
-.modal-bg.open{display:flex}
-.modal-box{background:var(--s1);border:1px solid var(--bdr);border-radius:20px;width:100%;max-width:780px;margin:auto;animation:mIn .2s ease}
-@keyframes mIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.mh{padding:22px 26px 18px;border-bottom:1px solid var(--bdr);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:sticky;top:0;background:var(--s1);z-index:1;border-radius:20px 20px 0 0}
-.mh-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800}
-.mh-sub{font-size:12px;color:var(--muted);margin-top:3px}
-.m-close{width:32px;height:32px;border-radius:9px;border:1px solid var(--bdr);background:transparent;color:var(--muted);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-.m-close:hover{border-color:var(--c4);color:var(--c4)}
-.mbody{padding:22px 26px}
-
-/* CHECKLIST DENTRO DO MODAL */
-.ck-progress{display:flex;align-items:center;gap:14px;background:var(--s2);border-radius:10px;padding:12px 16px;margin-bottom:20px}
-.ck-prog-track{flex:1;height:8px;background:var(--s3);border-radius:99px;overflow:hidden}
-.ck-prog-fill{height:100%;border-radius:99px;background:var(--green);transition:width .4s}
-.ck-prog-pct{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--green);width:52px;text-align:right}
-.ck-section-title{font-size:11px;font-family:'IBM Plex Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;margin-top:18px;display:flex;align-items:center;gap:8px}
-.ck-section-title::after{content:'';flex:1;height:1px;background:var(--bdr)}
-.ck-list{display:flex;flex-direction:column;gap:6px}
-.ck-item{background:var(--s2);border:1px solid var(--bdr);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .15s}
-.ck-item:hover{border-color:#3a3e58}
-.ck-item.done{opacity:.55}
-.ck-item.done .ck-text{text-decoration:line-through;color:var(--muted)}
-.ck-box{width:20px;height:20px;border:2px solid #444;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;flex-shrink:0;margin-top:1px;transition:all .2s}
-.ck-item.done .ck-box{background:var(--green);border-color:var(--green);color:#000}
-.ck-num{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;min-width:24px;margin-top:2px;flex-shrink:0}
-.ck-content{flex:1}
-.ck-text{font-size:13px;color:var(--text);font-weight:500}
-.ck-meta{display:flex;align-items:center;gap:8px;margin-top:4px}
-.ck-manual{font-size:10px;color:var(--c0);text-decoration:none;border:1px solid rgba(129,140,248,.25);border-radius:99px;padding:2px 8px;transition:all .15s}
-.ck-manual:hover{background:rgba(129,140,248,.1)}
-.ck-by{font-size:10px;color:var(--muted)}
-.ck-date{font-size:10px;color:var(--green)}
-
-/* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:#1e2030;border:1px solid #333;border-radius:10px;padding:12px 18px;font-size:13px;color:#ccc;z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
-.toast.show{opacity:1;transform:translateY(0)}
-.toast.success{border-color:rgba(0,229,160,.4);color:var(--green)}
-.toast.error{border-color:rgba(248,113,113,.4);color:var(--c4)}
-
 .spin{width:16px;height:16px;border:2px solid var(--bdr);border-top-color:var(--c0);border-radius:50%;animation:sp .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
-.loader{padding:60px;text-align:center;color:var(--muted);font-size:14px}
-
-@media(max-width:768px){.shell{padding:0 16px 60px}.cards-grid{grid-template-columns:1fr}}
+.loader{grid-column:1/-1;padding:60px;text-align:center;color:var(--muted)}
+@media(max-width:768px){.shell{padding:0 16px 60px}.summary{grid-template-columns:1fr 1fr}.cards-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
 </style>
 </head>
 <body>
-<div class="blob blob1"></div>
-<div class="blob blob2"></div>
-
-<!-- SIDEBAR -->
+<div class="blob blob1"></div><div class="blob blob2"></div>
 <aside class="sidebar" id="sidebar">
-  <div class="sb-logo">
-    <div class="sb-logo-mark">GR7</div>
-    <div class="sb-logo-text"><h2>GR7</h2><p>Sistema de Instalações</p></div>
-  </div>
+  <div class="sb-logo"><div class="sb-logo-mark">GR7</div><div class="sb-logo-text"><h2>GR7</h2><p>Sistema de Instalações</p></div></div>
   <nav class="sb-nav">
     <div class="sb-label">Menu</div>
     <a class="sb-item" href="index.html"><span class="sb-icon">🏠</span><span class="sb-text">Dashboard</span></a>
@@ -216,556 +108,162 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
     <a class="sb-item" href="Checklist.html"><span class="sb-icon">✅</span><span class="sb-text">Checklist</span></a>
     <a class="sb-item" href="relatorios-checklist.html"><span class="sb-icon">📊</span><span class="sb-text">Relatórios</span></a>
   </nav>
-  <div class="sb-footer">
-    <button class="sb-toggle" onclick="toggleSidebar()">
-      <span class="sb-toggle-icon">◀</span>
-      <span class="sb-toggle-text">Recolher menu</span>
-    </button>
-  </div>
+  <div class="sb-footer"><button class="sb-toggle" onclick="toggleSidebar()"><span class="sb-toggle-icon">◀</span><span class="sb-toggle-text">Recolher menu</span></button></div>
 </aside>
 
-<!-- SHELL -->
 <div class="shell">
   <header>
-    <div class="hd-title">
-      <h1>🚀 Implantação</h1>
-      <p>Acompanhamento de projetos por cliente</p>
-    </div>
+    <div class="hd-title"><h1>🚀 Implantação</h1><p>Projetos em andamento</p></div>
     <div class="hd-right">
       <div class="chip" id="dateChip"></div>
       <div class="chip btn" onclick="loadProjetos()">↺ Atualizar</div>
     </div>
   </header>
-
+  <div class="summary">
+    <div class="sc tot"><div class="sc-num" id="sTot">—</div><div class="sc-lbl">Total de Projetos</div></div>
+    <div class="sc sn"><div class="sc-num" id="sNovo">—</div><div class="sc-lbl">🔵 Novos</div></div>
+    <div class="sc si"><div class="sc-num" id="sImp">—</div><div class="sc-lbl">🟡 Implantando</div></div>
+    <div class="sc sa"><div class="sc-num" id="sAtv">—</div><div class="sc-lbl">🟢 Ativos</div></div>
+  </div>
   <div class="toolbar">
-    <div class="search-wrap">
-      <input type="text" id="searchInput" placeholder="Buscar cliente..." oninput="renderCards()">
-    </div>
+    <div class="search-wrap"><input type="text" id="searchInput" placeholder="Buscar cliente..." oninput="renderCards()"></div>
+    <button class="fbtn on" id="fAll" onclick="setFilter('all')">Todos</button>
+    <button class="fbtn" id="fNovo" onclick="setFilter('novo')">🔵 Novo</button>
+    <button class="fbtn" id="fImp" onclick="setFilter('implantando')">🟡 Implantando</button>
+    <button class="fbtn" id="fAtv" onclick="setFilter('ativo')">🟢 Ativo</button>
   </div>
-
   <p class="sec" id="secLabel">Projetos</p>
-  <div class="cards-grid" id="cardsGrid">
-    <div class="loader"><div class="spin"></div>Carregando projetos...</div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<!-- MODAL CHECKLIST -->
-<div class="modal-bg" id="modalCk">
-  <div class="modal-box">
-    <div class="mh">
-      <div>
-        <div class="mh-title" id="ckTitle">—</div>
-        <div class="mh-sub" id="ckSub">—</div>
-      </div>
-      <button class="m-close" onclick="closeCk()">✕</button>
-    </div>
-    <div class="mbody" id="ckBody"></div>
-  </div>
+  <div class="cards-grid" id="cardsGrid"><div class="loader"><div class="spin"></div>Carregando...</div></div>
 </div>
 
 <script>
-// ── SUPABASE ──
-const SURL = 'https://nhzjkahbkeusgntheyug.supabase.co';
-const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oemprYWhia2V1c2dudGhleXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjYwMDQsImV4cCI6MjA4ODg0MjAwNH0.hB2bJBMoJoztuNrb4xCRIgWmwMlayBpVOMWq3mI4nH4';
-const SH = {'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY,'Prefer':'return=representation'};
+const SURL='https://nhzjkahbkeusgntheyug.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oemprYWhia2V1c2dudGhleXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjYwMDQsImV4cCI6MjA4ODg0MjAwNH0.hB2bJBMoJoztuNrb4xCRIgWmwMlayBpVOMWq3mI4nH4';
+const SH={'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY};
+async function dbGet(p){const r=await fetch(SURL+'/rest/v1/'+p,{headers:SH});return r.json();}
 
-async function dbGet(path){ const r=await fetch(SURL+'/rest/v1/'+path,{headers:SH}); return r.json(); }
-async function dbPost(table,body){ const r=await fetch(SURL+'/rest/v1/'+table,{method:'POST',headers:SH,body:JSON.stringify(body)}); return r.json(); }
-async function dbPatch(table,filter,body){ const r=await fetch(SURL+'/rest/v1/'+table+'?'+filter,{method:'PATCH',headers:SH,body:JSON.stringify(body)}); return r.json(); }
-async function dbDelete(table,filter){ await fetch(SURL+'/rest/v1/'+table+'?'+filter,{method:'DELETE',headers:SH}); }
+function toggleSidebar(){const sb=document.getElementById('sidebar');sb.classList.toggle('collapsed');document.body.classList.toggle('sb-collapsed');localStorage.setItem('sb_collapsed',sb.classList.contains('collapsed'));}
+(function(){if(localStorage.getItem('sb_collapsed')==='true'){document.getElementById('sidebar').classList.add('collapsed');document.body.classList.add('sb-collapsed');}})();
 
-// ── SIDEBAR ──
-function toggleSidebar(){
-  const sb=document.getElementById('sidebar');
-  sb.classList.toggle('collapsed');
-  document.body.classList.toggle('sb-collapsed');
-  localStorage.setItem('sb_collapsed',sb.classList.contains('collapsed'));
-}
-(function(){
-  if(localStorage.getItem('sb_collapsed')==='true'){
-    document.getElementById('sidebar').classList.add('collapsed');
-    document.body.classList.add('sb-collapsed');
-  }
-})();
+const PAL=['#818cf8','#38bdf8','#34d399','#fbbf24','#f87171','#e879f9','#fb923c','#4ade80','#a78bfa','#22d3ee','#f472b6','#60a5fa'];
+function getColor(s){let h=0;for(const c of(s||'A'))h=(h*31+c.charCodeAt(0))%PAL.length;return PAL[h];}
+function ini(s){return(s||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
 
-// ── STEPS DATA ──
-const STEPS = {
-  servidor: [
-    {num:1,text:"Preparar acesso pelo AnyDesk",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480bdb716d7a4ce8f6b5b"},
-    {num:2,text:"Instalar o Master Remote no cliente",manual:"https://gr7autocom.notion.site/INSTALANDO-REMOTE-NO-CLIENTE-E-ADICIONANDO-AO-CONTROL-2659a16d674481069e5df972792afa0e"},
-    {num:3,text:"Transferir arquivos GR7 pelo Master",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744808b8c38d7791241ade3"},
-    {num:"Extra",text:"Otimização do Windows para Uso do Sistema GR7",manual:"https://gr7autocom.notion.site/CONFIGURANDO-WINDOWS-PARA-O-USUARIO-2689a16d674480c08d43c5867b2177dc"},
-    {num:4,text:"Ajustes rápidos no Windows",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448085bbfef928d9f39a9a"},
-    {num:5,text:"Pastas na Área de Trabalho",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744800790e2d496e564ada0"},
-    {num:6,text:"(Se possível) Renomear o computador",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480c393c1e8ad3b8580e6"},
-    {num:7,text:"Compartilhamento de redes do Windows",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480ee8ff6cf2becf374f8"},
-    {num:8,text:"Fixar pastas no Acesso Rápido",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744807bb47fdb698a6bb6b9"},
-    {num:9,text:"(Se dedicado) Instalar WASSetup",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744805fb740f32f1f828e9d"},
-    {num:10,text:"Instalar e definir Notepad++",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480f1acaec0f3fddae730"},
-    {num:11,text:"Instalar a fonte dos relatórios",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e?pvs=97#2699a16d67448067b3eaef32c6975911"},
-    {num:12,text:"Copiar o registro do cliente",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744802b8643e06706c62a19"},
-    {num:"13a",text:"Instalar e configurar o MySQL 5.7",manual:"https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-SERVER-5-7-38-a125c940921143429f7c5b25d5cfdab9"},
-    {num:"13b",text:"Configuração MySQL Server / My.ini",manual:"https://gr7autocom.notion.site/CONFIGURA-O-MYSQL-SERVER-MY-INI-2659a16d67448053b567d2673f45d5f8"},
-    {num:"13c",text:"Instalar e configurar o MySQL Administrator",manual:"https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-ADMINISTRATOR-4de01b2e6580441098c482691842f347"},
-    {num:"13d",text:"Instalar e configurar o MySQL Manager 2007",manual:"https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-MANAGER-2007-c4ee483a15774877875a370be49cb784"},
-    {num:14,text:"Restaurar a base no Administrator",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448080873ef00890f2343f"},
-    {num:"??",text:"Restaurar as bases em ordem",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e?pvs=97#27d9a16d6744808894b2f569143defb3"},
-    {num:15,text:"Compartilhar pastas do servidor",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480bf9dd7dc3db6e2aa77"},
-    {num:16,text:"Ajustar Demo.ini e config.ini",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448086859fc99e61ee26e5"},
-    {num:17,text:"Criar atalhos GR7 e organizar",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448065bcefd02e8da923c0"},
-    {num:18,text:"Configurar diretórios no Retaguarda",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448025841af612a7ce3124"},
-    {num:19,text:"Rodar o ATUALIZA GR7",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480648992c41cd28ced47"},
-    {num:20,text:"Configurar o Verificador GR7 na inicialização",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744809e911fcea916537e40"},
-    {num:21,text:"Instalando WebCharts e ServerMobile como serviço",manual:"https://gr7autocom.notion.site/INSTALANDO-WEBCHARTS-E-SERVERMOBILE-COMO-SERVI-O-1389a16d674480f08f6bfcdea16bb71d"},
-    {num:22,text:"Criando e Configurando Rotina de Backup MySQL",manual:"https://gr7autocom.notion.site/CRIANDO-E-CONFIGURANDO-ROTINA-DE-BACKUP-MYSQL-2699a16d674480b284b6f9c0c8b64a22"},
-    {num:23,text:"Criar exceções no Windows Defender",manual:"https://gr7autocom.notion.site/CRIAR-EXCE-ES-NO-WINDOWS-DEFENDER-2809a16d674480c0a7fbf1353b1b6aa1"},
-  ],
-  retaguarda: [
-    {num:1,text:"Preparar acesso pelo AnyDesk",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480178a79fdd8401b3027"},
-    {num:2,text:"Instalar o Master Remote no cliente",manual:"https://gr7autocom.notion.site/INSTALANDO-REMOTE-NO-CLIENTE-E-ADICIONANDO-AO-CONTROL-2659a16d674481069e5df972792afa0e"},
-    {num:3,text:"Transferir arquivos GR7 pelo Master",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744807fa3cffc97531bd8df"},
-    {num:"Extra",text:"Otimização do Windows para Uso do Sistema GR7",manual:"https://gr7autocom.notion.site/CONFIGURANDO-WINDOWS-PARA-O-USUARIO-2689a16d674480c08d43c5867b2177dc"},
-    {num:4,text:"Ajustes rápidos no Windows",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d67448052adb4ebe04c134262"},
-    {num:5,text:"Pastas na Área de Trabalho",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744800587a5c44f8db0f085"},
-    {num:6,text:"(Se possível) Renomear o computador",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480d19123fe57b8703144"},
-    {num:7,text:"Compartilhamento de redes do Windows",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744803ba6e8effb3970d0f2"},
-    {num:8,text:"Fixar pastas no Acesso Rápido",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480eb901dcd4a3d32f02c"},
-    {num:9,text:"Instalar a fonte dos relatórios",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480928a08e13c773bf520"},
-    {num:10,text:"Atualizar Registro e colocar no Servidor",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d67448056a7e7c962d4946609"},
-    {num:11,text:"Instalar MySQL Manager",manual:"https://www.notion.so/INSTALANDO-E-CONFIGURANDO-O-MYSQL-MANAGER-2007-c4ee483a15774877875a370be49cb784?pvs=21"},
-    {num:12,text:"Ajustar Demo.ini e config.ini",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b?pvs=97#26a9a16d6744801cb6fac09b5c6c72ae"},
-    {num:13,text:"Criar atalhos GR7 e organizar",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d67448042b1e4c03012197f63"},
-    {num:14,text:"Rodar o ATUALIZA GR7",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b?pvs=97#26a9a16d6744803e90a3f3f2927e3180"},
-    {num:15,text:"Configurar o ATUALIZA GR7 na inicialização",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744809eaa5bfc5498c29d64"},
-    {num:16,text:"Permissão para acessar rede compartilhada",manual:"https://gr7autocom.notion.site/PERMISS-O-PARA-ACESSAR-REDE-COMPARTILHADA-CREDENCIAIS-DO-WINDOWS-27e9a16d67448008a4b1fbccf7423f17"},
-    {num:17,text:"Configurando periféricos no Sistema GR7",manual:"https://gr7autocom.notion.site/CONFIGURANDO-PERIFERICOS-NO-SISTEMA-GR7-2699a16d6744806eb63cff2b84c2cd7e"},
-    {num:18,text:"Criar exceções no Windows Defender",manual:"https://gr7autocom.notion.site/CRIAR-EXCE-ES-NO-WINDOWS-DEFENDER-2809a16d674480c0a7fbf1353b1b6aa1"},
-  ],
-  nfce: [
-    {num:1,text:"Preparar acesso pelo AnyDesk",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448056bd9cccf8e9d2f691"},
-    {num:2,text:"Instalar o Master Remote no cliente",manual:"https://gr7autocom.notion.site/INSTALANDO-REMOTE-NO-CLIENTE-E-ADICIONANDO-AO-CONTROL-2659a16d674481069e5df972792afa0e"},
-    {num:3,text:"Transferir arquivos GR7 pelo Master",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d6744803dada5d076fb6ac295"},
-    {num:"Extra",text:"Otimização do Windows para Uso do Sistema GR7",manual:"https://gr7autocom.notion.site/CONFIGURANDO-WINDOWS-PARA-O-USUARIO-2689a16d674480c08d43c5867b2177dc"},
-    {num:4,text:"Ajustes rápidos no Windows",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448017a540d6796c95f95e"},
-    {num:5,text:"Pastas na Área de Trabalho",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d674480b493b6e55c05001f42"},
-    {num:6,text:"(Se possível) Renomear o computador",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448031a488cf28707c1eda"},
-    {num:7,text:"Compartilhamento de redes do Windows",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448033848adb5c79fedf05"},
-    {num:8,text:"Fixar pastas no Acesso Rápido",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497?pvs=97#26a9a16d674480b980a0df9fce9b96f6"},
-    {num:9,text:"Atualizar Registro e colocar no Servidor",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497?pvs=97#26a9a16d674480579240f028f87242ea"},
-    {num:"10a",text:"Instalar e configurar o MySQL 5.7",manual:"https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-SERVER-5-7-38-a125c940921143429f7c5b25d5cfdab9"},
-    {num:"10b",text:"Configuração MySQL Server / My.ini",manual:"https://gr7autocom.notion.site/CONFIGURA-O-MYSQL-SERVER-MY-INI-2659a16d67448053b567d2673f45d5f8"},
-    {num:"10c",text:"Instalar e configurar o MySQL Administrator",manual:"https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-ADMINISTRATOR-4de01b2e6580441098c482691842f347"},
-    {num:"10d",text:"Instalar e configurar o MySQL Manager 2007",manual:"https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-MANAGER-2007-c4ee483a15774877875a370be49cb784"},
-    {num:11,text:"Restaurar a base no Administrator",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448030bcfdc5c1c8367c99"},
-    {num:12,text:"Ajustar Demo.ini e config.ini",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d674480dd8e62e28be4d9bb54"},
-    {num:13,text:"Criar atalhos GR7 e organizar",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d674480f09e2dea6378df59a2"},
-    {num:"14a",text:"Rodar o ATUALIZA GR7",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497?pvs=97#26b9a16d674480d38a7ae23f70954fc9"},
-    {num:"14b",text:"Permissão para acessar rede compartilhada",manual:"https://gr7autocom.notion.site/PERMISS-O-PARA-ACESSAR-REDE-COMPARTILHADA-CREDENCIAIS-DO-WINDOWS-27e9a16d67448008a4b1fbccf7423f17"},
-    {num:15,text:"Configurar o ATUALIZA GR7 na inicialização",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#2b59a16d6744805db5dbe4bcf72e6e2b"},
-    {num:16,text:"Configurando periféricos no Sistema GR7",manual:"https://gr7autocom.notion.site/CONFIGURANDO-PERIFERICOS-NO-SISTEMA-GR7-2699a16d6744806eb63cff2b84c2cd7e"},
-    {num:17,text:"Instalando fonte para relatório",manual:"https://gr7autocom.notion.site/INSTALANDO-FONTE-PARA-RELAT-RIO-27e9a16d6744800aad99f4fffd8385b1"},
-    {num:18,text:"Criar exceções no Windows Defender",manual:"https://gr7autocom.notion.site/CRIAR-EXCE-ES-NO-WINDOWS-DEFENDER-2809a16d674480c0a7fbf1353b1b6aa1"},
-  ]
-};
+let allProjetos=[],progresso={},modulos_prog={},tasks_data={},filtro='all';
+const SCNT={servidor:23,retaguarda:18,nfce:18};
 
-// ── STATE ──
-let allProjetos = [];       // clientes_gr7
-let progresso = {};         // { clienteId: { maquina_key: { item_num: {done,date,by} } } }
-let modulos_prog = {};      // { clienteId: { modulo: {done, date} } }
-let tasks_data = {};        // { clienteId: [ {id, text, done} ] }
-let currentCkClienteId = null;
-let currentCkMaquina = null;
-
-// ── TOAST ──
-function toast(msg, type='success'){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast '+type+' show';
-  setTimeout(()=>t.classList.remove('show'),3000);
+function buildMaq(c){
+  const l=[];
+  for(let i=1;i<=(parseInt(c.qtd_servidor)||0);i++)l.push({key:`servidor_${i}`,tipo:'servidor'});
+  for(let i=1;i<=(parseInt(c.qtd_retaguarda)||0);i++)l.push({key:`retaguarda_${i}`,tipo:'retaguarda'});
+  for(let i=1;i<=(parseInt(c.qtd_caixas)||0);i++)l.push({key:`nfce_${i}`,tipo:'nfce'});
+  return l;
 }
 
-// ── LOAD ──
+function calcPct(c){
+  let tot=0,dn=0;
+  buildMaq(c).forEach(m=>{
+    const n=SCNT[m.tipo]||0;tot+=n;
+    const mp=(progresso[c.id]||{})[m.key]||{};
+    dn+=Object.values(mp).filter(v=>v).length;
+  });
+  const mods=c.modulos||[];tot+=mods.length;
+  const modp=modulos_prog[c.id]||{};dn+=mods.filter(m=>modp[m]).length;
+  const tasks=tasks_data[c.id]||[];tot+=tasks.length;dn+=tasks.filter(t=>t.done).length;
+  return tot?Math.round(dn/tot*100):0;
+}
+
 async function loadProjetos(){
-  document.getElementById('cardsGrid').innerHTML = '<div class="loader"><div class="spin"></div>Carregando projetos...</div>';
-  try {
-    const clientes = await dbGet('clientes_gr7?order=created_at.desc');
-    if(!Array.isArray(clientes)){ allProjetos=[]; renderCards(); return; }
-    allProjetos = clientes.map(c=>({
-      ...c,
-      modulos: typeof c.modulos==='string' ? JSON.parse(c.modulos||'[]') : (c.modulos||[])
-    }));
+  document.getElementById('cardsGrid').innerHTML='<div class="loader"><div class="spin"></div>Carregando...</div>';
+  try{
+    const cl=await dbGet('clientes_gr7?order=created_at.desc');
+    if(!Array.isArray(cl)){allProjetos=[];renderCards();return;}
+    allProjetos=cl.map(c=>({...c,modulos:typeof c.modulos==='string'?JSON.parse(c.modulos||'[]'):(c.modulos||[])}));
 
-    // Carregar progresso das instalações
-    const prog = await dbGet('implant_checklist?select=*');
-    progresso = {};
-    if(Array.isArray(prog)) prog.forEach(p=>{
-      if(!progresso[p.cliente_id]) progresso[p.cliente_id]={};
-      if(!progresso[p.cliente_id][p.maquina_key]) progresso[p.cliente_id][p.maquina_key]={};
-      progresso[p.cliente_id][p.maquina_key][p.item_num]={done:p.concluido,date:p.data_conclusao,by:p.feito_por};
+    const [pg,mg,tg]=await Promise.all([
+      dbGet('implant_checklist?select=cliente_id,maquina_key,item_num,concluido'),
+      dbGet('implant_modulos?select=cliente_id,modulo,concluido'),
+      dbGet('implant_tasks?select=cliente_id,id,done'),
+    ]).catch(()=>[[], [], []]);
+
+    progresso={};
+    if(Array.isArray(pg))pg.forEach(p=>{
+      if(!progresso[p.cliente_id])progresso[p.cliente_id]={};
+      if(!progresso[p.cliente_id][p.maquina_key])progresso[p.cliente_id][p.maquina_key]={};
+      progresso[p.cliente_id][p.maquina_key][p.item_num]=p.concluido;
     });
-
-    // Progresso dos módulos
-    const mods = await dbGet('implant_modulos?select=*');
-    modulos_prog = {};
-    if(Array.isArray(mods)) mods.forEach(m=>{
-      if(!modulos_prog[m.cliente_id]) modulos_prog[m.cliente_id]={};
-      modulos_prog[m.cliente_id][m.modulo]={done:m.concluido, date:m.data_conclusao};
+    modulos_prog={};
+    if(Array.isArray(mg))mg.forEach(m=>{
+      if(!modulos_prog[m.cliente_id])modulos_prog[m.cliente_id]={};
+      modulos_prog[m.cliente_id][m.modulo]=m.concluido;
     });
-
-    // Tasks
-    const tasks = await dbGet('implant_tasks?order=created_at.asc');
-    tasks_data = {};
-    if(Array.isArray(tasks)) tasks.forEach(t=>{
-      if(!tasks_data[t.cliente_id]) tasks_data[t.cliente_id]=[];
+    tasks_data={};
+    if(Array.isArray(tg))tg.forEach(t=>{
+      if(!tasks_data[t.cliente_id])tasks_data[t.cliente_id]=[];
       tasks_data[t.cliente_id].push(t);
     });
 
+    document.getElementById('sTot').textContent=allProjetos.length;
+    document.getElementById('sNovo').textContent=allProjetos.filter(c=>(c.status||'novo')==='novo').length;
+    document.getElementById('sImp').textContent=allProjetos.filter(c=>c.status==='implantando').length;
+    document.getElementById('sAtv').textContent=allProjetos.filter(c=>c.status==='ativo').length;
     renderCards();
-  } catch(e) {
-    document.getElementById('cardsGrid').innerHTML = `<div class="loader" style="color:var(--c4)">❌ Erro: ${e.message}<br><small style="color:var(--muted);margin-top:8px;display:block">Execute o SQL de criação das tabelas no Supabase.</small></div>`;
+  }catch(e){
+    document.getElementById('cardsGrid').innerHTML=`<div class="loader" style="color:var(--c4)">❌ ${e.message}</div>`;
   }
 }
 
-// ── CALCULA PROGRESSO GERAL DO PROJETO ──
-function calcProgresso(c) {
-  const cid = c.id;
-  let total = 0, done = 0;
-
-  // Instalações
-  const maquinas = buildMaquinas(c);
-  maquinas.forEach(m => {
-    const steps = STEPS[m.tipo] || [];
-    total += steps.length;
-    const mp = (progresso[cid]||{})[m.key]||{};
-    done += steps.filter(s => mp[String(s.num)]?.done).length;
-  });
-
-  // Módulos
-  const mods = c.modulos||[];
-  total += mods.length;
-  const modp = modulos_prog[cid]||{};
-  done += mods.filter(m => modp[m]?.done).length;
-
-  // Tasks
-  const tasks = tasks_data[cid]||[];
-  total += tasks.length;
-  done += tasks.filter(t=>t.done).length;
-
-  return { total, done, pct: total ? Math.round(done/total*100) : 0 };
+function setFilter(f){
+  filtro=f;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on','on-green'));
+  const map={all:'fAll',novo:'fNovo',implantando:'fImp',ativo:'fAtv'};
+  const btn=document.getElementById(map[f]);
+  if(btn)btn.classList.add(f==='ativo'?'on-green':'on');
+  renderCards();
 }
 
-// ── BUILD LISTA DE MÁQUINAS DO CLIENTE ──
-function buildMaquinas(c) {
-  const list = [];
-  const srv = parseInt(c.qtd_servidor)||0;
-  const ret = parseInt(c.qtd_retaguarda)||0;
-  const pdv = parseInt(c.qtd_caixas)||0;
-  for(let i=1;i<=srv;i++) list.push({key:`servidor_${i}`,tipo:'servidor',label:`🖥️ Servidor ${srv>1?i:''}`.trim(),icon:'🖥️'});
-  for(let i=1;i<=ret;i++) list.push({key:`retaguarda_${i}`,tipo:'retaguarda',label:`🗄️ Retaguarda ${ret>1?i:''}`.trim(),icon:'🗄️'});
-  for(let i=1;i<=pdv;i++) list.push({key:`nfce_${i}`,tipo:'nfce',label:`🧾 PDV / NFCe ${pdv>1?i:''}`.trim(),icon:'🧾'});
-  return list;
-}
-
-// ── RENDER CARDS ──
 function renderCards(){
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  let list = allProjetos.filter(c=>{
-    if(!q) return true;
-    return ((c.razao_social||'')+(c.nome_fantasia||'')).toLowerCase().includes(q);
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const list=allProjetos.filter(c=>{
+    if(filtro!=='all'&&(c.status||'novo')!==filtro)return false;
+    if(q){const h=((c.razao_social||'')+(c.nome_fantasia||'')).toLowerCase();if(!h.includes(q))return false;}
+    return true;
   });
-
-  document.getElementById('secLabel').textContent = `Projetos (${list.length})`;
-
+  document.getElementById('secLabel').textContent=`Projetos (${list.length})`;
   if(!list.length){
-    document.getElementById('cardsGrid').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🚀</div>
-        <p>Nenhum cliente cadastrado ainda.<br>Cadastre clientes na tela <a href="clientes.html" style="color:var(--c0)">Clientes</a> para iniciar implantações.</p>
-      </div>`;
+    document.getElementById('cardsGrid').innerHTML=`<div class="empty-state"><div style="font-size:52px;margin-bottom:16px">🚀</div><p>Nenhum cliente encontrado.<br><a href="clientes.html" style="color:var(--c0)">Cadastre clientes</a> para iniciar.</p></div>`;
     return;
   }
-
-  document.getElementById('cardsGrid').innerHTML = list.map(c => renderCard(c)).join('');
-}
-
-function renderCard(c) {
-  const cid = c.id;
-  const {pct, done, total} = calcProgresso(c);
-  const maquinas = buildMaquinas(c);
-  const mods = c.modulos||[];
-  const tasks = tasks_data[cid]||[];
-  const tasksDone = tasks.filter(t=>t.done).length;
-  const status = c.status||'novo';
-  const statusLabel = {novo:'🔵 Novo',implantando:'🟡 Implantando',ativo:'🟢 Ativo'};
-
-  // Cor da barra
-  const barColor = pct===100 ? 'var(--green)' : pct>=60 ? 'var(--c3)' : pct>=20 ? 'var(--c0)' : 'var(--c4)';
-
-  // Links de instalação
-  const installHtml = maquinas.length ? maquinas.map(m=>{
-    const steps = STEPS[m.tipo]||[];
-    const mp = (progresso[cid]||{})[m.key]||{};
-    const mdone = steps.filter(s=>mp[String(s.num)]?.done).length;
-    const mpct = steps.length ? Math.round(mdone/steps.length*100) : 0;
-    const isDone = mpct===100;
-    return `<div class="install-link ${isDone?'done':''}" onclick="openCk('${cid}','${m.key}','${m.tipo}','${m.label}','${(c.nome_fantasia||c.razao_social||'').replace(/'/g,'&#39;')}')">
-      <div class="install-link-left">
-        <span class="install-link-icon">${m.icon}</span>
-        <div>
-          <div class="install-link-name">${m.label}</div>
-          <div class="install-link-sub">${mdone}/${steps.length} etapas</div>
+  document.getElementById('cardsGrid').innerHTML=list.map(c=>{
+    const pct=calcPct(c);
+    const status=c.status||'novo';
+    const col=getColor(c.razao_social||'');
+    const av=ini(c.nome_fantasia||c.razao_social||'');
+    const statusLabel={novo:'🔵 Novo',implantando:'🟡 Implantando',ativo:'🟢 Ativo'};
+    const barCol=pct===100?'#00e5a0':pct>=60?'#fbbf24':pct>=20?'#818cf8':'#f87171';
+    // SVG ring
+    const R=45,circ=2*Math.PI*R,off=circ-(pct/100)*circ;
+    return `<div class="cli-card" onclick="abrirProjeto('${c.id}')">
+      <div class="cli-card-topbar" style="background:${barCol}"></div>
+      <div class="cli-avatar-area">
+        <div class="avatar-ring-wrap">
+          <svg viewBox="0 0 104 104">
+            <circle class="ring-bg" cx="52" cy="52" r="${R}" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="0"/>
+            <circle class="ring-fill" cx="52" cy="52" r="${R}" stroke="${barCol}" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/>
+          </svg>
+          <div class="cli-av" style="background:${col}22;border-color:${col}55">${av}</div>
         </div>
-      </div>
-      <span class="install-link-pct" style="color:${isDone?'var(--green)':barColor}">${isDone?'✅':mpct+'%'}</span>
-    </div>`;
-  }).join('') : '<div style="font-size:12px;color:var(--muted);padding:4px 0">Nenhuma máquina configurada</div>';
-
-  // Módulos
-  const modp = modulos_prog[cid]||{};
-  const modsHtml = mods.length ? mods.map(m=>{
-    const d = modp[m];
-    const isDone = d?.done;
-    const dateStr = d?.date ? new Date(d.date).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : '';
-    return `<div class="mod-item ${isDone?'done':''}" onclick="toggleModulo('${cid}','${m}',${isDone?'false':'true'})">
-      <div class="mod-check">${isDone?'✓':''}</div>
-      ${m}${isDone&&dateStr?`<span class="mod-date">${dateStr}</span>`:''}
-    </div>`;
-  }).join('') : '<div style="font-size:12px;color:var(--muted)">Nenhum módulo contratado</div>';
-
-  // Tasks
-  const tasksHtml = tasks.map(t=>`
-    <div class="task-item ${t.done?'done':''}" id="task-${t.id}">
-      <div class="task-cb" onclick="toggleTask('${cid}','${t.id}',${t.done?'false':'true'})">${t.done?'✓':''}</div>
-      <span class="task-text">${t.texto}</span>
-      <button class="task-del" onclick="deleteTask('${cid}','${t.id}')" title="Remover">✕</button>
-    </div>`).join('');
-
-  // Botão de status
-  const nextStatus = {novo:'implantando',implantando:'ativo'};
-  const nextLabel = {novo:'▶ Iniciar Implantação',implantando:'✅ Marcar como Ativo'};
-  const footerBtn = status!=='ativo'
-    ? `<button class="status-btn avancar" onclick="avancarStatus('${cid}','${nextStatus[status]}')">${nextLabel[status]}</button>`
-    : `<span class="status-btn concluido">✅ Ativo</span>`;
-
-  return `<div class="proj-card" id="card-${cid}">
-    <div class="card-bar"><div class="card-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
-
-    <div class="card-head">
-      <div class="card-name">${c.razao_social||'—'}</div>
-      <div class="card-fantasy">${c.nome_fantasia||''}</div>
-      <div class="card-status ${status}">${statusLabel[status]}</div>
-    </div>
-
-    <div class="card-contact">
-      <div class="card-contact-row">👤 <span>${c.responsavel||'—'}</span></div>
-      ${c.telefone?`<div class="card-contact-row">📞 <span>${c.telefone}</span></div>`:''}
-    </div>
-
-    <div class="card-progress">
-      <div class="prog-header">
-        <span class="prog-label">Progresso Geral do Projeto</span>
-        <span class="prog-pct" style="color:${barColor}">${pct}%</span>
-      </div>
-      <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${barColor}"></div></div>
-    </div>
-
-    <div class="card-section">
-      <div class="card-section-title">Instalações <span class="count">${maquinas.length} máquina${maquinas.length!==1?'s':''}</span></div>
-      <div class="install-links">${installHtml}</div>
-    </div>
-
-    <div class="card-section">
-      <div class="card-section-title">Módulos <span class="count">${mods.filter(m=>modp[m]?.done).length}/${mods.length}</span></div>
-      <div class="modules-list">${modsHtml}</div>
-    </div>
-
-    <div class="card-section">
-      <div class="card-section-title">Tarefas <span class="count">${tasksDone}/${tasks.length}</span></div>
-      <div class="tasks-list" id="tasks-${cid}">${tasksHtml}</div>
-      <div class="add-task-row">
-        <input class="add-task-input" id="newtask-${cid}" type="text" placeholder="Nova tarefa..." onkeydown="if(event.key==='Enter')addTask('${cid}')">
-        <button class="add-task-btn-sm" onclick="addTask('${cid}')">+ Add</button>
-      </div>
-    </div>
-
-    <div class="card-footer">
-      <span class="card-footer-pct"><strong>${done}</strong>/${total} atividades</span>
-      ${footerBtn}
-    </div>
-  </div>`;
-}
-
-// ── MÓDULO TOGGLE ──
-async function toggleModulo(clienteId, modulo, novoEstado){
-  const date = novoEstado ? new Date().toISOString() : null;
-  try {
-    // upsert
-    const h = {...SH, Prefer:'resolution=merge-duplicates,return=representation'};
-    await fetch(SURL+'/rest/v1/implant_modulos?on_conflict=cliente_id,modulo',{
-      method:'POST', headers:h,
-      body:JSON.stringify({cliente_id:clienteId, modulo, concluido:novoEstado, data_conclusao:date})
-    });
-    if(!modulos_prog[clienteId]) modulos_prog[clienteId]={};
-    modulos_prog[clienteId][modulo] = {done:novoEstado, date};
-    // Re-render card
-    const c = allProjetos.find(x=>x.id===clienteId);
-    if(c) document.getElementById(`card-${clienteId}`).outerHTML = renderCard(c);
-  } catch(e) { toast('Erro: '+e.message,'error'); }
-}
-
-// ── TASKS ──
-async function addTask(clienteId){
-  const inp = document.getElementById(`newtask-${clienteId}`);
-  const texto = inp.value.trim();
-  if(!texto) return;
-  try {
-    const r = await dbPost('implant_tasks',{cliente_id:clienteId, texto, done:false});
-    if(r && r.id){
-      if(!tasks_data[clienteId]) tasks_data[clienteId]=[];
-      tasks_data[clienteId].push(r);
-      inp.value='';
-      const c = allProjetos.find(x=>x.id===clienteId);
-      if(c) document.getElementById(`card-${clienteId}`).outerHTML = renderCard(c);
-    }
-  } catch(e){ toast('Erro: '+e.message,'error'); }
-}
-
-async function toggleTask(clienteId, taskId, novoEstado){
-  try {
-    await dbPatch('implant_tasks','id=eq.'+taskId,{done:novoEstado});
-    const arr = tasks_data[clienteId]||[];
-    const t = arr.find(x=>x.id===taskId);
-    if(t) t.done = novoEstado;
-    const c = allProjetos.find(x=>x.id===clienteId);
-    if(c) document.getElementById(`card-${clienteId}`).outerHTML = renderCard(c);
-  } catch(e){ toast('Erro: '+e.message,'error'); }
-}
-
-async function deleteTask(clienteId, taskId){
-  try {
-    await dbDelete('implant_tasks','id=eq.'+taskId);
-    tasks_data[clienteId] = (tasks_data[clienteId]||[]).filter(t=>t.id!==taskId);
-    const c = allProjetos.find(x=>x.id===clienteId);
-    if(c) document.getElementById(`card-${clienteId}`).outerHTML = renderCard(c);
-  } catch(e){ toast('Erro: '+e.message,'error'); }
-}
-
-// ── AVANÇAR STATUS ──
-async function avancarStatus(clienteId, novoStatus){
-  try {
-    await dbPatch('clientes_gr7','id=eq.'+clienteId,{status:novoStatus});
-    const c = allProjetos.find(x=>x.id===clienteId);
-    if(c){
-      c.status = novoStatus;
-      document.getElementById(`card-${clienteId}`).outerHTML = renderCard(c);
-    }
-    const labels = {implantando:'🟡 Implantação iniciada!', ativo:'🟢 Cliente marcado como Ativo!'};
-    toast(labels[novoStatus]||'Status atualizado','success');
-  } catch(e){ toast('Erro: '+e.message,'error'); }
-}
-
-// ── MODAL CHECKLIST ──
-function openCk(clienteId, maquinaKey, tipo, label, clienteNome){
-  currentCkClienteId = clienteId;
-  currentCkMaquina = maquinaKey;
-  document.getElementById('ckTitle').textContent = label;
-  document.getElementById('ckSub').textContent = clienteNome + ' · Checklist de instalação';
-  renderCkBody(clienteId, maquinaKey, tipo);
-  document.getElementById('modalCk').classList.add('open');
-}
-
-function closeCk(){
-  document.getElementById('modalCk').classList.remove('open');
-  // Re-render card ao fechar
-  if(currentCkClienteId){
-    const c = allProjetos.find(x=>x.id===currentCkClienteId);
-    if(c) document.getElementById(`card-${currentCkClienteId}`).outerHTML = renderCard(c);
-  }
-  currentCkClienteId = null; currentCkMaquina = null;
-}
-
-function renderCkBody(clienteId, maquinaKey, tipo){
-  const steps = STEPS[tipo]||[];
-  const mp = (progresso[clienteId]||{})[maquinaKey]||{};
-  const done = steps.filter(s=>mp[String(s.num)]?.done).length;
-  const pct = steps.length ? Math.round(done/steps.length*100) : 0;
-
-  let html = `<div class="ck-progress">
-    <div class="ck-prog-track"><div class="ck-prog-fill" id="ck-prog-fill" style="width:${pct}%"></div></div>
-    <div class="ck-prog-pct" id="ck-prog-pct">${pct}%</div>
-  </div>
-  <div class="ck-section-title">Etapas de Instalação</div>
-  <div class="ck-list">`;
-
-  steps.forEach(s=>{
-    const key = String(s.num);
-    const itemData = mp[key];
-    const isDone = itemData?.done;
-    const dateStr = itemData?.date ? new Date(itemData.date).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}) : '';
-    const byStr = itemData?.by || '';
-    html += `<div class="ck-item ${isDone?'done':''}" id="ckitem-${key}" onclick="toggleCkItem('${clienteId}','${maquinaKey}','${tipo}','${key}',${isDone?'false':'true'})">
-      <div class="ck-box">✓</div>
-      <span class="ck-num">${s.num}</span>
-      <div class="ck-content">
-        <div class="ck-text">${s.text}</div>
-        <div class="ck-meta">
-          ${s.manual?`<a class="ck-manual" href="${s.manual}" target="_blank" onclick="event.stopPropagation()">📖 Manual</a>`:''}
-          ${isDone&&dateStr?`<span class="ck-date">✓ ${dateStr}</span>`:''}
-          ${isDone&&byStr?`<span class="ck-by">👤 ${byStr}</span>`:''}
-        </div>
+        <div class="cli-name">${c.nome_fantasia||c.razao_social||'—'}</div>
+        ${c.nome_fantasia&&c.razao_social?`<div class="cli-razao">${c.razao_social}</div>`:''}
+        <div class="cli-badge ${status}">${statusLabel[status]}</div>
+        <div class="cli-pct" style="color:${barCol}">${pct}%</div>
       </div>
     </div>`;
-  });
-
-  html += '</div>';
-  document.getElementById('ckBody').innerHTML = html;
+  }).join('');
 }
 
-async function toggleCkItem(clienteId, maquinaKey, tipo, itemNum, novoEstado){
-  const date = novoEstado ? new Date().toISOString() : null;
-  try {
-    const h = {...SH, Prefer:'resolution=merge-duplicates,return=representation'};
-    await fetch(SURL+'/rest/v1/implant_checklist?on_conflict=cliente_id,maquina_key,item_num',{
-      method:'POST', headers:h,
-      body:JSON.stringify({cliente_id:clienteId, maquina_key:maquinaKey, item_num:itemNum, tipo, concluido:novoEstado, data_conclusao:date})
-    });
-
-    if(!progresso[clienteId]) progresso[clienteId]={};
-    if(!progresso[clienteId][maquinaKey]) progresso[clienteId][maquinaKey]={};
-    progresso[clienteId][maquinaKey][itemNum] = {done:novoEstado, date};
-
-    // Atualiza item no modal
-    const el = document.getElementById(`ckitem-${itemNum}`);
-    if(el){
-      el.classList.toggle('done', novoEstado);
-      el.querySelector('.ck-box').textContent = novoEstado ? '✓' : '';
-      const dateStr = date ? new Date(date).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}) : '';
-      const meta = el.querySelector('.ck-meta');
-      // update date span
-      let ds = meta.querySelector('.ck-date');
-      if(novoEstado && dateStr){ if(!ds){ds=document.createElement('span');ds.className='ck-date';meta.appendChild(ds);} ds.textContent='✓ '+dateStr; }
-      else if(ds) ds.remove();
-    }
-
-    // Atualiza barra progresso no modal
-    const steps = STEPS[tipo]||[];
-    const mp = progresso[clienteId][maquinaKey];
-    const done = steps.filter(s=>mp[String(s.num)]?.done).length;
-    const pct = steps.length ? Math.round(done/steps.length*100) : 0;
-    const pf = document.getElementById('ck-prog-fill');
-    const pp = document.getElementById('ck-prog-pct');
-    if(pf) pf.style.width = pct+'%';
-    if(pp) pp.textContent = pct+'%';
-
-  } catch(e){ toast('Erro: '+e.message,'error'); }
-}
-
-document.getElementById('modalCk').addEventListener('click',function(e){if(e.target===this)closeCk();});
-
-// ── INIT ──
-document.getElementById('dateChip').textContent = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+function abrirProjeto(id){ window.location.href='projeto.html?id='+id; }
+document.getElementById('dateChip').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
 loadProjetos();
 </script>
 </body>
