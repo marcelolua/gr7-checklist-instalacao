@@ -2179,6 +2179,93 @@
     updateCurrentUserUI();
     loadColaboradores();
 
+    // ── AUTO-LOAD via URL params: ?clienteId=XXX&tipo=servidor&maquina=servidor_1&nome=NomeCliente ──
+    (async function autoLoadFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const pClienteId = params.get('clienteId');
+      const pTipo      = params.get('tipo');      // servidor | retaguarda | nfce
+      const pMaquina   = params.get('maquina');   // servidor_1 | retaguarda_2 | nfce_1
+      const pNome      = params.get('nome');
+      const pPC        = params.get('pc') || pMaquina || '';
+      const pEmp       = params.get('emp') || '—';
+
+      if (!pClienteId || !pTipo) return; // nenhum param, mostra modal normalmente
+
+      // Mapeia tipo para o formato esperado
+      const tipoMap = { servidor: 'Servidor', retaguarda: 'Retaguarda', nfce: 'NFCe / Caixa' };
+      const tipoLabel = tipoMap[pTipo] || 'Servidor';
+
+      // Tenta carregar o cliente existente da tabela clientes pelo nome/id
+      // Primeiro verifica se já existe na tabela clientes (checklist antigo)
+      const { data: existingClients } = await dbSelect('clientes', { nome: pNome || '', tipo: tipoLabel });
+      
+      let clientRecord = null;
+      if (existingClients && existingClients.length > 0) {
+        // Pega o mais recente
+        clientRecord = existingClients[existingClients.length - 1];
+      }
+
+      if (!clientRecord) {
+        // Cria novo registro na tabela clientes para este checklist
+        const { data: newClient, error } = await dbInsert('clientes', {
+          nome: pNome || 'Cliente',
+          data: new Date().toISOString().split('T')[0],
+          computador: pPC,
+          funcionario: pEmp,
+          tipo: tipoLabel
+        });
+        if (error) { showToast('Erro ao iniciar checklist: ' + error.message, 'error'); return; }
+        clientRecord = newClient;
+      }
+
+      if (!clientRecord) return;
+
+      // Simula resumeClient sem pedir responsável
+      currentClientId = clientRecord.id;
+      selectedType = tipoLabel;
+      clientData = {
+        name: clientRecord.nome,
+        date: clientRecord.data,
+        pc: clientRecord.computador || pPC,
+        emp: clientRecord.funcionario || pEmp,
+        type: tipoLabel
+      };
+      setCurrentUserName(clientData.emp);
+      applyClientUI();
+
+      document.getElementById('modalOverlay').classList.remove('active');
+      document.getElementById('app').classList.add('active');
+      buildLists();
+      loadCustomTasks(currentClientId);
+      ['servidor','retaguarda','nfce'].forEach(g => loadOrderFromStorage(currentClientId, g));
+      switchToTypeTab(tipoLabel);
+
+      // Carrega progresso salvo
+      const { data: progresso } = await dbSelect('checklist_progresso', { cliente_id: currentClientId, concluido: true });
+      if (progresso && progresso.length > 0) {
+        const listIdMap2 = { servidor: 'list-servidor-steps', retaguarda: 'list-retaguarda', nfce: 'list-nfce' };
+        progresso.forEach(p => {
+          const listId = listIdMap2[p.grupo];
+          if (!listId) return;
+          const el = document.querySelector(`#${listId} [data-num="${p.item_num}"]`);
+          if (el) {
+            el.classList.add('done');
+            const by = p.marcado_por || '';
+            if (by) updateItemBadge(el, by);
+            setItemMeta(currentClientId, p.grupo, p.item_num, { by, at: p.marcado_em });
+          }
+        });
+        ['servidor','retaguarda','nfce'].forEach(g => updateProgress(g));
+      }
+
+      // Botão Voltar deve fechar aba
+      const btnVoltar = document.querySelector('.topbar-btn');
+      if (btnVoltar && btnVoltar.textContent.includes('Dashboard')) {
+        btnVoltar.textContent = '← Voltar ao Projeto';
+        btnVoltar.onclick = () => { window.close(); };
+      }
+    })();
+
     // ------------------------------------------
     //  ADICIONAR NOVA TAREFA
     // ------------------------------------------
