@@ -704,7 +704,10 @@ document.getElementById('dateChip').textContent = new Date().toLocaleDateString(
 
 // Init
 buildModulos();
-loadClientes();
+loadClientes().then(() => {
+  const editId = new URLSearchParams(location.search).get('edit');
+  if(editId) setTimeout(() => openEditar(editId), 600);
+});
 </script>
 </body>
 </html>
