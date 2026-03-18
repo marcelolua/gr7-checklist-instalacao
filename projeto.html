@@ -39,132 +39,110 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .sb-toggle-text{transition:opacity .2s}
 .sidebar.collapsed .sb-toggle-text{opacity:0}
 /* LAYOUT */
-.shell{position:relative;z-index:10;padding:0 44px 80px;max-width:1200px}
-/* HERO */
-.hero{display:flex;align-items:center;gap:24px;padding:32px 0 28px;flex-wrap:wrap}
-.hero-avatar{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;flex-shrink:0}
+.shell{position:relative;z-index:10;padding:0 40px 80px}
+.hero{display:flex;align-items:center;gap:22px;padding:28px 0 22px;flex-wrap:wrap}
+.hero-av{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#fff;flex-shrink:0}
 .hero-info{flex:1;min-width:0}
-.hero-name{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.5px}
-.hero-fantasy{font-size:13px;color:var(--muted);margin-top:3px}
-.hero-badges{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
-.badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px}
-.badge.novo{background:rgba(129,140,248,.12);color:var(--c0);border:1px solid rgba(129,140,248,.25)}
-.badge.implantando{background:rgba(251,191,36,.1);color:var(--c3);border:1px solid rgba(251,191,36,.25)}
-.badge.ativo{background:rgba(0,229,160,.1);color:var(--green);border:1px solid rgba(0,229,160,.25)}
+.hero-name{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hero-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.hero-badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px}
 .badge.info{background:var(--s2);color:var(--muted);border:1px solid var(--bdr)}
-.hero-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.btn{padding:9px 18px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:1.5px solid;font-family:'Outfit',sans-serif}
+.hero-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:1.5px solid;font-family:'Outfit',sans-serif}
 .btn-ghost{background:transparent;border-color:var(--bdr);color:var(--muted)}
 .btn-ghost:hover{border-color:var(--c0);color:var(--c0)}
-.btn-primary{background:rgba(0,229,160,.1);border-color:var(--green);color:var(--green)}
-.btn-primary:hover{background:rgba(0,229,160,.2)}
-.btn-purple{background:rgba(129,140,248,.12);border-color:var(--c0);color:var(--c0)}
-.btn-purple:hover{background:rgba(129,140,248,.22)}
-/* PROGRESSO HERO */
-.prog-hero{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:20px 24px;margin-bottom:28px;display:flex;align-items:center;gap:24px}
-.prog-hero-bar-wrap{flex:1}
-.prog-hero-top{display:flex;justify-content:space-between;margin-bottom:8px}
-.prog-hero-label{font-size:12px;color:var(--muted)}
-.prog-hero-pct{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700}
-.prog-track{height:10px;background:var(--s3);border-radius:99px;overflow:hidden}
+.btn-purple{background:rgba(129,140,248,.1);border-color:var(--c0);color:var(--c0)}
+.btn-purple:hover{background:rgba(129,140,248,.2)}
+/* PROGRESS HERO */
+.prog-bar-hero{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:18px 22px;margin-bottom:24px;display:flex;align-items:center;gap:20px}
+.prog-track{flex:1;height:10px;background:var(--s3);border-radius:99px;overflow:hidden}
 .prog-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-.prog-stats{display:flex;gap:20px;flex-shrink:0}
+.prog-stats{display:flex;gap:18px;flex-shrink:0}
 .ps{text-align:center}
-.ps-n{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600}
-.ps-l{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
-/* GRID PRINCIPAL */
-.main-grid{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
-/* SEÇÃO */
-.section-box{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
-.sec-head{padding:16px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
-.sec-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
-.sec-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
+.ps-n{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600}
+.ps-l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+/* GRID */
+.main-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
+/* BOXES */
+.box{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
+.box-head{padding:15px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.box-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+.box-meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
 /* INSTALAÇÕES */
-.install-item{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--bdr);cursor:pointer;transition:background .15s}
-.install-item:last-child{border-bottom:none}
-.install-item:hover{background:var(--s2)}
-.install-left{display:flex;align-items:center;gap:12px}
-.install-icon{font-size:20px;width:36px;height:36px;background:var(--s2);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.install-name{font-size:14px;font-weight:600;color:var(--text)}
-.install-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.install-right{display:flex;align-items:center;gap:10px}
-.mini-ring{width:36px;height:36px;flex-shrink:0}
-.mini-ring circle{fill:none;stroke-width:3.5;stroke-linecap:round}
-.install-pct{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;min-width:36px;text-align:right}
-.install-arrow{color:var(--muted);font-size:18px}
+.install-row{display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid var(--bdr);cursor:pointer;transition:background .15s;text-decoration:none}
+.install-row:last-child{border-bottom:none}
+.install-row:hover{background:rgba(255,255,255,.025)}
+.inst-left{display:flex;align-items:center;gap:12px}
+.inst-icon{width:36px;height:36px;background:var(--s2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.inst-name{font-size:13px;font-weight:600}
+.inst-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.inst-right{display:flex;align-items:center;gap:8px}
+.inst-pct{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;min-width:32px;text-align:right}
+.inst-arrow{color:var(--muted);font-size:16px}
 /* MÓDULOS */
-.modules-grid{padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
-.mod-chip{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 8px;background:var(--s2);border:1.5px solid var(--bdr);border-radius:10px;cursor:pointer;transition:all .15s;text-align:center;user-select:none}
-.mod-chip:hover{border-color:#3a3e58}
-.mod-chip.done{background:rgba(0,229,160,.07);border-color:rgba(0,229,160,.35)}
-.mod-chip-name{font-size:11px;font-weight:700;color:var(--muted)}
-.mod-chip.done .mod-chip-name{color:var(--green)}
-.mod-chip-check{width:18px;height:18px;border-radius:5px;border:1.5px solid #3a3e58;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .15s}
-.mod-chip.done .mod-chip-check{background:var(--green);border-color:var(--green);color:#000}
-.mod-chip-date{font-size:9px;color:var(--green);font-weight:400}
+.mods-wrap{padding:14px 18px;display:flex;flex-wrap:wrap;gap:7px}
+.mod-pill{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:5px 10px;border-radius:7px;background:var(--s2);border:1.5px solid var(--bdr);color:var(--muted);cursor:pointer;transition:all .15s;user-select:none}
+.mod-pill:hover{border-color:#3a3e58;color:var(--text)}
+.mod-pill.done{background:rgba(0,229,160,.07);border-color:rgba(0,229,160,.35);color:var(--green)}
+.mod-pill-ck{width:14px;height:14px;border-radius:3px;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .15s}
+.mod-pill.done .mod-pill-ck{background:var(--green);border-color:var(--green);color:#000}
+.mod-pill-date{font-size:9px;color:var(--green);font-weight:400}
 /* TAREFAS */
-.tasks-body{padding:12px 16px}
-.task-item{display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--s2);border:1px solid var(--bdr);border-radius:9px;margin-bottom:6px;transition:all .15s}
-.task-item.done .task-text{text-decoration:line-through;color:var(--muted)}
+.tasks-wrap{padding:12px 16px}
+.task-row{display:flex;align-items:center;gap:9px;padding:9px 10px;background:var(--s2);border:1px solid var(--bdr);border-radius:8px;margin-bottom:6px}
+.task-row.done .task-txt{text-decoration:line-through;color:var(--muted)}
 .task-cb{width:20px;height:20px;border-radius:6px;border:1.5px solid #444;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;flex-shrink:0;transition:all .15s;color:transparent}
-.task-item.done .task-cb{background:var(--green);border-color:var(--green);color:#000}
-.task-text{flex:1;font-size:13px}
+.task-row.done .task-cb{background:var(--green);border-color:var(--green);color:#000}
+.task-txt{flex:1;font-size:13px}
 .task-del{width:22px;height:22px;border:none;background:transparent;color:#3a3e58;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;border-radius:5px;transition:all .15s;flex-shrink:0}
 .task-del:hover{color:var(--c4);background:rgba(248,113,113,.1)}
-.add-task-row{display:flex;gap:8px;margin-top:4px}
-.add-task-input{flex:1;background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
-.add-task-input:focus{border-color:var(--c0)}
-.add-task-input::placeholder{color:var(--muted)}
-.add-task-btn{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);border-radius:8px;padding:9px 14px;color:var(--green);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
-.add-task-btn:hover{background:rgba(0,229,160,.2)}
-/* CONTATO BOX */
-.contact-box{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:20px;margin-bottom:20px}
-.contact-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
-.contact-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px}
-.contact-row:last-child{margin-bottom:0}
-.contact-label{color:var(--muted);width:80px;flex-shrink:0;font-size:11px}
-.contact-val{color:var(--text);font-weight:500}
-/* INFO CARDS */
-.info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
-.info-card{background:var(--s2);border-radius:10px;padding:14px;text-align:center}
-.info-num{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:700}
-.info-lbl{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
-/* STATUS BTN */
-.status-action{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:16px 20px;margin-bottom:20px}
-.status-action-title{font-size:11px;color:var(--muted);margin-bottom:10px}
-.status-btn{width:100%;padding:11px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:1.5px solid}
-.status-btn.avancar{background:rgba(0,229,160,.1);border-color:var(--green);color:var(--green)}
-.status-btn.avancar:hover{background:rgba(0,229,160,.2)}
-.status-btn.concluido{background:rgba(129,140,248,.08);border-color:var(--c0);color:var(--c0);cursor:default}
-/* MODAL CHECKLIST */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:flex-start;justify-content:center;z-index:1000;backdrop-filter:blur(6px);padding:24px;overflow-y:auto}
-.modal-bg.open{display:flex}
-.modal-box{background:var(--s1);border:1px solid var(--bdr);border-radius:20px;width:100%;max-width:720px;margin:auto;animation:mIn .2s ease}
-@keyframes mIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.mh{padding:22px 26px 18px;border-bottom:1px solid var(--bdr);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:sticky;top:0;background:var(--s1);z-index:1;border-radius:20px 20px 0 0}
-.mh-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800}
-.mh-sub{font-size:12px;color:var(--muted);margin-top:3px}
-.m-close{width:32px;height:32px;border-radius:9px;border:1px solid var(--bdr);background:transparent;color:var(--muted);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-.m-close:hover{border-color:var(--c4);color:var(--c4)}
-.mbody{padding:20px 26px 26px}
-.ck-prog{display:flex;align-items:center;gap:16px;background:var(--s2);border-radius:10px;padding:12px 16px;margin-bottom:20px}
-.ck-prog-track{flex:1;height:8px;background:var(--s3);border-radius:99px;overflow:hidden}
-.ck-prog-fill{height:100%;border-radius:99px;background:var(--green);transition:width .4s}
-.ck-prog-pct{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;color:var(--green);min-width:48px;text-align:right}
-.ck-list{display:flex;flex-direction:column;gap:6px}
-.ck-item{background:var(--s2);border:1px solid var(--bdr);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all .15s}
-.ck-item:hover{border-color:#3a3e58}
-.ck-item.done{opacity:.5}
-.ck-item.done .ck-text{text-decoration:line-through;color:var(--muted)}
-.ck-box{width:20px;height:20px;border:2px solid #444;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;flex-shrink:0;margin-top:1px;transition:all .2s}
-.ck-item.done .ck-box{background:var(--green);border-color:var(--green);color:#000}
-.ck-num{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;min-width:26px;margin-top:2px;flex-shrink:0}
-.ck-content{flex:1}
-.ck-text{font-size:13px;color:var(--text);font-weight:500}
-.ck-meta{display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap}
-.ck-manual{font-size:10px;color:var(--c0);text-decoration:none;border:1px solid rgba(129,140,248,.25);border-radius:99px;padding:2px 8px;transition:all .15s}
-.ck-manual:hover{background:rgba(129,140,248,.1)}
-.ck-date{font-size:10px;color:var(--green)}
+.add-row{display:flex;gap:7px;margin-top:4px}
+.add-inp{flex:1;background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
+.add-inp:focus{border-color:var(--c0)}
+.add-inp::placeholder{color:var(--muted)}
+.add-btn{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);border-radius:8px;padding:9px 13px;color:var(--green);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+.add-btn:hover{background:rgba(0,229,160,.2)}
+/* STATUS MANAGER */
+.status-current{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr)}
+.status-label-big{font-size:14px;font-weight:700}
+.status-date{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)}
+.status-select-wrap{padding:12px 18px;border-bottom:1px solid var(--bdr)}
+.status-select-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.status-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.status-opt{padding:8px 10px;border-radius:8px;border:1.5px solid var(--bdr);background:var(--s2);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center;color:var(--muted)}
+.status-opt:hover{border-color:#3a3e58;color:var(--text)}
+.status-opt.sel{border-color:var(--green);background:rgba(0,229,160,.08);color:var(--green)}
+.status-add-wrap{padding:10px 18px;display:flex;gap:7px;border-bottom:1px solid var(--bdr)}
+.status-add-inp{flex:1;background:var(--s2);border:1px solid var(--bdr);border-radius:7px;padding:7px 10px;color:var(--text);font-size:12px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
+.status-add-inp:focus{border-color:var(--c0)}
+.status-add-inp::placeholder{color:var(--muted)}
+.status-add-btn{background:rgba(129,140,248,.1);border:1px solid rgba(129,140,248,.3);border-radius:7px;padding:7px 12px;color:var(--c0);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+.status-add-btn:hover{background:rgba(129,140,248,.2)}
+.status-apply-btn{margin:10px 18px 14px;width:calc(100% - 36px);padding:10px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:1.5px solid var(--green);background:rgba(0,229,160,.1);color:var(--green);font-family:'Outfit',sans-serif}
+.status-apply-btn:hover{background:rgba(0,229,160,.2)}
+/* TIMELINE */
+.timeline{padding:14px 18px}
+.tl-item{display:flex;gap:12px;margin-bottom:18px;position:relative}
+.tl-item:last-child{margin-bottom:0}
+.tl-line{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.tl-connector{width:2px;flex:1;margin-top:4px;margin-bottom:-14px}
+.tl-content{flex:1;min-width:0}
+.tl-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px}
+.tl-label{font-size:12px;font-weight:700}
+.tl-date{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);flex-shrink:0}
+.tl-note{font-size:11px;color:var(--muted);line-height:1.5}
+/* CONTATO */
+.contact-grid{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.cg-row{display:flex;align-items:center;gap:8px;font-size:12px}
+.cg-label{color:var(--muted);width:76px;flex-shrink:0;font-size:11px}
+.cg-val{color:var(--text);font-weight:500}
+/* INFRA MINI */
+.infra-mini{padding:12px 18px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.infra-card{background:var(--s2);border-radius:9px;padding:11px;text-align:center}
+.infra-n{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700}
+.infra-l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:#1e2030;border:1px solid #333;border-radius:10px;padding:12px 18px;font-size:13px;color:#ccc;z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
 .toast.show{opacity:1;transform:translateY(0)}
@@ -173,7 +151,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .spin{width:16px;height:16px;border:2px solid var(--bdr);border-top-color:var(--c0);border-radius:50%;animation:sp .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .loader{padding:60px;text-align:center;color:var(--muted)}
-@media(max-width:900px){.main-grid{grid-template-columns:1fr}.shell{padding:0 16px 80px}.info-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}.shell{padding:0 16px 80px}}
 </style>
 </head>
 <body>
@@ -194,19 +172,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <div class="shell" id="shell">
   <div class="loader" id="loading"><div class="spin"></div>Carregando projeto...</div>
 </div>
-
 <div class="toast" id="toast"></div>
-
-<!-- MODAL CHECKLIST -->
-<div class="modal-bg" id="modalCk">
-  <div class="modal-box">
-    <div class="mh">
-      <div><div class="mh-title" id="ckTitle">—</div><div class="mh-sub" id="ckSub">—</div></div>
-      <button class="m-close" onclick="closeCk()">✕</button>
-    </div>
-    <div class="mbody" id="ckBody"></div>
-  </div>
-</div>
 
 <script>
 const SURL='https://nhzjkahbkeusgntheyug.supabase.co';
@@ -224,109 +190,46 @@ function toggleSidebar(){const sb=document.getElementById('sidebar');sb.classLis
 const PAL=['#818cf8','#38bdf8','#34d399','#fbbf24','#f87171','#e879f9','#fb923c','#4ade80','#a78bfa','#22d3ee'];
 function getColor(s){let h=0;for(const c of(s||'A'))h=(h*31+c.charCodeAt(0))%PAL.length;return PAL[h];}
 function ini(s){return(s||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
-function fmtDate(d){return d?new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'—';}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});}
+function fmtDateTime(d){if(!d)return'—';return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});}
+function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(()=>t.classList.remove('show'),3200);}
 
-function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(()=>t.classList.remove('show'),3000);}
-
-// URL param
 const clienteId=new URLSearchParams(location.search).get('id');
-if(!clienteId){document.getElementById('shell').innerHTML='<div class="loader" style="color:var(--c4)">❌ ID não informado. <a href="implantacao.html" style="color:var(--c0)">Voltar</a></div>';}
 
-let cliente={}, progresso={}, modulos_prog={}, tasks=[], currentCkKey=null, currentCkTipo=null;
+// STATUS CONFIG
+const STATUS_DEFAULT=[
+  {key:'a_fazer',    label:'A Fazer',    color:'#5a5e78'},
+  {key:'contatado',  label:'Contatado',  color:'#38bdf8'},
+  {key:'instalando', label:'Instalando', color:'#818cf8'},
+  {key:'importando', label:'Importando', color:'#fbbf24'},
+  {key:'concluido',  label:'Concluído',  color:'#00e5a0'},
+  {key:'inaugurado', label:'Inaugurado', color:'#34d399'},
+  {key:'cadastrando',label:'Cadastrando',color:'#fb923c'},
+  {key:'pausado',    label:'Pausado',    color:'#f87171'},
+  {key:'cancelado',  label:'Cancelado',  color:'#ef4444'},
+];
 
-const STEPS={
-  servidor:[
-    {num:1,text:"Preparar acesso pelo AnyDesk",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480bdb716d7a4ce8f6b5b"},
-    {num:2,text:"Instalar o Master Remote no cliente",manual:"https://gr7autocom.notion.site/INSTALANDO-REMOTE-NO-CLIENTE-E-ADICIONANDO-AO-CONTROL-2659a16d674481069e5df972792afa0e"},
-    {num:3,text:"Transferir arquivos GR7 pelo Master",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744808b8c38d7791241ade3"},
-    {num:"Extra",text:"Otimização do Windows para Uso do Sistema GR7",manual:"https://gr7autocom.notion.site/CONFIGURANDO-WINDOWS-PARA-O-USUARIO-2689a16d674480c08d43c5867b2177dc"},
-    {num:4,text:"Ajustes rápidos no Windows",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448085bbfef928d9f39a9a"},
-    {num:5,text:"Pastas na Área de Trabalho",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744800790e2d496e564ada0"},
-    {num:6,text:"(Se possível) Renomear o computador",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480c393c1e8ad3b8580e6"},
-    {num:7,text:"Compartilhamento de redes do Windows",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480ee8ff6cf2becf374f8"},
-    {num:8,text:"Fixar pastas no Acesso Rápido",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744807bb47fdb698a6bb6b9"},
-    {num:9,text:"(Se dedicado) Instalar WASSetup",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744805fb740f32f1f828e9d"},
-    {num:10,text:"Instalar e definir Notepad++",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480f1acaec0f3fddae730"},
-    {num:11,text:"Instalar a fonte dos relatórios",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e?pvs=97#2699a16d67448067b3eaef32c6975911"},
-    {num:12,text:"Copiar o registro do cliente",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744802b8643e06706c62a19"},
-    {num:"13a",text:"Instalar e configurar o MySQL 5.7",manual:"https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-SERVER-5-7-38-a125c940921143429f7c5b25d5cfdab9"},
-    {num:"13b",text:"Configuração MySQL Server / My.ini",manual:"https://gr7autocom.notion.site/CONFIGURA-O-MYSQL-SERVER-MY-INI-2659a16d67448053b567d2673f45d5f8"},
-    {num:"13c",text:"Instalar e configurar o MySQL Administrator",manual:"https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-ADMINISTRATOR-4de01b2e6580441098c482691842f347"},
-    {num:"13d",text:"Instalar e configurar o MySQL Manager 2007",manual:"https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-MANAGER-2007-c4ee483a15774877875a370be49cb784"},
-    {num:14,text:"Restaurar a base no Administrator",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448080873ef00890f2343f"},
-    {num:"??",text:"Restaurar as bases em ordem",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e?pvs=97#27d9a16d6744808894b2f569143defb3"},
-    {num:15,text:"Compartilhar pastas do servidor",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480bf9dd7dc3db6e2aa77"},
-    {num:16,text:"Ajustar Demo.ini e config.ini",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448086859fc99e61ee26e5"},
-    {num:17,text:"Criar atalhos GR7 e organizar",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448065bcefd02e8da923c0"},
-    {num:18,text:"Configurar diretórios no Retaguarda",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448025841af612a7ce3124"},
-    {num:19,text:"Rodar o ATUALIZA GR7",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480648992c41cd28ced47"},
-    {num:20,text:"Configurar o Verificador GR7 na inicialização",manual:"https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744809e911fcea916537e40"},
-    {num:21,text:"Instalando WebCharts e ServerMobile como serviço",manual:"https://gr7autocom.notion.site/INSTALANDO-WEBCHARTS-E-SERVERMOBILE-COMO-SERVI-O-1389a16d674480f08f6bfcdea16bb71d"},
-    {num:22,text:"Criando e Configurando Rotina de Backup MySQL",manual:"https://gr7autocom.notion.site/CRIANDO-E-CONFIGURANDO-ROTINA-DE-BACKUP-MYSQL-2699a16d674480b284b6f9c0c8b64a22"},
-    {num:23,text:"Criar exceções no Windows Defender",manual:"https://gr7autocom.notion.site/CRIAR-EXCE-ES-NO-WINDOWS-DEFENDER-2809a16d674480c0a7fbf1353b1b6aa1"},
-  ],
-  retaguarda:[
-    {num:1,text:"Preparar acesso pelo AnyDesk",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480178a79fdd8401b3027"},
-    {num:2,text:"Instalar o Master Remote no cliente",manual:"https://gr7autocom.notion.site/INSTALANDO-REMOTE-NO-CLIENTE-E-ADICIONANDO-AO-CONTROL-2659a16d674481069e5df972792afa0e"},
-    {num:3,text:"Transferir arquivos GR7 pelo Master",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744807fa3cffc97531bd8df"},
-    {num:"Extra",text:"Otimização do Windows para Uso do Sistema GR7",manual:"https://gr7autocom.notion.site/CONFIGURANDO-WINDOWS-PARA-O-USUARIO-2689a16d674480c08d43c5867b2177dc"},
-    {num:4,text:"Ajustes rápidos no Windows",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d67448052adb4ebe04c134262"},
-    {num:5,text:"Pastas na Área de Trabalho",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744800587a5c44f8db0f085"},
-    {num:6,text:"(Se possível) Renomear o computador",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480d19123fe57b8703144"},
-    {num:7,text:"Compartilhamento de redes do Windows",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744803ba6e8effb3970d0f2"},
-    {num:8,text:"Fixar pastas no Acesso Rápido",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480eb901dcd4a3d32f02c"},
-    {num:9,text:"Instalar a fonte dos relatórios",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480928a08e13c773bf520"},
-    {num:10,text:"Atualizar Registro e colocar no Servidor",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d67448056a7e7c962d4946609"},
-    {num:11,text:"Instalar MySQL Manager",manual:"https://www.notion.so/INSTALANDO-E-CONFIGURANDO-O-MYSQL-MANAGER-2007-c4ee483a15774877875a370be49cb784?pvs=21"},
-    {num:12,text:"Ajustar Demo.ini e config.ini",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b?pvs=97#26a9a16d6744801cb6fac09b5c6c72ae"},
-    {num:13,text:"Criar atalhos GR7 e organizar",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d67448042b1e4c03012197f63"},
-    {num:14,text:"Rodar o ATUALIZA GR7",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b?pvs=97#26a9a16d6744803e90a3f3f2927e3180"},
-    {num:15,text:"Configurar o ATUALIZA GR7 na inicialização",manual:"https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744809eaa5bfc5498c29d64"},
-    {num:16,text:"Permissão para acessar rede compartilhada",manual:"https://gr7autocom.notion.site/PERMISS-O-PARA-ACESSAR-REDE-COMPARTILHADA-CREDENCIAIS-DO-WINDOWS-27e9a16d67448008a4b1fbccf7423f17"},
-    {num:17,text:"Configurando periféricos no Sistema GR7",manual:"https://gr7autocom.notion.site/CONFIGURANDO-PERIFERICOS-NO-SISTEMA-GR7-2699a16d6744806eb63cff2b84c2cd7e"},
-    {num:18,text:"Criar exceções no Windows Defender",manual:"https://gr7autocom.notion.site/CRIAR-EXCE-ES-NO-WINDOWS-DEFENDER-2809a16d674480c0a7fbf1353b1b6aa1"},
-  ],
-  nfce:[
-    {num:1,text:"Preparar acesso pelo AnyDesk",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448056bd9cccf8e9d2f691"},
-    {num:2,text:"Instalar o Master Remote no cliente",manual:"https://gr7autocom.notion.site/INSTALANDO-REMOTE-NO-CLIENTE-E-ADICIONANDO-AO-CONTROL-2659a16d674481069e5df972792afa0e"},
-    {num:3,text:"Transferir arquivos GR7 pelo Master",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d6744803dada5d076fb6ac295"},
-    {num:"Extra",text:"Otimização do Windows para Uso do Sistema GR7",manual:"https://gr7autocom.notion.site/CONFIGURANDO-WINDOWS-PARA-O-USUARIO-2689a16d674480c08d43c5867b2177dc"},
-    {num:4,text:"Ajustes rápidos no Windows",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448017a540d6796c95f95e"},
-    {num:5,text:"Pastas na Área de Trabalho",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d674480b493b6e55c05001f42"},
-    {num:6,text:"(Se possível) Renomear o computador",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448031a488cf28707c1eda"},
-    {num:7,text:"Compartilhamento de redes do Windows",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448033848adb5c79fedf05"},
-    {num:8,text:"Fixar pastas no Acesso Rápido",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497?pvs=97#26a9a16d674480b980a0df9fce9b96f6"},
-    {num:9,text:"Atualizar Registro e colocar no Servidor",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497?pvs=97#26a9a16d674480579240f028f87242ea"},
-    {num:"10a",text:"Instalar e configurar o MySQL 5.7",manual:"https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-SERVER-5-7-38-a125c940921143429f7c5b25d5cfdab9"},
-    {num:"10b",text:"Configuração MySQL Server / My.ini",manual:"https://gr7autocom.notion.site/CONFIGURA-O-MYSQL-SERVER-MY-INI-2659a16d67448053b567d2673f45d5f8"},
-    {num:"10c",text:"Instalar e configurar o MySQL Administrator",manual:"https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-ADMINISTRATOR-4de01b2e6580441098c482691842f347"},
-    {num:"10d",text:"Instalar e configurar o MySQL Manager 2007",manual:"https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-MANAGER-2007-c4ee483a15774877875a370be49cb784"},
-    {num:11,text:"Restaurar a base no Administrator",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448030bcfdc5c1c8367c99"},
-    {num:12,text:"Ajustar Demo.ini e config.ini",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d674480dd8e62e28be4d9bb54"},
-    {num:13,text:"Criar atalhos GR7 e organizar",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d674480f09e2dea6378df59a2"},
-    {num:"14a",text:"Rodar o ATUALIZA GR7",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497?pvs=97#26b9a16d674480d38a7ae23f70954fc9"},
-    {num:"14b",text:"Permissão para acessar rede compartilhada",manual:"https://gr7autocom.notion.site/PERMISS-O-PARA-ACESSAR-REDE-COMPARTILHADA-CREDENCIAIS-DO-WINDOWS-27e9a16d67448008a4b1fbccf7423f17"},
-    {num:15,text:"Configurar o ATUALIZA GR7 na inicialização",manual:"https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#2b59a16d6744805db5dbe4bcf72e6e2b"},
-    {num:16,text:"Configurando periféricos no Sistema GR7",manual:"https://gr7autocom.notion.site/CONFIGURANDO-PERIFERICOS-NO-SISTEMA-GR7-2699a16d6744806eb63cff2b84c2cd7e"},
-    {num:17,text:"Instalando fonte para relatório",manual:"https://gr7autocom.notion.site/INSTALANDO-FONTE-PARA-RELAT-RIO-27e9a16d6744800aad99f4fffd8385b1"},
-    {num:18,text:"Criar exceções no Windows Defender",manual:"https://gr7autocom.notion.site/CRIAR-EXCE-ES-NO-WINDOWS-DEFENDER-2809a16d674480c0a7fbf1353b1b6aa1"},
-  ]
-};
+let statusList = [...STATUS_DEFAULT];
+let selectedStatusKey = null;
+
+let cliente={}, progresso={}, modulos_prog={}, tasks=[], timeline=[], customStatuses=[];
+
+const SCNT={servidor:23,retaguarda:18,nfce:18};
 
 function buildMaq(c){
   const l=[];
-  for(let i=1;i<=(parseInt(c.qtd_servidor)||0);i++)l.push({key:`servidor_${i}`,tipo:'servidor',label:`🖥️ Servidor${(parseInt(c.qtd_servidor)||0)>1?' '+i:''}`,icon:'🖥️'});
-  for(let i=1;i<=(parseInt(c.qtd_retaguarda)||0);i++)l.push({key:`retaguarda_${i}`,tipo:'retaguarda',label:`🗄️ Retaguarda${(parseInt(c.qtd_retaguarda)||0)>1?' '+i:''}`,icon:'🗄️'});
-  for(let i=1;i<=(parseInt(c.qtd_caixas)||0);i++)l.push({key:`nfce_${i}`,tipo:'nfce',label:`🧾 PDV / NFCe${(parseInt(c.qtd_caixas)||0)>1?' '+i:''}`,icon:'🧾'});
+  for(let i=1;i<=(parseInt(c.qtd_servidor)||0);i++)l.push({key:`servidor_${i}`,tipo:'servidor',label:`Servidor${(parseInt(c.qtd_servidor)||0)>1?' '+i:''}`,icon:'🖥️'});
+  for(let i=1;i<=(parseInt(c.qtd_retaguarda)||0);i++)l.push({key:`retaguarda_${i}`,tipo:'retaguarda',label:`Retaguarda${(parseInt(c.qtd_retaguarda)||0)>1?' '+i:''}`,icon:'🗄️'});
+  for(let i=1;i<=(parseInt(c.qtd_caixas)||0);i++)l.push({key:`nfce_${i}`,tipo:'nfce',label:`PDV / NFCe${(parseInt(c.qtd_caixas)||0)>1?' '+i:''}`,icon:'🧾'});
   return l;
 }
 
 function calcGeral(){
   let tot=0,dn=0;
   buildMaq(cliente).forEach(m=>{
-    const steps=STEPS[m.tipo]||[];tot+=steps.length;
+    const n=SCNT[m.tipo]||0;tot+=n;
     const mp=(progresso[m.key])||{};
-    dn+=steps.filter(s=>mp[String(s.num)]?.done).length;
+    dn+=Object.values(mp).filter(v=>v?.done).length;
   });
   const mods=cliente.modulos||[];tot+=mods.length;
   dn+=mods.filter(m=>modulos_prog[m]?.done).length;
@@ -334,16 +237,30 @@ function calcGeral(){
   return{tot,dn,pct:tot?Math.round(dn/tot*100):0};
 }
 
+function getStatus(key){
+  return statusList.find(s=>s.key===key) || {key:key,label:key,color:'#5a5e78'};
+}
+
+function currentStatusFromTimeline(){
+  const statusEvents = timeline.filter(t=>t.tipo==='status').sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  return statusEvents[0]?.conteudo || 'a_fazer';
+}
+
 async function load(){
+  if(!clienteId){document.getElementById('shell').innerHTML='<div class="loader" style="color:var(--c4)">❌ ID não informado. <a href="implantacao.html" style="color:var(--c0)">Voltar</a></div>';return;}
   try{
-    const [c,pg,mg,tg]=await Promise.all([
+    const [c,pg,mg,tg,tl,cs]=await Promise.all([
       dbGet(`clientes_gr7?id=eq.${clienteId}&limit=1`),
-      dbGet(`implant_checklist?cliente_id=eq.${clienteId}`),
+      dbGet(`implant_checklist?cliente_id=eq.${clienteId}&select=maquina_key,item_num,concluido,data_conclusao`),
       dbGet(`implant_modulos?cliente_id=eq.${clienteId}`),
       dbGet(`implant_tasks?cliente_id=eq.${clienteId}&order=created_at.asc`),
+      dbGet(`projeto_timeline?cliente_id=eq.${clienteId}&order=created_at.asc`).catch(()=>[]),
+      dbGet(`projeto_status_custom?cliente_id=eq.${clienteId}`).catch(()=>[]),
     ]);
+
     if(!Array.isArray(c)||!c[0]){document.getElementById('shell').innerHTML='<div class="loader" style="color:var(--c4)">❌ Cliente não encontrado. <a href="implantacao.html" style="color:var(--c0)">Voltar</a></div>';return;}
     cliente={...c[0],modulos:typeof c[0].modulos==='string'?JSON.parse(c[0].modulos||'[]'):(c[0].modulos||[])};
+
     progresso={};
     if(Array.isArray(pg))pg.forEach(p=>{
       if(!progresso[p.maquina_key])progresso[p.maquina_key]={};
@@ -352,6 +269,17 @@ async function load(){
     modulos_prog={};
     if(Array.isArray(mg))mg.forEach(m=>{modulos_prog[m.modulo]={done:m.concluido,date:m.data_conclusao};});
     tasks=Array.isArray(tg)?tg:[];
+    timeline=Array.isArray(tl)?tl:[];
+
+    // Custom statuses
+    if(Array.isArray(cs) && cs.length){
+      cs.forEach(s=>{
+        if(!statusList.find(x=>x.key===s.key)){
+          statusList.push({key:s.key,label:s.label,color:s.color||'#818cf8'});
+        }
+      });
+    }
+
     renderPage();
   }catch(e){
     document.getElementById('shell').innerHTML=`<div class="loader" style="color:var(--c4)">❌ ${e.message}</div>`;
@@ -362,97 +290,106 @@ function renderPage(){
   const c=cliente;
   const col=getColor(c.razao_social||'');
   const av=ini(c.nome_fantasia||c.razao_social||'');
-  const status=c.status||'novo';
-  const statusLabel={novo:'🔵 Novo',implantando:'🟡 Implantando',ativo:'🟢 Ativo'};
   const {tot,dn,pct}=calcGeral();
-  const barCol=pct===100?'#00e5a0':pct>=60?'#fbbf24':pct>=20?'#818cf8':'#f87171';
+  const curStatusKey=currentStatusFromTimeline();
+  const curStatus=getStatus(curStatusKey);
+  const barCol=curStatus.color;
   const maquinas=buildMaq(c);
   document.title=`GR7 — ${c.nome_fantasia||c.razao_social}`;
 
-  // Status button
-  const nextStatus={novo:'implantando',implantando:'ativo'};
-  const nextLabel={novo:'▶ Iniciar Implantação',implantando:'✅ Marcar como Ativo'};
-  const statusBtnHtml=status!=='ativo'
-    ?`<button class="status-btn avancar" onclick="avancarStatus('${nextStatus[status]}')">${nextLabel[status]}</button>`
-    :`<button class="status-btn concluido">✅ Cliente Ativo</button>`;
-
-  // Instalações HTML
+  // ── INSTALAÇÕES ──
   const installHtml=maquinas.length?maquinas.map(m=>{
-    const steps=STEPS[m.tipo]||[];
+    const n=SCNT[m.tipo]||0;
     const mp=progresso[m.key]||{};
-    const done=steps.filter(s=>mp[String(s.num)]?.done).length;
-    const mpct=steps.length?Math.round(done/steps.length*100):0;
-    const col2=mpct===100?'#00e5a0':mpct>=60?'#fbbf24':'#818cf8';
-    const R=14,circ=2*Math.PI*R,off=circ-(mpct/100)*circ;
-    return `<div class="install-item" onclick="openCk('${m.key}','${m.tipo}','${m.label}')">
-      <div class="install-left">
-        <div class="install-icon">${m.icon}</div>
-        <div><div class="install-name">${m.label}</div><div class="install-sub">${done}/${steps.length} etapas concluídas</div></div>
+    const done=Object.values(mp).filter(v=>v?.done).length;
+    const mpct=n?Math.round(done/n*100):0;
+    const mc=mpct===100?'#00e5a0':mpct>=60?'#fbbf24':'#818cf8';
+    // Build URL for Checklist.html
+    const ckUrl=`Checklist.html?clienteId=${clienteId}&tipo=${m.tipo}&maquina=${m.key}&nome=${encodeURIComponent(c.nome_fantasia||c.razao_social||'')}&pc=${m.key}&emp=${encodeURIComponent(c.responsavel||'')}`;
+    return `<a class="install-row" href="${ckUrl}" target="_blank">
+      <div class="inst-left">
+        <div class="inst-icon">${m.icon}</div>
+        <div><div class="inst-name">${m.icon} ${m.label}</div><div class="inst-sub">${done}/${n} etapas · clique para abrir checklist</div></div>
       </div>
-      <div class="install-right">
-        <svg class="mini-ring" viewBox="0 0 36 36" style="width:36px;height:36px">
-          <circle cx="18" cy="18" r="${R}" fill="none" stroke="#1e2030" stroke-width="3.5"/>
-          <circle cx="18" cy="18" r="${R}" fill="none" stroke="${col2}" stroke-width="3.5" stroke-linecap="round"
-            stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"
-            transform="rotate(-90 18 18)"/>
-        </svg>
-        <span class="install-pct" style="color:${col2}">${mpct===100?'✅':mpct+'%'}</span>
-        <span class="install-arrow">›</span>
+      <div class="inst-right">
+        <span class="inst-pct" style="color:${mc}">${mpct===100?'✅':mpct+'%'}</span>
+        <span class="inst-arrow">↗</span>
       </div>
-    </div>`;
-  }).join(''):`<div style="padding:16px 20px;color:var(--muted);font-size:13px">Nenhuma máquina configurada.</div>`;
+    </a>`;
+  }).join(''):`<div style="padding:14px 20px;color:var(--muted);font-size:13px">Nenhuma máquina configurada.</div>`;
 
-  // Módulos HTML
+  // ── MÓDULOS ──
   const mods=c.modulos||[];
-  const modsHtml=mods.length?`<div class="modules-grid">${mods.map(m=>{
-    const d=modulos_prog[m];const isDone=d?.done;
-    const dt=d?.date?fmtDate(d.date):'';
-    return `<div class="mod-chip ${isDone?'done':''}" onclick="toggleModulo('${m}',${isDone?'false':'true'})">
-      <div class="mod-chip-check">${isDone?'✓':''}</div>
-      <div class="mod-chip-name">${m}</div>
-      ${isDone&&dt?`<div class="mod-chip-date">${dt}</div>`:''}
+  const modsHtml=mods.length?`<div class="mods-wrap">${mods.map(m=>{
+    const d=modulos_prog[m];const isDone=d?.done;const dt=d?.date?fmtDate(d.date):'';
+    return `<div class="mod-pill ${isDone?'done':''}" onclick="toggleModulo('${m}',${!isDone})">
+      <div class="mod-pill-ck">${isDone?'✓':''}</div>${m}${isDone&&dt?`<span class="mod-pill-date">${dt}</span>`:''}
     </div>`;
-  }).join('')}</div>`:`<div style="padding:16px 20px;color:var(--muted);font-size:13px">Nenhum módulo contratado.</div>`;
+  }).join('')}</div>`:`<div style="padding:14px 20px;color:var(--muted);font-size:13px">Nenhum módulo contratado.</div>`;
 
-  // Tasks HTML
+  // ── TASKS ──
   const tasksDone=tasks.filter(t=>t.done).length;
-  const tasksHtml=`<div class="tasks-body">
-    ${tasks.map(t=>`<div class="task-item ${t.done?'done':''}" id="task-${t.id}">
-      <div class="task-cb" onclick="toggleTask('${t.id}',${t.done?'false':'true'})">${t.done?'✓':''}</div>
-      <span class="task-text">${t.texto}</span>
+  const tasksHtml=`<div class="tasks-wrap">
+    ${tasks.map(t=>`<div class="task-row ${t.done?'done':''}">
+      <div class="task-cb" onclick="toggleTask('${t.id}',${!t.done})">${t.done?'✓':''}</div>
+      <span class="task-txt">${t.texto}</span>
       <button class="task-del" onclick="deleteTask('${t.id}')">✕</button>
     </div>`).join('')}
-    <div class="add-task-row">
-      <input class="add-task-input" id="newTaskInput" type="text" placeholder="Nova tarefa..." onkeydown="if(event.key==='Enter')addTask()">
-      <button class="add-task-btn" onclick="addTask()">+ Adicionar</button>
+    <div class="add-row">
+      <input class="add-inp" id="newTaskInp" type="text" placeholder="Nova tarefa..." onkeydown="if(event.key==='Enter')addTask()">
+      <button class="add-btn" onclick="addTask()">+ Add</button>
     </div>
   </div>`;
 
+  // ── STATUS GRID ──
+  const statusGridHtml=statusList.map(s=>`<div class="status-opt ${selectedStatusKey===s.key?'sel':''}" 
+    style="${selectedStatusKey===s.key?`border-color:${s.color};background:${s.color}18;color:${s.color}`:''}"
+    onclick="selectStatus('${s.key}')">${s.label}</div>`).join('');
+
+  // ── TIMELINE ──
+  const tlHtml=timeline.length?[...timeline].reverse().map(ev=>{
+    const isStatus=ev.tipo==='status';
+    const st=isStatus?getStatus(ev.conteudo):null;
+    const dotColor=isStatus?(st?.color||'#818cf8'):'#5a5e78';
+    const isLast=timeline[timeline.length-1]===ev;
+    return `<div class="tl-item">
+      <div class="tl-line">
+        <div class="tl-dot" style="background:${dotColor}"></div>
+        ${!isLast?`<div class="tl-connector" style="background:${dotColor}33"></div>`:''}
+      </div>
+      <div class="tl-content">
+        <div class="tl-head">
+          <span class="tl-label" style="color:${dotColor}">${isStatus?'Status: '+(st?.label||ev.conteudo):ev.autor||'Anotação'}</span>
+          <span class="tl-date">${fmtDateTime(ev.created_at)}</span>
+        </div>
+        ${!isStatus&&ev.conteudo?`<div class="tl-note">${ev.conteudo}</div>`:''}
+      </div>
+    </div>`;
+  }).join(''):`<div style="color:var(--muted);font-size:12px;padding:4px 0">Nenhum evento registrado ainda.</div>`;
+
   document.getElementById('shell').innerHTML=`
-    <!-- HERO -->
     <div class="hero">
-      <div class="hero-avatar" style="background:${col}22;border:2px solid ${col}44;width:72px;height:72px;font-size:26px">${av}</div>
+      <div class="hero-av" style="background:${col}22;border:2px solid ${col}44">${av}</div>
       <div class="hero-info">
         <div class="hero-name">${c.razao_social||'—'}</div>
-        <div class="hero-fantasy">${c.nome_fantasia||''}</div>
+        <div class="hero-sub">${c.nome_fantasia||''}</div>
         <div class="hero-badges">
-          <span class="badge ${status}">${statusLabel[status]}</span>
+          <span class="badge" style="background:${curStatus.color}18;color:${curStatus.color};border:1px solid ${curStatus.color}44">${curStatus.label}</span>
           ${c.cnpj?`<span class="badge info">🪪 ${c.cnpj}</span>`:''}
           ${c.data_venda?`<span class="badge info">📅 ${fmtDate(c.data_venda)}</span>`:''}
         </div>
       </div>
-      <div class="hero-right">
+      <div class="hero-actions">
         <button class="btn btn-ghost" onclick="window.location.href='implantacao.html'">← Voltar</button>
         <button class="btn btn-purple" onclick="window.location.href='clientes.html?edit='+clienteId">✏️ Editar</button>
       </div>
     </div>
 
-    <!-- PROGRESSO -->
-    <div class="prog-hero">
-      <div class="prog-hero-bar-wrap">
-        <div class="prog-hero-top">
-          <span class="prog-hero-label">Progresso Geral do Projeto</span>
-          <span class="prog-hero-pct" style="color:${barCol}">${pct}%</span>
+    <div class="prog-bar-hero">
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--muted)">Progresso Geral</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:${barCol}">${pct}%</span>
         </div>
         <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${barCol}"></div></div>
       </div>
@@ -463,175 +400,152 @@ function renderPage(){
       </div>
     </div>
 
-    <!-- MAIN GRID -->
     <div class="main-grid">
-      <!-- COLUNA ESQUERDA -->
       <div>
-        <!-- INSTALAÇÕES -->
-        <div class="section-box">
-          <div class="sec-head">
-            <span class="sec-title">🖥️ Instalações</span>
-            <span class="sec-count">${maquinas.length} máquina${maquinas.length!==1?'s':''}</span>
-          </div>
+        <div class="box">
+          <div class="box-head"><span class="box-title">🖥️ Instalações</span><span class="box-meta">${maquinas.length} máquina${maquinas.length!==1?'s':''}</span></div>
           ${installHtml}
         </div>
-
-        <!-- MÓDULOS -->
-        <div class="section-box">
-          <div class="sec-head">
-            <span class="sec-title">🧩 Módulos Contratados</span>
-            <span class="sec-count">${mods.filter(m=>modulos_prog[m]?.done).length}/${mods.length} instalados</span>
-          </div>
+        <div class="box">
+          <div class="box-head"><span class="box-title">🧩 Módulos</span><span class="box-meta">${mods.filter(m=>modulos_prog[m]?.done).length}/${mods.length}</span></div>
           ${modsHtml}
         </div>
-
-        <!-- TAREFAS -->
-        <div class="section-box">
-          <div class="sec-head">
-            <span class="sec-title">📋 Tarefas do Projeto</span>
-            <span class="sec-count">${tasksDone}/${tasks.length} concluídas</span>
-          </div>
+        <div class="box">
+          <div class="box-head"><span class="box-title">📋 Tarefas</span><span class="box-meta">${tasksDone}/${tasks.length}</span></div>
           ${tasksHtml}
         </div>
       </div>
 
-      <!-- COLUNA DIREITA -->
       <div>
-        <!-- INFRA -->
-        <div class="info-grid" style="margin-bottom:20px">
-          <div class="info-card"><div class="info-num" style="color:var(--c0)">${c.qtd_servidor||0}</div><div class="info-lbl">🖥️ Servidores</div></div>
-          <div class="info-card"><div class="info-num" style="color:var(--c1)">${c.qtd_retaguarda||0}</div><div class="info-lbl">🗄️ Retaguardas</div></div>
-          <div class="info-card"><div class="info-num" style="color:var(--green)">${c.qtd_caixas||0}</div><div class="info-lbl">🧾 Caixas</div></div>
+        <!-- STATUS -->
+        <div class="box" style="margin-bottom:20px">
+          <div class="box-head"><span class="box-title">🔖 Status do Projeto</span></div>
+          <div class="status-current">
+            <span class="status-label-big" style="color:${curStatus.color}">${curStatus.label}</span>
+            <span class="status-date">${timeline.filter(t=>t.tipo==='status').slice(-1)[0]?fmtDate(timeline.filter(t=>t.tipo==='status').slice(-1)[0].created_at):'—'}</span>
+          </div>
+          <div class="status-select-wrap">
+            <div class="status-select-label">Alterar para:</div>
+            <div class="status-grid" id="statusGrid">${statusGridHtml}</div>
+          </div>
+          <div class="status-add-wrap">
+            <input class="status-add-inp" id="newStatusInp" placeholder="Novo status..." onkeydown="if(event.key==='Enter')addCustomStatus()">
+            <button class="status-add-btn" onclick="addCustomStatus()">+ Criar</button>
+          </div>
+          <button class="status-apply-btn" onclick="applyStatus()">✓ Aplicar Status</button>
+        </div>
+
+        <!-- TIMELINE / HISTÓRICO -->
+        <div class="box" style="margin-bottom:20px">
+          <div class="box-head"><span class="box-title">📅 Histórico</span></div>
+          <div class="timeline" id="tlWrap">${tlHtml}</div>
+          <div style="padding:0 18px 14px;display:flex;flex-direction:column;gap:7px;border-top:1px solid var(--bdr);margin-top:8px;padding-top:12px">
+            <textarea id="notaInp" style="background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;color:var(--text);font-size:12px;font-family:'Outfit',sans-serif;outline:none;resize:none;width:100%;transition:border-color .2s" rows="2" placeholder="Adicionar anotação..." onfocus="this.style.borderColor='var(--c0)'" onblur="this.style.borderColor='var(--bdr)'"></textarea>
+            <button class="add-btn" style="align-self:flex-end" onclick="addNota()">+ Registrar</button>
+          </div>
         </div>
 
         <!-- CONTATO -->
-        <div class="contact-box">
-          <div class="contact-title">Contato</div>
-          <div class="contact-row"><span class="contact-label">Responsável</span><span class="contact-val">${c.responsavel||'—'}</span></div>
-          <div class="contact-row"><span class="contact-label">Telefone</span><span class="contact-val">${c.telefone||'—'}</span></div>
-          <div class="contact-row"><span class="contact-label">CNPJ</span><span class="contact-val" style="font-family:monospace;font-size:11px">${c.cnpj||'—'}</span></div>
-          <div class="contact-row"><span class="contact-label">Venda</span><span class="contact-val">${fmtDate(c.data_venda)}</span></div>
+        <div class="box" style="margin-bottom:20px">
+          <div class="box-head"><span class="box-title">📞 Contato</span></div>
+          <div class="contact-grid">
+            <div class="cg-row"><span class="cg-label">Responsável</span><span class="cg-val">${c.responsavel||'—'}</span></div>
+            <div class="cg-row"><span class="cg-label">Telefone</span><span class="cg-val">${c.telefone||'—'}</span></div>
+            <div class="cg-row"><span class="cg-label">CNPJ</span><span class="cg-val" style="font-family:monospace;font-size:11px">${c.cnpj||'—'}</span></div>
+            <div class="cg-row"><span class="cg-label">Venda</span><span class="cg-val">${fmtDate(c.data_venda)}</span></div>
+          </div>
         </div>
 
-        <!-- STATUS ACTION -->
-        <div class="status-action">
-          <div class="status-action-title">Status do Projeto</div>
-          ${statusBtnHtml}
+        <!-- INFRA -->
+        <div class="box">
+          <div class="box-head"><span class="box-title">⚙️ Infraestrutura</span></div>
+          <div class="infra-mini">
+            <div class="infra-card"><div class="infra-n" style="color:var(--c0)">${c.qtd_servidor||0}</div><div class="infra-l">Servidores</div></div>
+            <div class="infra-card"><div class="infra-n" style="color:var(--c1)">${c.qtd_retaguarda||0}</div><div class="infra-l">Retaguardas</div></div>
+            <div class="infra-card"><div class="infra-n" style="color:var(--green)">${c.qtd_caixas||0}</div><div class="infra-l">Caixas</div></div>
+          </div>
         </div>
       </div>
     </div>`;
 }
 
+// ── STATUS ──
+function selectStatus(key){
+  selectedStatusKey=key;
+  document.querySelectorAll('.status-opt').forEach(el=>{
+    const k=el.getAttribute('onclick').match(/'([^']+)'/)?.[1];
+    const s=getStatus(k);
+    if(k===key){el.classList.add('sel');el.style.cssText=`border-color:${s.color};background:${s.color}18;color:${s.color}`;}
+    else{el.classList.remove('sel');el.style.cssText='';}
+  });
+}
+
+async function applyStatus(){
+  if(!selectedStatusKey){toast('Selecione um status primeiro.','error');return;}
+  try{
+    const r=await dbPost('projeto_timeline',{cliente_id:clienteId,tipo:'status',conteudo:selectedStatusKey});
+    if(r?.id){
+      timeline.push(r);
+      selectedStatusKey=null;
+      // Update clientes_gr7.status for dashboard compatibility
+      await dbPatch('clientes_gr7','id=eq.'+clienteId,{status:selectedStatusKey||r.conteudo});
+      renderPage();
+      toast('Status atualizado!','success');
+    }
+  }catch(e){toast('Erro: '+e.message,'error');}
+}
+
+async function addCustomStatus(){
+  const inp=document.getElementById('newStatusInp');
+  const label=(inp?.value||'').trim();
+  if(!label)return;
+  const key=label.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  if(statusList.find(s=>s.key===key)){toast('Status já existe.','error');return;}
+  const colors=['#818cf8','#38bdf8','#34d399','#fbbf24','#f87171','#e879f9','#fb923c','#4ade80'];
+  const color=colors[statusList.length%colors.length];
+  try{
+    await dbPost('projeto_status_custom',{cliente_id:clienteId,key,label,color}).catch(()=>null);
+    statusList.push({key,label,color});
+    if(inp)inp.value='';
+    renderPage();
+    toast('Status criado!','success');
+  }catch(e){toast('Erro: '+e.message,'error');}
+}
+
 // ── MÓDULO ──
-async function toggleModulo(modulo, novoEstado){
+async function toggleModulo(modulo,novoEstado){
   const date=novoEstado?new Date().toISOString():null;
   try{
     await dbUpsert('implant_modulos',{cliente_id:clienteId,modulo,concluido:novoEstado,data_conclusao:date},'cliente_id,modulo');
-    modulos_prog[modulo]={done:novoEstado,date};
-    renderPage();
+    modulos_prog[modulo]={done:novoEstado,date};renderPage();
   }catch(e){toast('Erro: '+e.message,'error');}
 }
 
 // ── TASKS ──
 async function addTask(){
-  const inp=document.getElementById('newTaskInput');
+  const inp=document.getElementById('newTaskInp');
   const texto=inp?.value?.trim();if(!texto)return;
-  try{
-    const r=await dbPost('implant_tasks',{cliente_id:clienteId,texto,done:false});
-    if(r?.id){tasks.push(r);inp.value='';renderPage();}
-  }catch(e){toast('Erro: '+e.message,'error');}
+  try{const r=await dbPost('implant_tasks',{cliente_id:clienteId,texto,done:false});if(r?.id){tasks.push(r);inp.value='';renderPage();}}
+  catch(e){toast('Erro: '+e.message,'error');}
 }
 async function toggleTask(id,novoEstado){
-  try{
-    await dbPatch('implant_tasks','id=eq.'+id,{done:novoEstado});
-    const t=tasks.find(x=>x.id===id);if(t)t.done=novoEstado;
-    renderPage();
-  }catch(e){toast('Erro: '+e.message,'error');}
+  try{await dbPatch('implant_tasks','id=eq.'+id,{done:novoEstado});const t=tasks.find(x=>x.id===id);if(t)t.done=novoEstado;renderPage();}
+  catch(e){toast('Erro: '+e.message,'error');}
 }
 async function deleteTask(id){
+  try{await dbDelete('implant_tasks','id=eq.'+id);tasks=tasks.filter(t=>t.id!==id);renderPage();}
+  catch(e){toast('Erro: '+e.message,'error');}
+}
+
+// ── NOTA ──
+async function addNota(){
+  const inp=document.getElementById('notaInp');
+  const conteudo=inp?.value?.trim();if(!conteudo)return;
   try{
-    await dbDelete('implant_tasks','id=eq.'+id);
-    tasks=tasks.filter(t=>t.id!==id);renderPage();
+    const r=await dbPost('projeto_timeline',{cliente_id:clienteId,tipo:'nota',conteudo,autor:'—'});
+    if(r?.id){timeline.push(r);inp.value='';renderPage();toast('Anotação registrada!','success');}
   }catch(e){toast('Erro: '+e.message,'error');}
 }
-
-// ── STATUS ──
-async function avancarStatus(novoStatus){
-  try{
-    await dbPatch('clientes_gr7','id=eq.'+clienteId,{status:novoStatus});
-    cliente.status=novoStatus;renderPage();
-    const l={implantando:'🟡 Implantação iniciada!',ativo:'🟢 Cliente marcado como Ativo!'};
-    toast(l[novoStatus]||'Atualizado','success');
-  }catch(e){toast('Erro: '+e.message,'error');}
-}
-
-// ── CHECKLIST MODAL ──
-function openCk(maqKey,tipo,label){
-  currentCkKey=maqKey;currentCkTipo=tipo;
-  document.getElementById('ckTitle').textContent=label;
-  document.getElementById('ckSub').textContent=(cliente.nome_fantasia||cliente.razao_social||'')+'  ·  Checklist de Instalação';
-  renderCkBody();
-  document.getElementById('modalCk').classList.add('open');
-}
-function closeCk(){document.getElementById('modalCk').classList.remove('open');renderPage();}
-
-function renderCkBody(){
-  const steps=STEPS[currentCkTipo]||[];
-  const mp=progresso[currentCkKey]||{};
-  const done=steps.filter(s=>mp[String(s.num)]?.done).length;
-  const pct=steps.length?Math.round(done/steps.length*100):0;
-  const barCol=pct===100?'#00e5a0':pct>=60?'#fbbf24':'#818cf8';
-  let html=`<div class="ck-prog">
-    <div class="ck-prog-track"><div class="ck-prog-fill" id="ckFill" style="width:${pct}%;background:${barCol}"></div></div>
-    <div class="ck-prog-pct" id="ckPct" style="color:${barCol}">${pct}%</div>
-  </div><div class="ck-list">`;
-  steps.forEach(s=>{
-    const key=String(s.num);const d=mp[key];const isDone=d?.done;
-    const dt=d?.date?fmtDate(d.date):'';
-    html+=`<div class="ck-item ${isDone?'done':''}" id="cki-${key}" onclick="toggleCkItem('${key}',${isDone?'false':'true'})">
-      <div class="ck-box">✓</div>
-      <span class="ck-num">${s.num}</span>
-      <div class="ck-content">
-        <div class="ck-text">${s.text}</div>
-        <div class="ck-meta">
-          ${s.manual?`<a class="ck-manual" href="${s.manual}" target="_blank" onclick="event.stopPropagation()">📖 Manual</a>`:''}
-          ${isDone&&dt?`<span class="ck-date">✓ ${dt}</span>`:''}
-        </div>
-      </div>
-    </div>`;
-  });
-  html+='</div>';
-  document.getElementById('ckBody').innerHTML=html;
-}
-
-async function toggleCkItem(itemNum,novoEstado){
-  const date=novoEstado?new Date().toISOString():null;
-  try{
-    await dbUpsert('implant_checklist',{cliente_id:clienteId,maquina_key:currentCkKey,tipo:currentCkTipo,item_num:itemNum,concluido:novoEstado,data_conclusao:date},'cliente_id,maquina_key,item_num');
-    if(!progresso[currentCkKey])progresso[currentCkKey]={};
-    progresso[currentCkKey][itemNum]={done:novoEstado,date};
-    // Update item UI
-    const el=document.getElementById('cki-'+itemNum);
-    if(el){
-      el.classList.toggle('done',novoEstado);
-      el.querySelector('.ck-box').textContent=novoEstado?'✓':'';
-      let ds=el.querySelector('.ck-date');
-      if(novoEstado&&date){const dt=fmtDate(date);if(!ds){ds=document.createElement('span');ds.className='ck-date';el.querySelector('.ck-meta').appendChild(ds);}ds.textContent='✓ '+dt;}
-      else if(ds)ds.remove();
-    }
-    // Update progress bar
-    const steps=STEPS[currentCkTipo]||[];
-    const mp=progresso[currentCkKey]||{};
-    const dn=steps.filter(s=>mp[String(s.num)]?.done).length;
-    const pct=steps.length?Math.round(dn/steps.length*100):0;
-    const barCol=pct===100?'#00e5a0':pct>=60?'#fbbf24':'#818cf8';
-    const f=document.getElementById('ckFill');const p=document.getElementById('ckPct');
-    if(f){f.style.width=pct+'%';f.style.background=barCol;}
-    if(p){p.textContent=pct+'%';p.style.color=barCol;}
-  }catch(e){toast('Erro: '+e.message,'error');}
-}
-
-document.getElementById('modalCk').addEventListener('click',function(e){if(e.target===this)closeCk();});
 
 if(clienteId)load();
 </script>
