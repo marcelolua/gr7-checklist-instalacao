@@ -11,40 +11,14 @@
   --text:#dde1f0;--muted:#5a5e78;--r:14px;
   --green:#00e5a0;--green2:#059669;
   --c0:#818cf8;--c1:#38bdf8;--c2:#34d399;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;
-  --sb-w:240px;--sb-w-collapsed:64px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;padding-left:var(--sb-w);transition:padding-left .25s cubic-bezier(.4,0,.2,1)}
-body.sb-collapsed{padding-left:var(--sb-w-collapsed)}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
 .blob{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0;opacity:.12}
 .blob1{width:600px;height:600px;top:-200px;left:-100px;background:var(--c0)}
 .blob2{width:500px;height:500px;bottom:-200px;right:-100px;background:var(--c1)}
 
-/* ===== SIDEBAR ===== */
-.sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sb-w);background:#0e1018;border-right:1px solid #1e2030;display:flex;flex-direction:column;z-index:999;transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden}
-.sidebar.collapsed{width:var(--sb-w-collapsed)}
-.sb-logo{display:flex;align-items:center;gap:13px;padding:22px 16px 18px;border-bottom:1px solid #1e2030;flex-shrink:0;min-width:var(--sb-w);overflow:hidden}
-.sb-logo-mark{width:36px;height:36px;flex-shrink:0;background:linear-gradient(135deg,#818cf8,#e879f9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:#fff;box-shadow:0 0 20px rgba(129,140,248,.35)}
-.sb-logo-text{white-space:nowrap;overflow:hidden}
-.sb-logo-text h2{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.3px;color:#fff}
-.sb-logo-text p{font-size:10px;color:#5a5e78;margin-top:2px}
-.sb-nav{flex:1;padding:12px 0;overflow-y:auto;overflow-x:hidden}
-.sb-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#3a3e58;padding:10px 20px 4px;white-space:nowrap;opacity:1;transition:opacity .2s}
-.sidebar.collapsed .sb-label{opacity:0}
-.sb-item{display:flex;align-items:center;gap:12px;padding:11px 16px;color:#5a5e78;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;border-left:2px solid transparent;margin:1px 0}
-.sb-item:hover{color:#dde1f0;background:rgba(255,255,255,.04)}
-.sb-item.active{color:#00e5a0;background:rgba(0,229,160,.07);border-left-color:#00e5a0}
-.sb-icon{font-size:17px;flex-shrink:0;width:24px;display:flex;align-items:center;justify-content:center}
-.sb-text{transition:opacity .2s}
-.sidebar.collapsed .sb-text{opacity:0;pointer-events:none}
-.sb-footer{border-top:1px solid #1e2030;padding:12px 16px;flex-shrink:0}
-.sb-toggle{display:flex;align-items:center;gap:12px;background:transparent;border:1px solid #1e2030;border-radius:8px;padding:9px 12px;color:#5a5e78;font-size:12px;cursor:pointer;width:100%;transition:all .15s;white-space:nowrap;overflow:hidden}
-.sb-toggle:hover{border-color:#3a3e58;color:#dde1f0}
-.sb-toggle-icon{font-size:15px;flex-shrink:0;transition:transform .25s}
-.sidebar.collapsed .sb-toggle-icon{transform:rotate(180deg)}
-.sb-toggle-text{transition:opacity .2s}
-.sidebar.collapsed .sb-toggle-text{opacity:0}
 
 /* ===== LAYOUT ===== */
 .shell{position:relative;z-index:10;max-width:1400px;margin:0 auto;padding:0 44px 80px}
@@ -124,7 +98,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 .qty-input button:first-child{border-radius:9px 0 0 9px;border-right:none}
 .qty-input button:last-child{border-radius:0 9px 9px 0;border-left:none}
 .qty-input button:hover{background:var(--s3);color:var(--green)}
-.qty-input input{flex:1;background:#161820;border:1.5px solid var(--bdr);border-left:none;border-right:none;padding:11px 0;color:var(--text);font-size:14px;font-weight:700;text-align:center;font-family:'IBM Plex Mono',monospace;outline:none;min-width:0}
+.qty-input input{flex:1;background:#161820;border:1.5px solid var(--bdr);border-left:none;border-right:none;padding:11px 0;color:var(--text);font-size:14px;font-weight:700;text-align:center;font-family:'IBM Plex Mono',monospace;outline:none;min-width:0;-moz-appearance:textfield}
+.qty-input input::-webkit-outer-spin-button,.qty-input input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
 /* MÓDULOS CHECKBOXES */
 .modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
@@ -185,6 +160,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
   .detail-grid{grid-template-columns:1fr 1fr}
 }
 </style>
+<script src="sidebar.js"></script>
 </head>
 <body>
 
@@ -192,28 +168,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 <div class="blob blob1"></div>
 <div class="blob blob2"></div>
 
-<!-- SIDEBAR -->
-<aside class="sidebar" id="sidebar">
-  <div class="sb-logo">
-    <div class="sb-logo-mark">GR7</div>
-    <div class="sb-logo-text"><h2>GR7</h2><p>Sistema de Instalações</p></div>
-  </div>
-  <nav class="sb-nav">
-    
-      <div class="sb-label">Menu</div>
-      <a class="sb-item " href="index.html"><span class="sb-icon">🏠</span><span class="sb-text">Dashboard</span></a>
-      <a class="sb-item active" href="clientes.html"><span class="sb-icon">🏢</span><span class="sb-text">Clientes</span></a>
-      <a class="sb-item " href="implantacao.html"><span class="sb-icon">🚀</span><span class="sb-text">Implantação</span></a>
-      <a class="sb-item " href="Checklist.html"><span class="sb-icon">✅</span><span class="sb-text">Checklist</span></a>
-      <a class="sb-item " href="relatorios-checklist.html"><span class="sb-icon">📊</span><span class="sb-text">Relatórios</span></a>
-    </nav>
-  <div class="sb-footer">
-    <button class="sb-toggle" onclick="toggleSidebar()">
-      <span class="sb-toggle-icon">◀</span>
-      <span class="sb-toggle-text">Recolher menu</span>
-    </button>
-  </div>
-</aside>
+
 
 <!-- SHELL -->
 <div class="shell">
@@ -252,9 +207,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
       <div>Módulos</div>
       <div></div>
     </div>
-    <div id="tableBody">
-      <div class="loader"><div class="spin"></div>Carregando clientes...</div>
-    </div>
+    <div id="tableBody"></div>
   </div>
 </div>
 
@@ -343,20 +296,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
         </div>
       </div>
 
-      <!-- STATUS -->
-      <div class="form-section" style="margin-bottom:0">
-        <div class="form-section-title">Status</div>
-        <div class="form-grid cols3">
-          <div class="fg">
-            <label>Status do Cliente</label>
-            <select id="fStatus">
-              <option value="novo">🔵 Novo</option>
-              <option value="implantando">🟡 Implantando</option>
-              <option value="ativo">🟢 Ativo</option>
-            </select>
-          </div>
-        </div>
-      </div>
 
     </div>
     <div class="m-footer">
@@ -396,19 +335,6 @@ async function dbPost(table,body){ const r=await fetch(SURL+'/rest/v1/'+table,{m
 async function dbPatch(table,id,body){ const r=await fetch(SURL+'/rest/v1/'+table+'?id=eq.'+id,{method:'PATCH',headers:{...SH,Prefer:'return=representation'},body:JSON.stringify(body)}); return r.json(); }
 async function dbDelete(table,id){ await fetch(SURL+'/rest/v1/'+table+'?id=eq.'+id,{method:'DELETE',headers:SH}); }
 
-// ── SIDEBAR ──
-function toggleSidebar(){
-  const sb=document.getElementById('sidebar');
-  sb.classList.toggle('collapsed');
-  document.body.classList.toggle('sb-collapsed');
-  localStorage.setItem('sb_collapsed',sb.classList.contains('collapsed'));
-}
-(function(){
-  if(localStorage.getItem('sb_collapsed')==='true'){
-    document.getElementById('sidebar').classList.add('collapsed');
-    document.body.classList.add('sb-collapsed');
-  }
-})();
 
 // ── MÓDULOS ──
 const MODULOS = ['PIX','IMG','TEF','BKP','F. VENDAS','DASHBOARD','COLETOR','MATRIZ','T.DIGITAL','VPN','GRAZI','VDA','COTAÇÃO'];
@@ -467,6 +393,7 @@ let allClientes = [];
 let filtroAtual = 'all';
 let editingId = null;
 let detalheId = null;
+let _cadastroGuard = null; // dirty guard ativo
 
 // ── FILTER ──
 function setFilter(f){
@@ -529,7 +456,7 @@ function renderTable(){
 
 // ── LOAD ──
 async function loadClientes(){
-  document.getElementById('tableBody').innerHTML = '<div class="loader"><div class="spin"></div>Carregando...</div>';
+  document.getElementById('tableBody').innerHTML = gr7Skeletons.clientTable(7);
   try{
     const data = await dbGet('clientes_gr7?order=created_at.desc');
     if(Array.isArray(data)){
@@ -539,7 +466,7 @@ async function loadClientes(){
     }
     renderTable();
   }catch(e){
-    document.getElementById('tableBody').innerHTML = '<div class="tbl-empty" style="color:var(--c4)">❌ Erro ao carregar: '+e.message+'</div>';
+    document.getElementById('tableBody').innerHTML = '<div class="tbl-empty" style="color:var(--c4)">⚠️ '+humanizeError(e)+'</div>';
   }
 }
 
@@ -556,12 +483,17 @@ function openCadastro(){
   document.getElementById('qServidor').value = 1;
   document.getElementById('qRetaguarda').value = 0;
   document.getElementById('qCaixas').value = 0;
-  document.getElementById('fStatus').value = 'novo';
   buildModulos([]);
   document.getElementById('modalCadastro').classList.add('open');
+  _initCadastroGuard();
+}
+
+function _destroyCadastroGuard(){
+  if(_cadastroGuard){_cadastroGuard.destroy();_cadastroGuard=null;}
 }
 
 function closeCadastro(){
+  _destroyCadastroGuard();
   document.getElementById('modalCadastro').classList.remove('open');
   editingId = null;
 }
@@ -580,9 +512,9 @@ function openEditar(id){
   document.getElementById('qServidor').value = c.qtd_servidor||1;
   document.getElementById('qRetaguarda').value = c.qtd_retaguarda||0;
   document.getElementById('qCaixas').value = c.qtd_caixas||0;
-  document.getElementById('fStatus').value = c.status||'novo';
   buildModulos(c.modulos||[]);
   document.getElementById('modalCadastro').classList.add('open');
+  _initCadastroGuard();
 }
 
 function editarFromDetalhe(){
@@ -612,7 +544,6 @@ async function salvarCliente(){
     qtd_retaguarda: parseInt(document.getElementById('qRetaguarda').value)||0,
     qtd_caixas: parseInt(document.getElementById('qCaixas').value)||0,
     modulos: JSON.stringify(getSelectedModulos()),
-    status: document.getElementById('fStatus').value
   };
 
   try{
@@ -628,23 +559,34 @@ async function salvarCliente(){
     }
 
     toast(editingId ? '✅ Cliente atualizado!' : '✅ Cliente cadastrado!', 'success');
+    _destroyCadastroGuard(); // salvo com sucesso — guard não precisa perguntar
     closeCadastro();
     await loadClientes();
   }catch(e){
-    toast('❌ '+e.message,'error');
+    toast('❌ '+humanizeError(e),'error');
   }finally{
     btn.disabled = false; btn.textContent = '💾 Salvar Cliente';
   }
 }
 
 async function excluirCliente(id){
-  if(!confirm('Tem certeza que deseja excluir este cliente?')) return;
+  const c = allClientes.find(x=>x.id===id);
+  const nome = c ? (c.razao_social || 'este cliente') : 'este cliente';
+  const ok = await gr7Confirm({
+    title: 'Excluir cliente?',
+    message: `<strong style="color:#dde1f0">${nome}</strong> será removido permanentemente. Esta ação não pode ser desfeita.`,
+    confirmText: 'Sim, excluir',
+    cancelText: 'Cancelar',
+    danger: true,
+    icon: '🗑️',
+  });
+  if(!ok) return;
   try{
     await dbDelete('clientes_gr7', id);
     toast('Cliente excluído.','success');
     await loadClientes();
   }catch(e){
-    toast('Erro ao excluir: '+e.message,'error');
+    toast(humanizeError(e),'error');
   }
 }
 
@@ -695,12 +637,32 @@ function closeDetalhe(){
   detalheId = null;
 }
 
-// Fechar modal clicando fora
-document.getElementById('modalCadastro').addEventListener('click',function(e){if(e.target===this)closeCadastro();});
+// Fechar modal detalhe clicando fora (detalhe não tem dirty state)
 document.getElementById('modalDetalhe').addEventListener('click',function(e){if(e.target===this)closeDetalhe();});
 
 // Data chip
 document.getElementById('dateChip').textContent = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+
+// ── DIRTY GUARD: inicializa ao abrir o form ──
+function _initCadastroGuard(){
+  _destroyCadastroGuard();
+  var modalBg  = document.getElementById('modalCadastro');
+  var btnX     = modalBg.querySelector('.m-close');
+  var btnCancel= modalBg.querySelector('.btn-cancel');
+
+  _cadastroGuard = gr7DirtyGuard({
+    fieldIds: ['fRazao','fFantasia','fCnpj','fResponsavel','fTelefone','fDataVenda',
+               'qServidor','qRetaguarda','qCaixas'],
+    closeFn: closeCadastro,
+    interceptEl: [btnX, btnCancel, modalBg],
+    confirmOpts: {
+      title: 'Descartar alterações?',
+      message: 'Os dados preenchidos serão perdidos se você sair agora.',
+      confirmText: 'Sim, descartar',
+      cancelText: 'Continuar editando',
+    },
+  });
+}
 
 // Init
 buildModulos();
