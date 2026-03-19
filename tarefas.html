@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GR7 — Tarefas</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#07080d;--s1:#0e1018;--s2:#161820;--s3:#1e2030;--bdr:#252738;
+  --text:#dde1f0;--muted:#5a5e78;--r:14px;
+  --green:#00e5a0;--green2:#059669;
+  --c0:#818cf8;--c1:#38bdf8;--c2:#34d399;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;
+  --p-urgente:#f87171;--p-alta:#fbbf24;--p-normal:#818cf8;--p-baixa:#5a5e78;
+  --s-a_fazer:#5a5e78;--s-fazendo:#818cf8;--s-pausado:#fbbf24;--s-feito:#00e5a0;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+.blob{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0;opacity:.1}
+.blob1{width:600px;height:600px;top:-200px;left:-100px;background:var(--c0)}
+.blob2{width:500px;height:500px;bottom:-200px;right:-100px;background:var(--c3)}
+
+/* LAYOUT */
+.shell{position:relative;z-index:10;max-width:1400px;margin:0 auto;padding:0 44px 80px}
+header{display:flex;align-items:center;justify-content:space-between;padding:32px 0 28px;flex-wrap:wrap;gap:16px}
+.hd-title h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.3px}
+.hd-title p{font-size:12px;color:var(--muted);margin-top:3px}
+.hd-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* CHIPS */
+.chip{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--s1);border:1px solid var(--bdr);padding:6px 14px;border-radius:99px;color:var(--muted);user-select:none}
+.chip.btn{cursor:pointer;transition:all .15s}.chip.btn:hover{border-color:var(--c0);color:var(--c0)}
+.chip.green{background:rgba(0,229,160,.1);border-color:rgba(0,229,160,.3);color:var(--green);cursor:pointer;transition:all .15s}
+.chip.green:hover{background:rgba(0,229,160,.18)}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.search-wrap{flex:1;min-width:200px;position:relative}
+.search-wrap input{width:100%;background:var(--s1);border:1px solid var(--bdr);border-radius:10px;padding:10px 14px 10px 38px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
+.search-wrap input:focus{border-color:var(--c0)}
+.search-wrap input::placeholder{color:var(--muted)}
+.search-wrap::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px}
+.fbtn{background:var(--s1);border:1px solid var(--bdr);border-radius:9px;padding:8px 14px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'IBM Plex Mono',monospace}
+.fbtn:hover,.fbtn.on{border-color:var(--c0);color:var(--c0);background:rgba(129,140,248,.08)}
+.fbtn.on-green{border-color:var(--green);color:var(--green);background:rgba(0,229,160,.07)}
+select.fbtn{appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-color:var(--s1)}
+select.fbtn option{background:var(--s2);color:var(--text)}
+
+/* SUMMARY STRIP */
+.summary-strip{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.scard{background:var(--s1);border:1px solid var(--bdr);border-radius:10px;padding:12px 18px;display:flex;align-items:center;gap:10px;flex:1;min-width:120px}
+.scard-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.scard-n{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600}
+.scard-l{font-size:11px;color:var(--muted)}
+.sec{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+
+/* TASK LIST */
+.task-list{display:flex;flex-direction:column;gap:8px}
+.task-card{background:var(--s1);border:1px solid var(--bdr);border-radius:12px;padding:0;overflow:hidden;cursor:pointer;transition:all .18s}
+.task-card:hover{border-color:rgba(129,140,248,.3);transform:translateX(2px)}
+.task-card-inner{display:grid;grid-template-columns:4px 1fr auto;align-items:stretch}
+.task-accent{border-radius:12px 0 0 12px}
+.task-body{padding:14px 16px;display:flex;align-items:center;gap:14px;min-width:0}
+.task-status-icon{width:22px;height:22px;border-radius:6px;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .15s}
+.task-info{flex:1;min-width:0}
+.task-title{font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-title.done{text-decoration:line-through;color:var(--muted)}
+.task-meta{display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap}
+.task-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.task-meta-txt{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;white-space:nowrap}
+.task-right{padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.task-resp-av{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:10px;font-weight:800;flex-shrink:0}
+.task-date-warn{font-size:10px;color:var(--c4);font-family:'IBM Plex Mono',monospace;white-space:nowrap}
+.task-edit-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--bdr);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.task-edit-btn:hover{border-color:var(--c0);color:var(--c0)}
+.task-empty{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
+
+/* PRIORIDADE COLORS */
+.pr-urgente{--pc:var(--p-urgente)}
+.pr-alta{--pc:var(--p-alta)}
+.pr-normal{--pc:var(--p-normal)}
+.pr-baixa{--pc:var(--p-baixa)}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(6px);padding:20px}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--s1);border:1px solid var(--bdr);border-radius:20px;width:100%;max-width:740px;max-height:92vh;overflow-y:auto;animation:mIn .2s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.mh{padding:24px 28px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:sticky;top:0;background:var(--s1);z-index:1}
+.mh-title{font-family:'Syne',sans-serif;font-size:19px;font-weight:800}
+.mh-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.m-close{width:32px;height:32px;border-radius:9px;border:1px solid var(--bdr);background:transparent;color:var(--muted);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.m-close:hover{border-color:var(--c4);color:var(--c4)}
+.mbody{padding:24px 28px}
+.m-footer{padding:16px 28px 24px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--bdr)}
+
+/* FORM */
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.fg label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.fg input,.fg select,.fg textarea{background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 13px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--c0)}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--muted)}
+.fg select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;background-color:var(--s2)}
+.fg select option{background:var(--s2);color:var(--text)}
+.fg textarea{resize:vertical;min-height:80px;line-height:1.5}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-row.cols3{grid-template-columns:1fr 1fr 1fr}
+.form-section-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;margin-top:8px;display:flex;align-items:center;gap:10px}
+.form-section-title::after{content:'';flex:1;height:1px;background:var(--bdr)}
+
+/* PRIORIDADE SELECTOR */
+.prio-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.prio-opt{padding:9px 6px;border-radius:9px;border:1.5px solid var(--bdr);background:var(--s2);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;color:var(--muted)}
+.prio-opt:hover{border-color:#3a3e58;color:var(--text)}
+.prio-opt.sel-urgente{border-color:var(--p-urgente);background:rgba(248,113,113,.1);color:var(--p-urgente)}
+.prio-opt.sel-alta{border-color:var(--p-alta);background:rgba(251,191,36,.1);color:var(--p-alta)}
+.prio-opt.sel-normal{border-color:var(--p-normal);background:rgba(129,140,248,.1);color:var(--p-normal)}
+.prio-opt.sel-baixa{border-color:#5a5e78;background:rgba(90,94,120,.1);color:#888}
+
+/* STATUS SELECTOR */
+.status-grid-form{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.status-opt-form{padding:9px 6px;border-radius:9px;border:1.5px solid var(--bdr);background:var(--s2);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;color:var(--muted)}
+.status-opt-form:hover{border-color:#3a3e58;color:var(--text)}
+.status-opt-form.sel-a_fazer{border-color:var(--s-a_fazer);background:rgba(90,94,120,.1);color:var(--s-a_fazer)}
+.status-opt-form.sel-fazendo{border-color:var(--s-fazendo);background:rgba(129,140,248,.1);color:var(--s-fazendo)}
+.status-opt-form.sel-pausado{border-color:var(--s-pausado);background:rgba(251,191,36,.1);color:var(--s-pausado)}
+.status-opt-form.sel-feito{border-color:var(--s-feito);background:rgba(0,229,160,.1);color:var(--s-feito)}
+
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--bdr);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--c0);background:rgba(129,140,248,.04)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone-txt{font-size:13px;color:var(--muted);pointer-events:none}
+.upload-zone-txt strong{color:var(--c0)}
+.file-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.file-item{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:8px 12px}
+.file-item-name{flex:1;font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-item-size{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;flex-shrink:0}
+.file-item-remove{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;transition:all .15s;flex-shrink:0}
+.file-item-remove:hover{color:var(--c4)}
+.file-item-link{font-size:11px;color:var(--c0);text-decoration:none;flex-shrink:0}
+.file-item-link:hover{text-decoration:underline}
+.upload-progress{height:3px;background:var(--s3);border-radius:99px;margin-top:6px;overflow:hidden;display:none}
+.upload-progress-fill{height:100%;background:var(--c0);border-radius:99px;transition:width .3s}
+
+/* BOTÕES */
+.btn-cancel{background:transparent;border:1.5px solid var(--bdr);border-radius:9px;padding:10px 22px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Outfit',sans-serif}
+.btn-cancel:hover{border-color:#666;color:var(--text)}
+.btn-save{background:var(--green);border:none;border-radius:9px;padding:10px 28px;color:#000;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Outfit',sans-serif}
+.btn-save:hover{background:#00ffb3}
+.btn-save:disabled{opacity:.5;cursor:not-allowed}
+.btn-danger{background:rgba(248,113,113,.12);border:1.5px solid rgba(248,113,113,.35);border-radius:9px;padding:10px 18px;color:var(--c4);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Outfit',sans-serif;margin-right:auto}
+.btn-danger:hover{background:rgba(248,113,113,.22)}
+
+/* SPINNER */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{width:16px;height:16px;border:2px solid var(--bdr);border-top-color:var(--c0);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
+.loader{padding:60px 20px;text-align:center;color:var(--muted)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s2);border:1px solid var(--bdr);border-radius:10px;padding:12px 18px;font-size:13px;color:var(--text);z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s;max-width:320px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{border-color:rgba(0,229,160,.4);color:var(--green)}
+.toast.error{border-color:rgba(248,113,113,.4);color:var(--c4)}
+
+@media(max-width:900px){.shell{padding:0 16px 60px}.form-row{grid-template-columns:1fr}.form-row.cols3{grid-template-columns:1fr 1fr}.prio-grid,.status-grid-form{grid-template-columns:1fr 1fr}.summary-strip{gap:8px}}
+</style>
+<script src="sidebar.js"></script>
+</head>
+<body>
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+
+<div class="shell">
+  <header>
+    <div class="hd-title">
+      <h1>📌 Tarefas</h1>
+      <p>Gestão de tarefas e atividades</p>
+    </div>
+    <div class="hd-right">
+      <div class="chip" id="dateChip"></div>
+      <div class="chip btn" onclick="loadTarefas()">↺ Atualizar</div>
+      <div class="chip green" onclick="abrirModal()">+ Nova Tarefa</div>
+    </div>
+  </header>
+
+  <!-- SUMMARY -->
+  <div class="summary-strip" id="summaryStrip">
+    <div class="scard"><div class="scard-dot" style="background:var(--s-a_fazer)"></div><div><div class="scard-n" id="cnt-a_fazer">—</div><div class="scard-l">A Fazer</div></div></div>
+    <div class="scard"><div class="scard-dot" style="background:var(--s-fazendo)"></div><div><div class="scard-n" id="cnt-fazendo">—</div><div class="scard-l">Fazendo</div></div></div>
+    <div class="scard"><div class="scard-dot" style="background:var(--s-pausado)"></div><div><div class="scard-n" id="cnt-pausado">—</div><div class="scard-l">Pausado</div></div></div>
+    <div class="scard"><div class="scard-dot" style="background:var(--s-feito)"></div><div><div class="scard-n" id="cnt-feito">—</div><div class="scard-l">Feito</div></div></div>
+    <div class="scard" style="border-color:rgba(248,113,113,.3)"><div class="scard-dot" style="background:var(--c4)"></div><div><div class="scard-n" id="cnt-atrasado" style="color:var(--c4)">—</div><div class="scard-l">Atrasadas</div></div></div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Buscar tarefa..." oninput="renderLista()">
+    </div>
+    <select class="fbtn" id="fStatus" onchange="renderLista()">
+      <option value="">Todos os status</option>
+      <option value="a_fazer">A Fazer</option>
+      <option value="fazendo">Fazendo</option>
+      <option value="pausado">Pausado</option>
+      <option value="feito">Feito</option>
+    </select>
+    <select class="fbtn" id="fPrioridade" onchange="renderLista()">
+      <option value="">Todas as prioridades</option>
+      <option value="urgente">🔴 Urgente</option>
+      <option value="alta">🟡 Alta</option>
+      <option value="normal">🔵 Normal</option>
+      <option value="baixa">⚪ Baixa</option>
+    </select>
+    <select class="fbtn" id="fResponsavel" onchange="renderLista()">
+      <option value="">Todos os responsáveis</option>
+    </select>
+    <select class="fbtn" id="fCliente" onchange="renderLista()">
+      <option value="">Todos os clientes</option>
+      <option value="__avulsa__">Tarefas avulsas</option>
+    </select>
+  </div>
+
+  <p class="sec" id="secLabel">Tarefas</p>
+  <div id="taskList" class="task-list">
+    <div class="loader"><div class="spin"></div>Carregando tarefas...</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- MODAL TAREFA -->
+<div class="modal-bg" id="modalTarefa">
+  <div class="modal-box">
+    <div class="mh">
+      <div>
+        <div class="mh-title" id="modalTitulo">Nova Tarefa</div>
+        <div class="mh-sub" id="modalSub">Preencha os dados da tarefa</div>
+      </div>
+      <button class="m-close" onclick="fecharModal()">✕</button>
+    </div>
+    <div class="mbody">
+
+      <!-- TÍTULO -->
+      <div class="fg">
+        <label>Título *</label>
+        <input type="text" id="fTitulo" placeholder="Ex: Configurar servidor de backup">
+      </div>
+
+      <!-- PRIORIDADE -->
+      <div class="fg">
+        <label>Prioridade *</label>
+        <div class="prio-grid">
+          <div class="prio-opt" id="po-urgente" onclick="selecionarPrioridade('urgente')">🔴 Urgente</div>
+          <div class="prio-opt" id="po-alta"    onclick="selecionarPrioridade('alta')">🟡 Alta</div>
+          <div class="prio-opt sel-normal" id="po-normal" onclick="selecionarPrioridade('normal')">🔵 Normal</div>
+          <div class="prio-opt" id="po-baixa"   onclick="selecionarPrioridade('baixa')">⚪ Baixa</div>
+        </div>
+      </div>
+
+      <!-- STATUS -->
+      <div class="fg">
+        <label>Status *</label>
+        <div class="status-grid-form">
+          <div class="status-opt-form sel-a_fazer" id="so-a_fazer"  onclick="selecionarStatus('a_fazer')">A Fazer</div>
+          <div class="status-opt-form" id="so-fazendo"  onclick="selecionarStatus('fazendo')">Fazendo</div>
+          <div class="status-opt-form" id="so-pausado"  onclick="selecionarStatus('pausado')">Pausado</div>
+          <div class="status-opt-form" id="so-feito"    onclick="selecionarStatus('feito')">Feito</div>
+        </div>
+      </div>
+
+      <div class="form-section-title">Datas e Responsável</div>
+
+      <div class="form-row cols3">
+        <div class="fg">
+          <label>Data de Início</label>
+          <input type="date" id="fDataInicio">
+        </div>
+        <div class="fg">
+          <label>Previsão de Término</label>
+          <input type="date" id="fPrevisao">
+        </div>
+        <div class="fg">
+          <label>Data de Conclusão</label>
+          <input type="date" id="fDataTermino">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="fg">
+          <label>Responsável</label>
+          <select id="fResponsavelModal">
+            <option value="">— Selecione —</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Cliente (opcional)</label>
+          <select id="fClienteModal">
+            <option value="">— Tarefa avulsa —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section-title">Descrição</div>
+
+      <div class="fg">
+        <label>Descrição detalhada</label>
+        <textarea id="fDescricao" rows="4" placeholder="Descreva a tarefa com mais detalhes, contexto, critérios de aceite..."></textarea>
+      </div>
+
+      <div class="form-section-title">Arquivos</div>
+
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" multiple accept="*/*" onchange="onFileSelect(this.files)">
+        <div class="upload-zone-txt">
+          <div style="font-size:24px;margin-bottom:8px">📎</div>
+          <div>Arraste arquivos aqui ou <strong>clique para selecionar</strong></div>
+          <div style="font-size:11px;margin-top:4px">Qualquer formato • Máx. 50MB por arquivo</div>
+        </div>
+      </div>
+      <div class="upload-progress" id="uploadProgress"><div class="upload-progress-fill" id="uploadFill"></div></div>
+      <div class="file-list" id="fileList"></div>
+
+    </div>
+    <div class="m-footer">
+      <button class="btn-danger" id="btnExcluir" onclick="excluirTarefa()" style="display:none">🗑️ Excluir</button>
+      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-save" id="btnSalvar" onclick="salvarTarefa()">💾 Salvar Tarefa</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SUPABASE ──────────────────────────────────────────────────────────────────
+const SURL = 'https://nhzjkahbkeusgntheyug.supabase.co';
+const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oemprYWhia2V1c2dudGhleXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjYwMDQsImV4cCI6MjA4ODg0MjAwNH0.hB2bJBMoJoztuNrb4xCRIgWmwMlayBpVOMWq3mI4nH4';
+const SH = { 'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY,'Prefer':'return=representation' };
+const STORAGE_BUCKET = 'tarefas-arquivos';
+
+async function dbGet(p){ const r=await fetch(SURL+'/rest/v1/'+p,{headers:SH}); return r.json(); }
+async function dbPost(t,b){ const r=await fetch(SURL+'/rest/v1/'+t,{method:'POST',headers:SH,body:JSON.stringify(b)}); return r.json(); }
+async function dbPatch(t,f,b){ const r=await fetch(SURL+'/rest/v1/'+t+'?'+f,{method:'PATCH',headers:SH,body:JSON.stringify(b)}); return r.json(); }
+async function dbDelete(t,f){ await fetch(SURL+'/rest/v1/'+t+'?'+f,{method:'DELETE',headers:SH}); }
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let allTarefas = [];
+let colaboradores = [];
+let clientes = [];
+let editingId = null;
+let formPrioridade = 'normal';
+let formStatus = 'a_fazer';
+let formArquivos = []; // { nome, url, size, novo?, file? }
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const PRIO_LABEL = { urgente:'🔴 Urgente', alta:'🟡 Alta', normal:'🔵 Normal', baixa:'⚪ Baixa' };
+const STATUS_LABEL = { a_fazer:'A Fazer', fazendo:'Fazendo', pausado:'Pausado', feito:'✅ Feito' };
+const PRIO_COLOR = { urgente:'var(--p-urgente)', alta:'var(--p-alta)', normal:'var(--p-normal)', baixa:'var(--p-baixa)' };
+const STATUS_COLOR = { a_fazer:'var(--s-a_fazer)', fazendo:'var(--s-fazendo)', pausado:'var(--s-pausado)', feito:'var(--s-feito)' };
+const STATUS_ICON = { a_fazer:'○', fazendo:'◐', pausado:'⏸', feito:'✓' };
+
+function ini(s){ const p=(s||'').trim().split(' '); return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():(s||'??').slice(0,2).toUpperCase(); }
+function fmtDate(d){ if(!d)return'—'; return new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}); }
+function isAtrasada(t){ if(t.status==='feito'||!t.previsao_termino)return false; return new Date(t.previsao_termino+'T23:59:59') < new Date(); }
+function fmtSize(b){ if(b<1024)return b+'B'; if(b<1048576)return(b/1024).toFixed(1)+'KB'; return(b/1048576).toFixed(1)+'MB'; }
+function toast(msg,type='success'){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast '+type+' show'; setTimeout(()=>t.classList.remove('show'),3200); }
+
+function getPalette(name){
+  const p=['#818cf8','#38bdf8','#34d399','#fbbf24','#f87171','#e879f9','#fb923c','#4ade80','#a78bfa','#f472b6'];
+  let h=0; for(const c of(name||'A'))h=(h*31+c.charCodeAt(0))%p.length; return p[h];
+}
+
+// ── LOAD ──────────────────────────────────────────────────────────────────────
+async function loadTarefas(){
+  document.getElementById('taskList').innerHTML = '<div class="loader"><div class="spin"></div>Carregando tarefas...</div>';
+  try{
+    const [tarefas, colabs, clis] = await Promise.all([
+      dbGet('tarefas?order=criado_em.desc'),
+      dbGet('colaboradores?ativo=eq.true&order=nome'),
+      dbGet('clientes_gr7?order=razao_social&select=id,razao_social,nome_fantasia'),
+    ]);
+    allTarefas = Array.isArray(tarefas) ? tarefas.map(t=>({...t, arquivos: typeof t.arquivos==='string'?JSON.parse(t.arquivos||'[]'):(t.arquivos||[])})) : [];
+    colaboradores = Array.isArray(colabs) ? colabs : [];
+    clientes = Array.isArray(clis) ? clis : [];
+    populateFilters();
+    updateSummary();
+    renderLista();
+  }catch(e){
+    document.getElementById('taskList').innerHTML = '<div class="loader" style="color:var(--c4)">⚠️ '+humanizeError(e)+'</div>';
+  }
+}
+
+function populateFilters(){
+  const fR = document.getElementById('fResponsavel');
+  const saved = fR.value;
+  fR.innerHTML = '<option value="">Todos os responsáveis</option>' +
+    colaboradores.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
+  fR.value = saved;
+
+  const fC = document.getElementById('fCliente');
+  const savedC = fC.value;
+  fC.innerHTML = '<option value="">Todos os clientes</option><option value="__avulsa__">Tarefas avulsas</option>' +
+    clientes.map(c=>`<option value="${c.id}">${c.nome_fantasia||c.razao_social}</option>`).join('');
+  fC.value = savedC;
+
+  // Modal selects
+  document.getElementById('fResponsavelModal').innerHTML =
+    '<option value="">— Selecione —</option>' +
+    colaboradores.map(c=>`<option value="${c.id}">${c.nome}${c.cargo?' — '+c.cargo:''}</option>`).join('');
+  document.getElementById('fClienteModal').innerHTML =
+    '<option value="">— Tarefa avulsa —</option>' +
+    clientes.map(c=>`<option value="${c.id}">${c.nome_fantasia||c.razao_social}</option>`).join('');
+}
+
+function updateSummary(){
+  const hoje = new Date();
+  const counts = {a_fazer:0, fazendo:0, pausado:0, feito:0, atrasado:0};
+  allTarefas.forEach(t=>{
+    if(counts[t.status]!==undefined) counts[t.status]++;
+    if(isAtrasada(t)) counts.atrasado++;
+  });
+  document.getElementById('cnt-a_fazer').textContent = counts.a_fazer;
+  document.getElementById('cnt-fazendo').textContent = counts.fazendo;
+  document.getElementById('cnt-pausado').textContent = counts.pausado;
+  document.getElementById('cnt-feito').textContent = counts.feito;
+  document.getElementById('cnt-atrasado').textContent = counts.atrasado;
+}
+
+// ── RENDER LISTA ──────────────────────────────────────────────────────────────
+function renderLista(){
+  const q = (document.getElementById('searchInput').value||'').toLowerCase();
+  const fS = document.getElementById('fStatus').value;
+  const fP = document.getElementById('fPrioridade').value;
+  const fR = document.getElementById('fResponsavel').value;
+  const fC = document.getElementById('fCliente').value;
+
+  const lista = allTarefas.filter(t=>{
+    if(fS && t.status!==fS) return false;
+    if(fP && t.prioridade!==fP) return false;
+    if(fR && String(t.responsavel_id)!==String(fR)) return false;
+    if(fC==='__avulsa__' && t.cliente_id) return false;
+    if(fC && fC!=='__avulsa__' && t.cliente_id!==fC) return false;
+    if(q){
+      const hay = (t.titulo+' '+(t.descricao||'')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  document.getElementById('secLabel').textContent = `Tarefas (${lista.length})`;
+
+  if(!lista.length){
+    document.getElementById('taskList').innerHTML = `
+      <div class="task-empty">
+        <div style="font-size:48px;margin-bottom:12px">📌</div>
+        <p>Nenhuma tarefa encontrada.</p>
+        <p style="margin-top:6px;font-size:13px"><a href="#" onclick="abrirModal()" style="color:var(--c0)">Criar primeira tarefa</a></p>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('taskList').innerHTML = lista.map(t=>{
+    const resp = colaboradores.find(c=>String(c.id)===String(t.responsavel_id));
+    const cli  = clientes.find(c=>c.id===t.cliente_id);
+    const pColor = PRIO_COLOR[t.prioridade]||'var(--muted)';
+    const sColor = STATUS_COLOR[t.status]||'var(--muted)';
+    const atrasada = isAtrasada(t);
+    const respColor = resp ? getPalette(resp.nome) : 'var(--muted)';
+
+    return `<div class="task-card" onclick="abrirModal('${t.id}')">
+      <div class="task-card-inner">
+        <div class="task-accent" style="background:${pColor}"></div>
+        <div class="task-body">
+          <div class="task-status-icon" style="border-color:${sColor};color:${sColor};background:${sColor}15">
+            ${STATUS_ICON[t.status]||'○'}
+          </div>
+          <div class="task-info">
+            <div class="task-title${t.status==='feito'?' done':''}">${t.titulo}</div>
+            <div class="task-meta">
+              <span class="task-badge" style="background:${pColor}18;color:${pColor};border:1px solid ${pColor}33">${PRIO_LABEL[t.prioridade]}</span>
+              <span class="task-badge" style="background:${sColor}15;color:${sColor};border:1px solid ${sColor}30">${STATUS_LABEL[t.status]}</span>
+              ${cli?`<span class="task-meta-txt">🏢 ${cli.nome_fantasia||cli.razao_social}</span>`:''}
+              ${t.previsao_termino?`<span class="task-meta-txt" style="${atrasada?'color:var(--c4)':''}">📅 ${fmtDate(t.previsao_termino)}${atrasada?' ⚠️':''}</span>`:''}
+              ${t.arquivos&&t.arquivos.length?`<span class="task-meta-txt">📎 ${t.arquivos.length}</span>`:''}
+            </div>
+          </div>
+        </div>
+        <div class="task-right">
+          ${resp?`<div class="task-resp-av" style="background:${respColor}22;color:${respColor}" title="${resp.nome}">${ini(resp.nome)}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function abrirModal(id){
+  editingId = id||null;
+  formArquivos = [];
+  renderFileList();
+
+  if(id){
+    const t = allTarefas.find(x=>x.id===id);
+    if(!t) return;
+    document.getElementById('modalTitulo').textContent = '✏️ Editar Tarefa';
+    document.getElementById('modalSub').textContent = t.titulo;
+    document.getElementById('fTitulo').value = t.titulo||'';
+    document.getElementById('fDescricao').value = t.descricao||'';
+    document.getElementById('fDataInicio').value = t.data_inicio||'';
+    document.getElementById('fPrevisao').value = t.previsao_termino||'';
+    document.getElementById('fDataTermino').value = t.data_termino||'';
+    document.getElementById('fResponsavelModal').value = t.responsavel_id||'';
+    document.getElementById('fClienteModal').value = t.cliente_id||'';
+    selecionarPrioridade(t.prioridade||'normal');
+    selecionarStatus(t.status||'a_fazer');
+    formArquivos = (t.arquivos||[]).map(a=>({...a, novo:false}));
+    renderFileList();
+    document.getElementById('btnExcluir').style.display = 'block';
+  } else {
+    document.getElementById('modalTitulo').textContent = '📌 Nova Tarefa';
+    document.getElementById('modalSub').textContent = 'Preencha os dados da tarefa';
+    document.getElementById('fTitulo').value = '';
+    document.getElementById('fDescricao').value = '';
+    document.getElementById('fDataInicio').value = new Date().toISOString().split('T')[0];
+    document.getElementById('fPrevisao').value = '';
+    document.getElementById('fDataTermino').value = '';
+    document.getElementById('fResponsavelModal').value = '';
+    document.getElementById('fClienteModal').value = '';
+    selecionarPrioridade('normal');
+    selecionarStatus('a_fazer');
+    document.getElementById('btnExcluir').style.display = 'none';
+  }
+
+  document.getElementById('modalTarefa').classList.add('open');
+}
+
+function fecharModal(){ document.getElementById('modalTarefa').classList.remove('open'); }
+document.getElementById('modalTarefa').addEventListener('click',function(e){ if(e.target===this) fecharModal(); });
+
+function selecionarPrioridade(p){
+  formPrioridade = p;
+  ['urgente','alta','normal','baixa'].forEach(k=>{
+    const el = document.getElementById('po-'+k);
+    el.className = 'prio-opt' + (k===p?' sel-'+k:'');
+  });
+}
+
+function selecionarStatus(s){
+  formStatus = s;
+  ['a_fazer','fazendo','pausado','feito'].forEach(k=>{
+    const el = document.getElementById('so-'+k);
+    el.className = 'status-opt-form' + (k===s?' sel-'+k:'');
+  });
+  // Se marcou feito, preencher data de término
+  if(s==='feito' && !document.getElementById('fDataTermino').value){
+    document.getElementById('fDataTermino').value = new Date().toISOString().split('T')[0];
+  }
+}
+
+// ── UPLOAD ────────────────────────────────────────────────────────────────────
+const uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover',e=>{ e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop',e=>{ e.preventDefault(); uploadZone.classList.remove('drag-over'); onFileSelect(e.dataTransfer.files); });
+
+function onFileSelect(files){
+  [...files].forEach(f=>{
+    if(f.size > 52428800){ toast('Arquivo '+f.name+' excede 50MB','error'); return; }
+    formArquivos.push({ nome:f.name, size:f.size, novo:true, file:f, url:null });
+  });
+  renderFileList();
+  // Reset input
+  document.getElementById('fileInput').value = '';
+}
+
+function renderFileList(){
+  const el = document.getElementById('fileList');
+  if(!formArquivos.length){ el.innerHTML=''; return; }
+  el.innerHTML = formArquivos.map((a,i)=>`
+    <div class="file-item">
+      <span style="font-size:16px">${getFileIcon(a.nome)}</span>
+      <span class="file-item-name">${a.nome}</span>
+      ${a.size?`<span class="file-item-size">${fmtSize(a.size)}</span>`:''}
+      ${a.url&&!a.novo?`<a class="file-item-link" href="${a.url}" target="_blank">⬇ Baixar</a>`:''}
+      ${a.novo?`<span style="font-size:10px;color:var(--c3);font-family:'IBM Plex Mono',monospace">NOVO</span>`:''}
+      <button class="file-item-remove" onclick="removerArquivo(${i})" title="Remover">✕</button>
+    </div>`).join('');
+}
+
+function removerArquivo(i){ formArquivos.splice(i,1); renderFileList(); }
+
+function getFileIcon(nome){
+  const ext = (nome||'').split('.').pop().toLowerCase();
+  const map = {pdf:'📄',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',png:'🖼️',jpg:'🖼️',jpeg:'🖼️',gif:'🖼️',zip:'🗜️',rar:'🗜️',mp4:'🎬',mp3:'🎵',txt:'📃'};
+  return map[ext]||'📎';
+}
+
+async function uploadArquivos(tarefaId){
+  const novos = formArquivos.filter(a=>a.novo && a.file);
+  if(!novos.length) return formArquivos.filter(a=>!a.novo).map(a=>({nome:a.nome,url:a.url,size:a.size}));
+
+  const progress = document.getElementById('uploadProgress');
+  const fill = document.getElementById('uploadFill');
+  progress.style.display = 'block';
+
+  const resultados = [...formArquivos.filter(a=>!a.novo).map(a=>({nome:a.nome,url:a.url,size:a.size}))];
+
+  for(let i=0; i<novos.length; i++){
+    const a = novos[i];
+    fill.style.width = Math.round((i/novos.length)*100)+'%';
+
+    const path = `${tarefaId}/${Date.now()}_${a.nome.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+    const r = await fetch(`${SURL}/storage/v1/object/${STORAGE_BUCKET}/${path}`, {
+      method: 'POST',
+      headers: { 'apikey': SKEY, 'Authorization': 'Bearer '+SKEY, 'Content-Type': a.file.type||'application/octet-stream' },
+      body: a.file
+    });
+
+    if(r.ok){
+      const url = `${SURL}/storage/v1/object/public/${STORAGE_BUCKET}/${path}`;
+      resultados.push({ nome:a.nome, url, size:a.size });
+    } else {
+      toast('Erro ao enviar '+a.nome,'error');
+    }
+  }
+
+  fill.style.width = '100%';
+  setTimeout(()=>{ progress.style.display='none'; fill.style.width='0%'; }, 800);
+  return resultados;
+}
+
+// ── SALVAR ────────────────────────────────────────────────────────────────────
+async function salvarTarefa(){
+  const titulo = document.getElementById('fTitulo').value.trim();
+  if(!titulo){ toast('Título é obrigatório','error'); return; }
+
+  const btn = document.getElementById('btnSalvar');
+  btn.disabled = true; btn.textContent = '⏳ Salvando...';
+
+  try{
+    // Determina o ID da tarefa (novo ou existente)
+    const tarefaId = editingId || crypto.randomUUID();
+
+    // Faz upload dos arquivos novos
+    const arquivos = await uploadArquivos(tarefaId);
+
+    const payload = {
+      titulo,
+      descricao: document.getElementById('fDescricao').value.trim()||null,
+      prioridade: formPrioridade,
+      status: formStatus,
+      data_inicio: document.getElementById('fDataInicio').value||null,
+      previsao_termino: document.getElementById('fPrevisao').value||null,
+      data_termino: document.getElementById('fDataTermino').value||null,
+      responsavel_id: document.getElementById('fResponsavelModal').value ? parseInt(document.getElementById('fResponsavelModal').value) : null,
+      cliente_id: document.getElementById('fClienteModal').value||null,
+      arquivos: JSON.stringify(arquivos),
+      atualizado_em: new Date().toISOString(),
+    };
+
+    let result;
+    if(editingId){
+      result = await dbPatch('tarefas','id=eq.'+editingId, payload);
+    } else {
+      result = await dbPost('tarefas', {...payload, id:tarefaId});
+    }
+
+    if(result && result.code){ throw new Error(result.message||result.hint||'Erro ao salvar'); }
+
+    toast(editingId?'✅ Tarefa atualizada!':'✅ Tarefa criada!','success');
+    fecharModal();
+    await loadTarefas();
+  }catch(e){
+    toast(humanizeError(e),'error');
+  }finally{
+    btn.disabled=false; btn.textContent='💾 Salvar Tarefa';
+  }
+}
+
+// ── EXCLUIR ───────────────────────────────────────────────────────────────────
+async function excluirTarefa(){
+  if(!editingId) return;
+  const t = allTarefas.find(x=>x.id===editingId);
+  const nome = t?t.titulo:'esta tarefa';
+  const ok = await gr7Confirm({
+    title:'Excluir tarefa?',
+    message:`<strong style="color:#dde1f0">${nome}</strong> será removida permanentemente.`,
+    confirmText:'Sim, excluir',
+    danger:true, icon:'🗑️'
+  });
+  if(!ok) return;
+  try{
+    await dbDelete('tarefas','id=eq.'+editingId);
+    toast('Tarefa excluída.','success');
+    fecharModal();
+    await loadTarefas();
+  }catch(e){ toast(humanizeError(e),'error'); }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById('dateChip').textContent = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+
+// Verificar se veio com cliente pré-selecionado via URL
+(function(){
+  const params = new URLSearchParams(location.search);
+  const clienteId = params.get('cliente');
+  if(clienteId){
+    // Abrir modal já com cliente preenchido
+    window.addEventListener('load', ()=>{
+      setTimeout(()=>{ abrirModal(); document.getElementById('fClienteModal').value = clienteId; }, 600);
+    });
+  }
+})();
+
+loadTarefas();
+</script>
+</body>
+</html>
