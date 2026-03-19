@@ -178,131 +178,12 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 .color-opt.sel{border-color:#fff;transform:scale(1.15)}
 .umodal-btns{display:flex;gap:10px;margin-top:22px;justify-content:flex-end}
 
-    /* ===== SIDEBAR ===== */
-    :root { --sb-w: 240px; --sb-w-collapsed: 64px; }
-
-    .sidebar {
-      position: fixed; top: 0; left: 0; height: 100vh;
-      width: var(--sb-w); background: #0e1018;
-      border-right: 1px solid #1e2030;
-      display: flex; flex-direction: column;
-      z-index: 999; transition: width 0.25s cubic-bezier(.4,0,.2,1);
-      overflow: hidden;
-    }
-    .sidebar.collapsed { width: var(--sb-w-collapsed); }
-
-    .sb-logo {
-      display: flex; align-items: center; gap: 13px;
-      padding: 22px 16px 18px; border-bottom: 1px solid #1e2030;
-      flex-shrink: 0; min-width: var(--sb-w); overflow: hidden;
-    }
-    .sb-logo-mark {
-      width: 36px; height: 36px; flex-shrink: 0;
-      background: linear-gradient(135deg,#818cf8,#e879f9);
-      border-radius: 10px; display: flex; align-items: center;
-      justify-content: center; font-family: 'IBM Plex Mono', monospace;
-      font-weight: 600; font-size: 13px; color: #fff;
-      box-shadow: 0 0 20px rgba(129,140,248,.35);
-    }
-    .sb-logo-text { white-space: nowrap; overflow: hidden; }
-    .sb-logo-text h2 {
-      font-family: 'Syne', sans-serif; font-size: 16px;
-      font-weight: 800; letter-spacing: -.3px; color: #fff;
-    }
-    .sb-logo-text p { font-size: 10px; color: #5a5e78; margin-top: 2px; }
-
-    .sb-nav { flex: 1; padding: 12px 0; overflow-y: auto; overflow-x: hidden; }
-
-    .sb-label {
-      font-family: 'IBM Plex Mono', monospace; font-size: 9px;
-      letter-spacing: 2px; text-transform: uppercase; color: #3a3e58;
-      padding: 10px 20px 4px; white-space: nowrap; opacity: 1;
-      transition: opacity 0.2s;
-    }
-    .sidebar.collapsed .sb-label { opacity: 0; }
-
-    .sb-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 16px; color: #5a5e78; font-size: 13px;
-      font-weight: 500; cursor: pointer; text-decoration: none;
-      transition: all 0.15s; white-space: nowrap; overflow: hidden;
-      border-left: 2px solid transparent; margin: 1px 0;
-    }
-    .sb-item:hover { color: #dde1f0; background: rgba(255,255,255,.04); }
-    .sb-item.active {
-      color: #00e5a0; background: rgba(0,229,160,.07);
-      border-left-color: #00e5a0;
-    }
-    .sb-icon {
-      font-size: 17px; flex-shrink: 0; width: 24px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .sb-text { transition: opacity 0.2s; }
-    .sidebar.collapsed .sb-text { opacity: 0; pointer-events: none; }
-
-    .sb-footer {
-      border-top: 1px solid #1e2030; padding: 12px 16px;
-      flex-shrink: 0;
-    }
-    .sb-toggle {
-      display: flex; align-items: center; gap: 12px;
-      background: transparent; border: 1px solid #1e2030;
-      border-radius: 8px; padding: 9px 12px; color: #5a5e78;
-      font-size: 12px; cursor: pointer; width: 100%;
-      transition: all 0.15s; white-space: nowrap; overflow: hidden;
-    }
-    .sb-toggle:hover { border-color: #3a3e58; color: #dde1f0; }
-    .sb-toggle-icon { font-size: 15px; flex-shrink: 0; transition: transform 0.25s; }
-    .sidebar.collapsed .sb-toggle-icon { transform: rotate(180deg); }
-    .sb-toggle-text { transition: opacity 0.2s; }
-    .sidebar.collapsed .sb-toggle-text { opacity: 0; }
-
-    /* Page shifts right when sidebar open */
-    body { padding-left: var(--sb-w); transition: padding-left 0.25s cubic-bezier(.4,0,.2,1); }
-    body.sb-collapsed { padding-left: var(--sb-w-collapsed); }
 
 </style>
+<script src="sidebar.js"></script>
 </head>
 <body>
-  <!-- ===== SIDEBAR ===== -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sb-logo">
-      <div class="sb-logo-mark">GR7</div>
-      <div class="sb-logo-text">
-        <h2>GR7</h2>
-        <p>Sistema de Instalações</p>
-      </div>
-    </div>
-    <nav class="sb-nav">
-      
-      <div class="sb-label">Menu</div>
-      <a class="sb-item active" href="index.html"><span class="sb-icon">🏠</span><span class="sb-text">Dashboard</span></a>
-      <a class="sb-item " href="clientes.html"><span class="sb-icon">🏢</span><span class="sb-text">Clientes</span></a>
-      <a class="sb-item " href="implantacao.html"><span class="sb-icon">🚀</span><span class="sb-text">Implantação</span></a>
-      <a class="sb-item " href="Checklist.html"><span class="sb-icon">✅</span><span class="sb-text">Checklist</span></a>
-      <a class="sb-item " href="relatorios-checklist.html"><span class="sb-icon">📊</span><span class="sb-text">Relatórios</span></a>
-    </nav>
-    <div class="sb-footer">
-      <button class="sb-toggle" onclick="toggleSidebar()">
-        <span class="sb-toggle-icon">◀</span>
-        <span class="sb-toggle-text">Recolher menu</span>
-      </button>
-    </div>
-  </aside>
-  <script>
-    function toggleSidebar(){
-      const sb=document.getElementById('sidebar');
-      sb.classList.toggle('collapsed');
-      document.body.classList.toggle('sb-collapsed');
-      localStorage.setItem('sb_collapsed', sb.classList.contains('collapsed'));
-    }
-    (function(){
-      if(localStorage.getItem('sb_collapsed')==='true'){
-        document.getElementById('sidebar').classList.add('collapsed');
-        document.body.classList.add('sb-collapsed');
-      }
-    })();
-  </script>
+
 
   <div class="blob blob1"></div>
 <div class="blob blob2"></div>
@@ -324,7 +205,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 <p class="sec">Colaboradores Cadastrados</p>
 <div class="users-panel">
   <div class="box-head">&#128101; Equipe <span id="totalUsers" style="color:var(--muted);font-size:12px;margin-left:8px"></span></div>
-  <div class="users-grid-list" id="usersList"><div style="padding:16px;color:#555;font-size:13px">⏳ Conectando ao Supabase…</div></div>
+  <div class="users-grid-list" id="usersList"></div>
 </div>
 
 <p class="sec">Visão Geral</p>
@@ -338,19 +219,17 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 <p class="sec">Últimos Clientes</p>
 <div class="clientes-box">
   <div class="box-head">📂 Clientes Recentes <span id="totalClientes"></span></div>
-  <div id="clientesBody"><div style="padding:16px;color:#555;font-size:13px">⏳ Conectando…</div></div>
+  <div id="clientesBody"></div>
 </div>
 
 <p class="sec">Ranking de Colaboradores</p>
 <div class="ranking">
   <div class="box-head">🏆 Classificação por Tarefas Concluídas</div>
-  <div id="rankingBody"><div style="padding:16px;color:#555;font-size:13px">⏳ Conectando…</div></div>
+  <div id="rankingBody"></div>
 </div>
 
 <p class="sec">Desempenho Individual</p>
-<div class="cards" id="cardsGrid">
-  <div class="loader" style="grid-column:1/-1"><div class="spin"></div>Carregando...</div>
-</div>
+<div class="cards" id="cardsGrid"></div>
 
 </div>
 
@@ -379,6 +258,7 @@ const PALETTE = ['#818cf8','#38bdf8','#34d399','#fbbf24','#f87171','#e879f9','#f
 let USERS = [];
 let editingUserId = null;
 let selectedColor = PALETTE[0];
+let _colaboradorGuard = null;
 
 function initials(n){var p=(n||'').trim().split(' ');return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():(n||'??').slice(0,2).toUpperCase();}
 function norm(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
@@ -411,10 +291,7 @@ async function loadUsers(){
     document.getElementById('totalUsers').textContent=USERS.length+' membros';
   }catch(e){
     console.error('loadUsers:',e);
-    document.getElementById('usersList').innerHTML=
-      '<div style="padding:20px;color:#f87171;font-size:13px">❌ Erro ao carregar colaboradores:<br>'
-      +'<code style="font-size:11px;color:#fca5a5;word-break:break-all">'+e.message+'</code><br><br>'
-      +'<span style="color:#888;font-size:12px">Verifique se a tabela <b>colaboradores</b> existe no Supabase.</span></div>';
+    document.getElementById('usersList').innerHTML='<div style="padding:20px;color:#f87171;font-size:13px">⚠️ '+humanizeError(e)+'</div>';
   }
 }
 
@@ -460,34 +337,54 @@ function openUModal(id){
     buildColorGrid(PALETTE[USERS.length%PALETTE.length]);
   }
   document.getElementById('umodalBg').classList.add('open');
+  _initColaboradorGuard();
 }
-function closeUModal(){document.getElementById('umodalBg').classList.remove('open');}
-document.getElementById('umodalBg').addEventListener('click',function(e){if(e.target===e.currentTarget)closeUModal();});
+function closeUModal(){
+  if(_colaboradorGuard){_colaboradorGuard.destroy();_colaboradorGuard=null;}
+  document.getElementById('umodalBg').classList.remove('open');
+}
+// click-fora do umodal é gerenciado pelo dirty guard
 
 async function saveUser(){
   var nome=document.getElementById('uNome').value.trim();
   var cargo=document.getElementById('uCargo').value.trim()||'Colaborador';
-  if(!nome){alert('Digite o nome!');return;}
+  if(!nome){
+    gr7Alert({title:'Campo obrigatório',message:'Digite o nome do colaborador.',icon:'✏️'});
+    return;
+  }
   try{
     if(editingUserId){await dbPatch('colaboradores',editingUserId,{nome:nome,cargo:cargo,cor:selectedColor});}
     else{await dbPost('colaboradores',{nome:nome,cargo:cargo,cor:selectedColor,ativo:true});}
+    if(_colaboradorGuard){_colaboradorGuard.destroy();_colaboradorGuard=null;}
     closeUModal();
     await loadUsers();
     await loadDashboard();
-  }catch(e){alert('Erro ao salvar: '+e.message);}
+  }catch(e){gr7Alert({title:'Erro ao salvar',message:humanizeError(e),icon:'❌'});}
 }
 
 async function deleteUser(id,nome){
-  if(!confirm('Remover "'+nome+'"?'))return;
+  var ok=await gr7Confirm({
+    title:'Remover colaborador?',
+    message:'<strong style="color:#dde1f0">'+nome+'</strong> será desativado do sistema.',
+    confirmText:'Sim, remover',
+    cancelText:'Cancelar',
+    danger:true,
+    icon:'👤',
+  });
+  if(!ok)return;
   try{
     await dbPatch('colaboradores',id,{ativo:false});
     await loadUsers();
     await loadDashboard();
-  }catch(e){alert('Erro: '+e.message);}
+  }catch(e){gr7Alert({title:'Erro',message:humanizeError(e),icon:'❌'});}
 }
 
 async function loadDashboard(){
   document.getElementById('syncChip').textContent='↻ Sincronizando…';
+  ['sClientes','sDone','sMedia','sPend'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&el.textContent!=='ERR'){el.innerHTML='<div class="sk" style="width:60px;height:36px;border-radius:8px;display:inline-block"></div>';}
+  });
 
   // ── 1. Clientes (vw_progresso_clientes)
   var clientes=[];
@@ -497,7 +394,7 @@ async function loadDashboard(){
   }catch(e){
     console.error('vw_progresso_clientes:',e);
     document.getElementById('clientesBody').innerHTML=
-      '<tr><td colspan="6" style="padding:20px;color:#f87171;font-size:13px">❌ Erro ao carregar clientes:<br><code style="font-size:11px">'+e.message+'</code></td></tr>';
+      '<div style="padding:20px;color:#f87171;font-size:13px">⚠️ '+humanizeError(e)+'</div>';
   }
 
   // ── 2. Resumo geral (vw_resumo_geral)
@@ -535,9 +432,9 @@ async function loadDashboard(){
     renderCards(byUser);
   }catch(e){
     console.error('vw_ranking_colaboradores:',e);
-    var msg='<div style="padding:20px;color:#f87171;font-size:13px">❌ Erro no ranking:<br><code style="font-size:11px">'+e.message+'</code></div>';
+    var msg='<div style="padding:20px;color:#f87171;font-size:13px">⚠️ '+humanizeError(e)+'</div>';
     document.getElementById('rankingBody').innerHTML=msg;
-    document.getElementById('cardsGrid').innerHTML='<div style="grid-column:1/-1;padding:20px;color:#f87171;font-size:13px">❌ Erro nos cards:<br><code style="font-size:11px">'+e.message+'</code></div>';
+    document.getElementById('cardsGrid').innerHTML='<div style="grid-column:1/-1;padding:20px;color:#f87171;font-size:13px">⚠️ '+humanizeError(e)+'</div>';
   }
 
   document.getElementById('syncChip').textContent='✓ Atualizado';
@@ -551,13 +448,14 @@ function openChecklist(userName){
 
 async function loadAll(){
   // Substitui spinners imediatamente — nunca fica preso em "Carregando..."
-  var loadMsg='<div style="padding:16px;color:#555;font-size:13px">⏳ Buscando dados…</div>';
-  ['usersList','clientesBody','rankingBody'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(el) el.innerHTML=loadMsg;
-  });
+  var ul=document.getElementById('usersList');
+  if(ul) ul.innerHTML=gr7Skeletons.userPills(6);
+  var cb=document.getElementById('clientesBody');
+  if(cb) cb.innerHTML=gr7Skeletons.clientRows(6);
+  var rb=document.getElementById('rankingBody');
+  if(rb) rb.innerHTML=gr7Skeletons.rankingRows(5);
   var cg=document.getElementById('cardsGrid');
-  if(cg) cg.innerHTML='<div style="grid-column:1/-1;'+loadMsg.slice(5);
+  if(cg) cg.innerHTML=gr7Skeletons.collaboratorCards(3);
 
   // Timeout de segurança: se demorar >10s mostra diagnóstico
   var safetyTimer=setTimeout(function(){
@@ -659,6 +557,24 @@ function renderCards(byUser){
 }
 
 function toggleCli(btn){var l=btn.nextElementSibling;l.classList.toggle('open');btn.querySelector('span:last-child').textContent=l.classList.contains('open')?'▴':'▾';}
+
+function _initColaboradorGuard(){
+  if(_colaboradorGuard){_colaboradorGuard.destroy();}
+  var modalBg  = document.getElementById('umodalBg');
+  var btnCancel= modalBg.querySelector('.btn-cancel');
+  // Campos monitorados: nome e cargo (cor não inclui pois é sempre preenchida)
+  _colaboradorGuard = gr7DirtyGuard({
+    fieldIds: ['uNome','uCargo'],
+    closeFn: closeUModal,
+    interceptEl: [btnCancel, modalBg],
+    confirmOpts: {
+      title: 'Descartar alterações?',
+      message: 'Os dados do colaborador serão perdidos se você sair agora.',
+      confirmText: 'Sim, descartar',
+      cancelText: 'Continuar editando',
+    },
+  });
+}
 
 document.getElementById('dateChip').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
 loadAll();
