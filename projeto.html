@@ -6,38 +6,13 @@
 <title>GR7 — Projeto</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#07080d;--s1:#0e1018;--s2:#161820;--s3:#1e2030;--bdr:#252738;--text:#dde1f0;--muted:#5a5e78;--r:14px;--green:#00e5a0;--green2:#059669;--c0:#818cf8;--c1:#38bdf8;--c2:#34d399;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;--sb-w:240px;--sb-w-collapsed:64px;}
+:root{--bg:#07080d;--s1:#0e1018;--s2:#161820;--s3:#1e2030;--bdr:#252738;--text:#dde1f0;--muted:#5a5e78;--r:14px;--green:#00e5a0;--green2:#059669;--c0:#818cf8;--c1:#38bdf8;--c2:#34d399;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;padding-left:var(--sb-w);transition:padding-left .25s cubic-bezier(.4,0,.2,1)}
-body.sb-collapsed{padding-left:var(--sb-w-collapsed)}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
 .blob{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;opacity:.1}
 .blob1{width:600px;height:600px;top:-150px;left:0;background:var(--c0)}
 .blob2{width:500px;height:500px;bottom:-150px;right:-50px;background:var(--c5)}
-/* SIDEBAR */
-.sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sb-w);background:#0e1018;border-right:1px solid #1e2030;display:flex;flex-direction:column;z-index:999;transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden}
-.sidebar.collapsed{width:var(--sb-w-collapsed)}
-.sb-logo{display:flex;align-items:center;gap:13px;padding:22px 16px 18px;border-bottom:1px solid #1e2030;flex-shrink:0;min-width:var(--sb-w);overflow:hidden}
-.sb-logo-mark{width:36px;height:36px;flex-shrink:0;background:linear-gradient(135deg,#818cf8,#e879f9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:#fff;box-shadow:0 0 20px rgba(129,140,248,.35)}
-.sb-logo-text{white-space:nowrap;overflow:hidden}
-.sb-logo-text h2{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.3px;color:#fff}
-.sb-logo-text p{font-size:10px;color:#5a5e78;margin-top:2px}
-.sb-nav{flex:1;padding:12px 0;overflow-y:auto;overflow-x:hidden}
-.sb-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#3a3e58;padding:10px 20px 4px;white-space:nowrap;opacity:1;transition:opacity .2s}
-.sidebar.collapsed .sb-label{opacity:0}
-.sb-item{display:flex;align-items:center;gap:12px;padding:11px 16px;color:#5a5e78;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;border-left:2px solid transparent;margin:1px 0}
-.sb-item:hover{color:#dde1f0;background:rgba(255,255,255,.04)}
-.sb-item.active{color:#00e5a0;background:rgba(0,229,160,.07);border-left-color:#00e5a0}
-.sb-icon{font-size:17px;flex-shrink:0;width:24px;display:flex;align-items:center;justify-content:center}
-.sb-text{transition:opacity .2s}
-.sidebar.collapsed .sb-text{opacity:0;pointer-events:none}
-.sb-footer{border-top:1px solid #1e2030;padding:12px 16px;flex-shrink:0}
-.sb-toggle{display:flex;align-items:center;gap:12px;background:transparent;border:1px solid #1e2030;border-radius:8px;padding:9px 12px;color:#5a5e78;font-size:12px;cursor:pointer;width:100%;transition:all .15s;white-space:nowrap;overflow:hidden}
-.sb-toggle:hover{border-color:#3a3e58;color:#dde1f0}
-.sb-toggle-icon{font-size:15px;flex-shrink:0;transition:transform .25s}
-.sidebar.collapsed .sb-toggle-icon{transform:rotate(180deg)}
-.sb-toggle-text{transition:opacity .2s}
-.sidebar.collapsed .sb-toggle-text{opacity:0}
 /* LAYOUT */
 .shell{position:relative;z-index:10;padding:0 40px 80px}
 .hero{display:flex;align-items:center;gap:22px;padding:28px 0 22px;flex-wrap:wrap}
@@ -88,21 +63,20 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .mod-pill-ck{width:14px;height:14px;border-radius:3px;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .15s}
 .mod-pill.done .mod-pill-ck{background:var(--green);border-color:var(--green);color:#000}
 .mod-pill-date{font-size:9px;color:var(--green);font-weight:400}
-/* TAREFAS */
-.tasks-wrap{padding:12px 16px}
-.task-row{display:flex;align-items:center;gap:9px;padding:9px 10px;background:var(--s2);border:1px solid var(--bdr);border-radius:8px;margin-bottom:6px}
-.task-row.done .task-txt{text-decoration:line-through;color:var(--muted)}
-.task-cb{width:20px;height:20px;border-radius:6px;border:1.5px solid #444;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;flex-shrink:0;transition:all .15s;color:transparent}
-.task-row.done .task-cb{background:var(--green);border-color:var(--green);color:#000}
-.task-txt{flex:1;font-size:13px}
-.task-del{width:22px;height:22px;border:none;background:transparent;color:#3a3e58;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;border-radius:5px;transition:all .15s;flex-shrink:0}
-.task-del:hover{color:var(--c4);background:rgba(248,113,113,.1)}
-.add-row{display:flex;gap:7px;margin-top:4px}
-.add-inp{flex:1;background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
-.add-inp:focus{border-color:var(--c0)}
-.add-inp::placeholder{color:var(--muted)}
-.add-btn{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);border-radius:8px;padding:9px 13px;color:var(--green);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
-.add-btn:hover{background:rgba(0,229,160,.2)}
+/* TAREFAS PROJETO */
+.task-proj-list{display:flex;flex-direction:column;gap:7px;padding:12px 16px}
+.task-proj-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--bdr);border-radius:9px;cursor:pointer;transition:all .15s;text-decoration:none}
+.task-proj-row:hover{border-color:rgba(129,140,248,.3)}
+.task-proj-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.task-proj-body{min-width:0}
+.task-proj-title{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-proj-title.done{text-decoration:line-through;color:var(--muted)}
+.task-proj-meta{display:flex;align-items:center;gap:8px;margin-top:3px}
+.task-proj-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap}
+.task-proj-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.task-proj-av{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:9px;font-weight:800}
+.task-proj-add{display:flex;align-items:center;gap:8px;margin:8px 16px 14px;padding:9px 12px;border:1.5px dashed var(--bdr);border-radius:9px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.task-proj-add:hover{border-color:var(--green);color:var(--green);background:rgba(0,229,160,.04)}
 /* STATUS MANAGER */
 .status-current{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr)}
 .status-label-big{font-size:14px;font-weight:700}
@@ -121,18 +95,24 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .status-add-btn:hover{background:rgba(129,140,248,.2)}
 .status-apply-btn{margin:10px 18px 14px;width:calc(100% - 36px);padding:10px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:1.5px solid var(--green);background:rgba(0,229,160,.1);color:var(--green);font-family:'Outfit',sans-serif}
 .status-apply-btn:hover{background:rgba(0,229,160,.2)}
-/* TIMELINE */
-.timeline{padding:14px 18px}
-.tl-item{display:flex;gap:12px;margin-bottom:18px;position:relative}
-.tl-item:last-child{margin-bottom:0}
-.tl-line{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
-.tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
-.tl-connector{width:2px;flex:1;margin-top:4px;margin-bottom:-14px}
-.tl-content{flex:1;min-width:0}
-.tl-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px}
-.tl-label{font-size:12px;font-weight:700}
-.tl-date{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);flex-shrink:0}
-.tl-note{font-size:11px;color:var(--muted);line-height:1.5}
+/* HISTÓRICO HORIZONTAL */
+.feed-wrap{padding:16px 20px 20px;overflow-x:auto}
+.feed{display:flex;gap:0;position:relative}
+.feed::before{content:'';position:absolute;top:16px;left:16px;right:16px;height:2px;background:var(--bdr);z-index:0}
+.feed-item{display:flex;flex-direction:column;align-items:center;flex:1;min-width:130px;max-width:200px;position:relative;z-index:1;padding:0 8px}
+.feed-dot-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.feed-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--bg);flex-shrink:0}
+.feed-card{background:var(--s2);border:1px solid var(--bdr);border-radius:9px;padding:9px 11px;width:100%;transition:border-color .15s}
+.feed-card:hover{border-color:rgba(255,255,255,.12)}
+.feed-label{font-size:11px;font-weight:700;line-height:1.3;margin-bottom:4px}
+.feed-by{font-size:10px;color:var(--muted);margin-bottom:2px}
+.feed-date{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted)}
+.feed-note{font-size:10px;color:var(--muted);margin-top:4px;font-style:italic;line-height:1.4}
+/* INPUT NOTA */
+.nota-wrap{padding:12px 20px 16px;border-top:1px solid var(--bdr);display:flex;gap:8px;align-items:flex-end}
+.nota-inp{flex:1;background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;resize:none;transition:border-color .2s;line-height:1.4}
+.nota-inp:focus{border-color:var(--c0)}
+.nota-inp::placeholder{color:var(--muted)}
 /* CONTATO */
 .contact-grid{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
 .cg-row{display:flex;align-items:center;gap:8px;font-size:12px}
@@ -152,26 +132,20 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 @keyframes sp{to{transform:rotate(360deg)}}
 .loader{padding:60px;text-align:center;color:var(--muted)}
 @media(max-width:900px){.main-grid{grid-template-columns:1fr}.shell{padding:0 16px 80px}}
+/* BREADCRUMB */
+.breadcrumb{display:flex;align-items:center;gap:8px;padding:20px 0 0;font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;flex-wrap:wrap}
+.breadcrumb a{color:var(--muted);text-decoration:none;transition:color .15s}
+.breadcrumb a:hover{color:var(--text)}
+.breadcrumb-sep{opacity:.4;font-size:10px}
+.breadcrumb-current{color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px}
 </style>
+<script src="sidebar.js"></script>
 </head>
 <body>
 <div class="blob blob1"></div><div class="blob blob2"></div>
-<aside class="sidebar" id="sidebar">
-  <div class="sb-logo"><div class="sb-logo-mark">GR7</div><div class="sb-logo-text"><h2>GR7</h2><p>Sistema de Instalações</p></div></div>
-  <nav class="sb-nav">
-    <div class="sb-label">Menu</div>
-    <a class="sb-item" href="index.html"><span class="sb-icon">🏠</span><span class="sb-text">Dashboard</span></a>
-    <a class="sb-item" href="clientes.html"><span class="sb-icon">🏢</span><span class="sb-text">Clientes</span></a>
-    <a class="sb-item active" href="implantacao.html"><span class="sb-icon">🚀</span><span class="sb-text">Implantação</span></a>
-    <a class="sb-item" href="Checklist.html"><span class="sb-icon">✅</span><span class="sb-text">Checklist</span></a>
-    <a class="sb-item" href="relatorios-checklist.html"><span class="sb-icon">📊</span><span class="sb-text">Relatórios</span></a>
-  </nav>
-  <div class="sb-footer"><button class="sb-toggle" onclick="toggleSidebar()"><span class="sb-toggle-icon">◀</span><span class="sb-toggle-text">Recolher menu</span></button></div>
-</aside>
 
-<div class="shell" id="shell">
-  <div class="loader" id="loading"><div class="spin"></div>Carregando projeto...</div>
-</div>
+
+<div class="shell" id="shell"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -184,8 +158,6 @@ async function dbPatch(t,f,b){const r=await fetch(SURL+'/rest/v1/'+t+'?'+f,{meth
 async function dbDelete(t,f){await fetch(SURL+'/rest/v1/'+t+'?'+f,{method:'DELETE',headers:SH});}
 async function dbUpsert(t,b,oc){const h={...SH,Prefer:'resolution=merge-duplicates,return=representation'};const r=await fetch(SURL+'/rest/v1/'+t+'?on_conflict='+oc,{method:'POST',headers:h,body:JSON.stringify(b)});return r.json();}
 
-function toggleSidebar(){const sb=document.getElementById('sidebar');sb.classList.toggle('collapsed');document.body.classList.toggle('sb-collapsed');localStorage.setItem('sb_collapsed',sb.classList.contains('collapsed'));}
-(function(){if(localStorage.getItem('sb_collapsed')==='true'){document.getElementById('sidebar').classList.add('collapsed');document.body.classList.add('sb-collapsed');}})();
 
 const PAL=['#818cf8','#38bdf8','#34d399','#fbbf24','#f87171','#e879f9','#fb923c','#4ade80','#a78bfa','#22d3ee'];
 function getColor(s){let h=0;for(const c of(s||'A'))h=(h*31+c.charCodeAt(0))%PAL.length;return PAL[h];}
@@ -233,7 +205,7 @@ function calcGeral(){
   });
   const mods=cliente.modulos||[];tot+=mods.length;
   dn+=mods.filter(m=>modulos_prog[m]?.done).length;
-  tot+=tasks.length;dn+=tasks.filter(t=>t.done).length;
+  // tarefas não contam no progresso geral de instalação
   return{tot,dn,pct:tot?Math.round(dn/tot*100):0};
 }
 
@@ -247,13 +219,14 @@ function currentStatusFromTimeline(){
 }
 
 async function load(){
+  document.getElementById('shell').innerHTML=gr7Skeletons.projetoShell();
   if(!clienteId){document.getElementById('shell').innerHTML='<div class="loader" style="color:var(--c4)">❌ ID não informado. <a href="implantacao.html" style="color:var(--c0)">Voltar</a></div>';return;}
   try{
     const [c,pg,mg,tg,tl,cs]=await Promise.all([
       dbGet(`clientes_gr7?id=eq.${clienteId}&limit=1`),
       dbGet(`implant_checklist?cliente_id=eq.${clienteId}&select=maquina_key,item_num,concluido,data_conclusao`),
       dbGet(`implant_modulos?cliente_id=eq.${clienteId}`),
-      dbGet(`implant_tasks?cliente_id=eq.${clienteId}&order=created_at.asc`),
+      dbGet(`tarefas?cliente_id=eq.${clienteId}&order=criado_em.desc`),
       dbGet(`projeto_timeline?cliente_id=eq.${clienteId}&order=created_at.asc`).catch(()=>[]),
       dbGet(`projeto_status_custom?cliente_id=eq.${clienteId}`).catch(()=>[]),
     ]);
@@ -268,7 +241,7 @@ async function load(){
     });
     modulos_prog={};
     if(Array.isArray(mg))mg.forEach(m=>{modulos_prog[m.modulo]={done:m.concluido,date:m.data_conclusao};});
-    tasks=Array.isArray(tg)?tg:[];
+    tasks=Array.isArray(tg)?tg.map(t=>({...t,arquivos:typeof t.arquivos==='string'?JSON.parse(t.arquivos||'[]'):(t.arquivos||[])})):[];
     timeline=Array.isArray(tl)?tl:[];
 
     // Custom statuses
@@ -282,7 +255,7 @@ async function load(){
 
     renderPage();
   }catch(e){
-    document.getElementById('shell').innerHTML=`<div class="loader" style="color:var(--c4)">❌ ${e.message}</div>`;
+    document.getElementById('shell').innerHTML='<div class="loader" style="color:var(--c4)">⚠️ '+humanizeError(e)+'</div>';
   }
 }
 
@@ -328,46 +301,68 @@ function renderPage(){
   }).join('')}</div>`:`<div style="padding:14px 20px;color:var(--muted);font-size:13px">Nenhum módulo contratado.</div>`;
 
   // ── TASKS ──
-  const tasksDone=tasks.filter(t=>t.done).length;
-  const tasksHtml=`<div class="tasks-wrap">
-    ${tasks.map(t=>`<div class="task-row ${t.done?'done':''}">
-      <div class="task-cb" onclick="toggleTask('${t.id}',${!t.done})">${t.done?'✓':''}</div>
-      <span class="task-txt">${t.texto}</span>
-      <button class="task-del" onclick="deleteTask('${t.id}')">✕</button>
-    </div>`).join('')}
-    <div class="add-row">
-      <input class="add-inp" id="newTaskInp" type="text" placeholder="Nova tarefa..." onkeydown="if(event.key==='Enter')addTask()">
-      <button class="add-btn" onclick="addTask()">+ Add</button>
-    </div>
-  </div>`;
+  const PRIO_COLOR_T={'urgente':'var(--c4)','alta':'var(--c3)','normal':'var(--c0)','baixa':'var(--muted)'};
+  const STATUS_COLOR_T={'a_fazer':'var(--muted)','fazendo':'var(--c0)','pausado':'var(--c3)','feito':'var(--green)'};
+  const STATUS_LABEL_T={'a_fazer':'A Fazer','fazendo':'Fazendo','pausado':'Pausado','feito':'Feito'};
+  const PRIO_LABEL_T={'urgente':'&#128308; Urgente','alta':'&#128993; Alta','normal':'&#128309; Normal','baixa':'&#9898; Baixa'};
+  const tasksDone=tasks.filter(function(t){return t.status==='feito';}).length;
+
+  // navega para tarefas do cliente — função separada evita aspas aninhadas
+  function _irParaTarefas(){ window.location.href='tarefas.html?cliente='+clienteId; }
+
+  function _buildTaskRow(t){
+    var sc=STATUS_COLOR_T[t.status]||'var(--muted)';
+    var pc=PRIO_COLOR_T[t.prioridade]||'var(--muted)';
+    var doneClass=t.status==='feito'?' done':'';
+    var dateStr=t.previsao_termino
+      ? '<span style="font-size:10px;color:var(--muted)">&#128197; '+fmtDate(t.previsao_termino)+'</span>'
+      : '';
+    var attachStr=(t.arquivos&&t.arquivos.length)
+      ? '<span style="font-size:10px;color:var(--muted)">&#128206; '+t.arquivos.length+'</span>'
+      : '';
+    var prioSpan='<span class="task-proj-badge" style="background:'+pc+'18;color:'+pc+';border:1px solid '+pc+'30">'+(PRIO_LABEL_T[t.prioridade]||t.prioridade)+'</span>';
+    var statSpan='<span class="task-proj-badge" style="background:'+sc+'15;color:'+sc+';border:1px solid '+sc+'25">'+(STATUS_LABEL_T[t.status]||t.status)+'</span>';
+    return '<div class="task-proj-row" onclick="_irParaTarefas()">'
+      +'<div class="task-proj-dot" style="background:'+sc+'"></div>'
+      +'<div class="task-proj-body">'
+        +'<div class="task-proj-title'+doneClass+'">'+t.titulo+'</div>'
+        +'<div class="task-proj-meta">'+prioSpan+statSpan+dateStr+attachStr+'</div>'
+      +'</div>'
+      +'</div>';
+  }
+
+  var tasksHtml='<div class="task-proj-list">'
+    +(tasks.length?tasks.map(_buildTaskRow).join(''):'<div style="padding:8px 4px;color:var(--muted);font-size:12px">Nenhuma tarefa vinculada.</div>')
+    +'</div>'
+    +'<div class="task-proj-add" onclick="_irParaTarefas()">&#65291; Gerenciar tarefas</div>';
 
   // ── STATUS GRID ──
   const statusGridHtml=statusList.map(s=>`<div class="status-opt ${selectedStatusKey===s.key?'sel':''}" 
     style="${selectedStatusKey===s.key?`border-color:${s.color};background:${s.color}18;color:${s.color}`:''}"
     onclick="selectStatus('${s.key}')">${s.label}</div>`).join('');
 
-  // ── TIMELINE ──
+  // ── FEED HORIZONTAL ──
   const tlHtml=timeline.length?[...timeline].reverse().map(ev=>{
     const isStatus=ev.tipo==='status';
     const st=isStatus?getStatus(ev.conteudo):null;
     const dotColor=isStatus?(st?.color||'#818cf8'):'#5a5e78';
-    const isLast=timeline[timeline.length-1]===ev;
-    return `<div class="tl-item">
-      <div class="tl-line">
-        <div class="tl-dot" style="background:${dotColor}"></div>
-        ${!isLast?`<div class="tl-connector" style="background:${dotColor}33"></div>`:''}
-      </div>
-      <div class="tl-content">
-        <div class="tl-head">
-          <span class="tl-label" style="color:${dotColor}">${isStatus?'Status: '+(st?.label||ev.conteudo):ev.autor||'Anotação'}</span>
-          <span class="tl-date">${fmtDateTime(ev.created_at)}</span>
-        </div>
-        ${!isStatus&&ev.conteudo?`<div class="tl-note">${ev.conteudo}</div>`:''}
+    const label=isStatus?('Status → '+(st?.label||ev.conteudo)):(ev.autor||'Anotação');
+    return `<div class="feed-item">
+      <div class="feed-dot-wrap"><div class="feed-dot" style="background:${dotColor}"></div></div>
+      <div class="feed-card">
+        <div class="feed-label" style="color:${dotColor}">${label}</div>
+        ${!isStatus&&ev.conteudo?`<div class="feed-note">${ev.conteudo}</div>`:''}
+        <div class="feed-date">${fmtDateTime(ev.created_at)}</div>
       </div>
     </div>`;
   }).join(''):`<div style="color:var(--muted);font-size:12px;padding:4px 0">Nenhum evento registrado ainda.</div>`;
 
   document.getElementById('shell').innerHTML=`
+    <nav class="breadcrumb">
+      <a href="implantacao.html">🚀 Implantação</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">${c.nome_fantasia||c.razao_social||'Projeto'}</span>
+    </nav>
     <div class="hero">
       <div class="hero-av" style="background:${col}22;border:2px solid ${col}44">${av}</div>
       <div class="hero-info">
@@ -417,8 +412,29 @@ function renderPage(){
       </div>
 
       <div>
-        <!-- STATUS -->
+        <!-- CONTATO -->
         <div class="box" style="margin-bottom:20px">
+          <div class="box-head"><span class="box-title">📞 Contato</span></div>
+          <div class="contact-grid">
+            <div class="cg-row"><span class="cg-label">Responsável</span><span class="cg-val">${c.responsavel||'—'}</span></div>
+            <div class="cg-row"><span class="cg-label">Telefone</span><span class="cg-val">${c.telefone||'—'}</span></div>
+            <div class="cg-row"><span class="cg-label">CNPJ</span><span class="cg-val" style="font-family:monospace;font-size:11px">${c.cnpj||'—'}</span></div>
+            <div class="cg-row"><span class="cg-label">Venda</span><span class="cg-val">${fmtDate(c.data_venda)}</span></div>
+          </div>
+        </div>
+
+        <!-- INFRA -->
+        <div class="box" style="margin-bottom:20px">
+          <div class="box-head"><span class="box-title">⚙️ Infraestrutura</span></div>
+          <div class="infra-mini">
+            <div class="infra-card"><div class="infra-n" style="color:var(--c0)">${c.qtd_servidor||0}</div><div class="infra-l">Servidores</div></div>
+            <div class="infra-card"><div class="infra-n" style="color:var(--c1)">${c.qtd_retaguarda||0}</div><div class="infra-l">Retaguardas</div></div>
+            <div class="infra-card"><div class="infra-n" style="color:var(--green)">${c.qtd_caixas||0}</div><div class="infra-l">Caixas</div></div>
+          </div>
+        </div>
+
+        <!-- STATUS -->
+        <div class="box">
           <div class="box-head"><span class="box-title">🔖 Status do Projeto</span></div>
           <div class="status-current">
             <span class="status-label-big" style="color:${curStatus.color}">${curStatus.label}</span>
@@ -434,37 +450,21 @@ function renderPage(){
           </div>
           <button class="status-apply-btn" onclick="applyStatus()">✓ Aplicar Status</button>
         </div>
+      </div>
+    </div>
 
-        <!-- TIMELINE / HISTÓRICO -->
-        <div class="box" style="margin-bottom:20px">
-          <div class="box-head"><span class="box-title">📅 Histórico</span></div>
-          <div class="timeline" id="tlWrap">${tlHtml}</div>
-          <div style="padding:0 18px 14px;display:flex;flex-direction:column;gap:7px;border-top:1px solid var(--bdr);margin-top:8px;padding-top:12px">
-            <textarea id="notaInp" style="background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;color:var(--text);font-size:12px;font-family:'Outfit',sans-serif;outline:none;resize:none;width:100%;transition:border-color .2s" rows="2" placeholder="Adicionar anotação..." onfocus="this.style.borderColor='var(--c0)'" onblur="this.style.borderColor='var(--bdr)'"></textarea>
-            <button class="add-btn" style="align-self:flex-end" onclick="addNota()">+ Registrar</button>
-          </div>
-        </div>
-
-        <!-- CONTATO -->
-        <div class="box" style="margin-bottom:20px">
-          <div class="box-head"><span class="box-title">📞 Contato</span></div>
-          <div class="contact-grid">
-            <div class="cg-row"><span class="cg-label">Responsável</span><span class="cg-val">${c.responsavel||'—'}</span></div>
-            <div class="cg-row"><span class="cg-label">Telefone</span><span class="cg-val">${c.telefone||'—'}</span></div>
-            <div class="cg-row"><span class="cg-label">CNPJ</span><span class="cg-val" style="font-family:monospace;font-size:11px">${c.cnpj||'—'}</span></div>
-            <div class="cg-row"><span class="cg-label">Venda</span><span class="cg-val">${fmtDate(c.data_venda)}</span></div>
-          </div>
-        </div>
-
-        <!-- INFRA -->
-        <div class="box">
-          <div class="box-head"><span class="box-title">⚙️ Infraestrutura</span></div>
-          <div class="infra-mini">
-            <div class="infra-card"><div class="infra-n" style="color:var(--c0)">${c.qtd_servidor||0}</div><div class="infra-l">Servidores</div></div>
-            <div class="infra-card"><div class="infra-n" style="color:var(--c1)">${c.qtd_retaguarda||0}</div><div class="infra-l">Retaguardas</div></div>
-            <div class="infra-card"><div class="infra-n" style="color:var(--green)">${c.qtd_caixas||0}</div><div class="infra-l">Caixas</div></div>
-          </div>
-        </div>
+    <!-- HISTÓRICO FULL WIDTH -->
+    <div class="box" style="margin-bottom:40px">
+      <div class="box-head">
+        <span class="box-title">📅 Histórico</span>
+        <span class="box-meta">${timeline.length} evento${timeline.length!==1?'s':''}</span>
+      </div>
+      <div class="feed-wrap">
+        <div class="feed" id="tlWrap">${tlHtml}</div>
+      </div>
+      <div class="nota-wrap">
+        <textarea class="nota-inp" id="notaInp" rows="2" placeholder="Adicionar anotação ao histórico..."></textarea>
+        <button class="add-btn" onclick="addNota()">+ Registrar</button>
       </div>
     </div>`;
 }
@@ -492,7 +492,7 @@ async function applyStatus(){
       renderPage();
       toast('Status atualizado!','success');
     }
-  }catch(e){toast('Erro: '+e.message,'error');}
+  }catch(e){toast(humanizeError(e),'error');}
 }
 
 async function addCustomStatus(){
@@ -509,7 +509,7 @@ async function addCustomStatus(){
     if(inp)inp.value='';
     renderPage();
     toast('Status criado!','success');
-  }catch(e){toast('Erro: '+e.message,'error');}
+  }catch(e){toast(humanizeError(e),'error');}
 }
 
 // ── MÓDULO ──
@@ -518,24 +518,10 @@ async function toggleModulo(modulo,novoEstado){
   try{
     await dbUpsert('implant_modulos',{cliente_id:clienteId,modulo,concluido:novoEstado,data_conclusao:date},'cliente_id,modulo');
     modulos_prog[modulo]={done:novoEstado,date};renderPage();
-  }catch(e){toast('Erro: '+e.message,'error');}
+  }catch(e){toast(humanizeError(e),'error');}
 }
 
-// ── TASKS ──
-async function addTask(){
-  const inp=document.getElementById('newTaskInp');
-  const texto=inp?.value?.trim();if(!texto)return;
-  try{const r=await dbPost('implant_tasks',{cliente_id:clienteId,texto,done:false});if(r?.id){tasks.push(r);inp.value='';renderPage();}}
-  catch(e){toast('Erro: '+e.message,'error');}
-}
-async function toggleTask(id,novoEstado){
-  try{await dbPatch('implant_tasks','id=eq.'+id,{done:novoEstado});const t=tasks.find(x=>x.id===id);if(t)t.done=novoEstado;renderPage();}
-  catch(e){toast('Erro: '+e.message,'error');}
-}
-async function deleteTask(id){
-  try{await dbDelete('implant_tasks','id=eq.'+id);tasks=tasks.filter(t=>t.id!==id);renderPage();}
-  catch(e){toast('Erro: '+e.message,'error');}
-}
+// Tarefas gerenciadas em tarefas.html
 
 // ── NOTA ──
 async function addNota(){
@@ -544,7 +530,7 @@ async function addNota(){
   try{
     const r=await dbPost('projeto_timeline',{cliente_id:clienteId,tipo:'nota',conteudo,autor:'—'});
     if(r?.id){timeline.push(r);inp.value='';renderPage();toast('Anotação registrada!','success');}
-  }catch(e){toast('Erro: '+e.message,'error');}
+  }catch(e){toast(humanizeError(e),'error');}
 }
 
 if(clienteId)load();
