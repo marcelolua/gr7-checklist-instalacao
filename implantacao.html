@@ -6,38 +6,13 @@
 <title>GR7 — Implantação</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#07080d;--s1:#0e1018;--s2:#161820;--s3:#1e2030;--bdr:#252738;--text:#dde1f0;--muted:#5a5e78;--r:14px;--green:#00e5a0;--green2:#059669;--c0:#818cf8;--c1:#38bdf8;--c2:#34d399;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;--sb-w:240px;--sb-w-collapsed:64px;}
+:root{--bg:#07080d;--s1:#0e1018;--s2:#161820;--s3:#1e2030;--bdr:#252738;--text:#dde1f0;--muted:#5a5e78;--r:14px;--green:#00e5a0;--green2:#059669;--c0:#818cf8;--c1:#38bdf8;--c2:#34d399;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;padding-left:var(--sb-w);transition:padding-left .25s cubic-bezier(.4,0,.2,1)}
-body.sb-collapsed{padding-left:var(--sb-w-collapsed)}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
 .blob{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0;opacity:.1}
 .blob1{width:700px;height:700px;top:-200px;left:0;background:var(--c0)}
 .blob2{width:500px;height:500px;bottom:-200px;right:-100px;background:var(--c5)}
-/* SIDEBAR */
-.sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sb-w);background:#0e1018;border-right:1px solid #1e2030;display:flex;flex-direction:column;z-index:999;transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden}
-.sidebar.collapsed{width:var(--sb-w-collapsed)}
-.sb-logo{display:flex;align-items:center;gap:13px;padding:22px 16px 18px;border-bottom:1px solid #1e2030;flex-shrink:0;min-width:var(--sb-w);overflow:hidden}
-.sb-logo-mark{width:36px;height:36px;flex-shrink:0;background:linear-gradient(135deg,#818cf8,#e879f9);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:#fff;box-shadow:0 0 20px rgba(129,140,248,.35)}
-.sb-logo-text{white-space:nowrap;overflow:hidden}
-.sb-logo-text h2{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.3px;color:#fff}
-.sb-logo-text p{font-size:10px;color:#5a5e78;margin-top:2px}
-.sb-nav{flex:1;padding:12px 0;overflow-y:auto;overflow-x:hidden}
-.sb-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#3a3e58;padding:10px 20px 4px;white-space:nowrap;opacity:1;transition:opacity .2s}
-.sidebar.collapsed .sb-label{opacity:0}
-.sb-item{display:flex;align-items:center;gap:12px;padding:11px 16px;color:#5a5e78;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .15s;white-space:nowrap;overflow:hidden;border-left:2px solid transparent;margin:1px 0}
-.sb-item:hover{color:#dde1f0;background:rgba(255,255,255,.04)}
-.sb-item.active{color:#00e5a0;background:rgba(0,229,160,.07);border-left-color:#00e5a0}
-.sb-icon{font-size:17px;flex-shrink:0;width:24px;display:flex;align-items:center;justify-content:center}
-.sb-text{transition:opacity .2s}
-.sidebar.collapsed .sb-text{opacity:0;pointer-events:none}
-.sb-footer{border-top:1px solid #1e2030;padding:12px 16px;flex-shrink:0}
-.sb-toggle{display:flex;align-items:center;gap:12px;background:transparent;border:1px solid #1e2030;border-radius:8px;padding:9px 12px;color:#5a5e78;font-size:12px;cursor:pointer;width:100%;transition:all .15s;white-space:nowrap;overflow:hidden}
-.sb-toggle:hover{border-color:#3a3e58;color:#dde1f0}
-.sb-toggle-icon{font-size:15px;flex-shrink:0;transition:transform .25s}
-.sidebar.collapsed .sb-toggle-icon{transform:rotate(180deg)}
-.sb-toggle-text{transition:opacity .2s}
-.sidebar.collapsed .sb-toggle-text{opacity:0}
 /* LAYOUT */
 .shell{position:relative;z-index:10;padding:0 44px 80px}
 header{display:flex;align-items:center;justify-content:space-between;padding:32px 0 28px;flex-wrap:wrap;gap:16px}
@@ -95,21 +70,11 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 .loader{grid-column:1/-1;padding:60px;text-align:center;color:var(--muted)}
 @media(max-width:768px){.shell{padding:0 16px 60px}.summary{grid-template-columns:1fr 1fr}.cards-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
 </style>
+<script src="sidebar.js"></script>
 </head>
 <body>
 <div class="blob blob1"></div><div class="blob blob2"></div>
-<aside class="sidebar" id="sidebar">
-  <div class="sb-logo"><div class="sb-logo-mark">GR7</div><div class="sb-logo-text"><h2>GR7</h2><p>Sistema de Instalações</p></div></div>
-  <nav class="sb-nav">
-    <div class="sb-label">Menu</div>
-    <a class="sb-item" href="index.html"><span class="sb-icon">🏠</span><span class="sb-text">Dashboard</span></a>
-    <a class="sb-item" href="clientes.html"><span class="sb-icon">🏢</span><span class="sb-text">Clientes</span></a>
-    <a class="sb-item active" href="implantacao.html"><span class="sb-icon">🚀</span><span class="sb-text">Implantação</span></a>
-    <a class="sb-item" href="Checklist.html"><span class="sb-icon">✅</span><span class="sb-text">Checklist</span></a>
-    <a class="sb-item" href="relatorios-checklist.html"><span class="sb-icon">📊</span><span class="sb-text">Relatórios</span></a>
-  </nav>
-  <div class="sb-footer"><button class="sb-toggle" onclick="toggleSidebar()"><span class="sb-toggle-icon">◀</span><span class="sb-toggle-text">Recolher menu</span></button></div>
-</aside>
+
 
 <div class="shell">
   <header>
@@ -133,7 +98,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
     <button class="fbtn" id="fAtv" onclick="setFilter('ativo')">🟢 Ativo</button>
   </div>
   <p class="sec" id="secLabel">Projetos</p>
-  <div class="cards-grid" id="cardsGrid"><div class="loader"><div class="spin"></div>Carregando...</div></div>
+  <div class="cards-grid" id="cardsGrid"></div>
 </div>
 
 <script>
@@ -142,8 +107,6 @@ const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 const SH={'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY};
 async function dbGet(p){const r=await fetch(SURL+'/rest/v1/'+p,{headers:SH});return r.json();}
 
-function toggleSidebar(){const sb=document.getElementById('sidebar');sb.classList.toggle('collapsed');document.body.classList.toggle('sb-collapsed');localStorage.setItem('sb_collapsed',sb.classList.contains('collapsed'));}
-(function(){if(localStorage.getItem('sb_collapsed')==='true'){document.getElementById('sidebar').classList.add('collapsed');document.body.classList.add('sb-collapsed');}})();
 
 const PAL=['#818cf8','#38bdf8','#34d399','#fbbf24','#f87171','#e879f9','#fb923c','#4ade80','#a78bfa','#22d3ee','#f472b6','#60a5fa'];
 function getColor(s){let h=0;for(const c of(s||'A'))h=(h*31+c.charCodeAt(0))%PAL.length;return PAL[h];}
@@ -174,7 +137,7 @@ function calcPct(c){
 }
 
 async function loadProjetos(){
-  document.getElementById('cardsGrid').innerHTML='<div class="loader"><div class="spin"></div>Carregando...</div>';
+  document.getElementById('cardsGrid').innerHTML=gr7Skeletons.implantCards(8);
   try{
     const cl=await dbGet('clientes_gr7?order=created_at.desc');
     if(!Array.isArray(cl)){allProjetos=[];renderCards();return;}
@@ -209,7 +172,7 @@ async function loadProjetos(){
     document.getElementById('sAtv').textContent=allProjetos.filter(c=>c.status==='ativo').length;
     renderCards();
   }catch(e){
-    document.getElementById('cardsGrid').innerHTML=`<div class="loader" style="color:var(--c4)">❌ ${e.message}</div>`;
+    document.getElementById('cardsGrid').innerHTML='<div class="loader" style="color:var(--c4)">⚠️ '+humanizeError(e)+'</div>';
   }
 }
 
