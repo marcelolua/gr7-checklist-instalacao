@@ -43,6 +43,19 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 .sc-ico{font-size:26px;margin-bottom:12px}
 .sc-num{font-family:'IBM Plex Mono',monospace;font-size:44px;font-weight:600;line-height:1;margin-bottom:6px}
 .sc-lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+/* FILTRO DE PERÍODO */
+.periodo-bar{display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.periodo-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);flex-shrink:0}
+.periodo-btns{display:flex;gap:6px;flex-wrap:wrap}
+.pbtn{background:var(--s1);border:1px solid var(--bdr);border-radius:8px;padding:7px 14px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'IBM Plex Mono',monospace;white-space:nowrap}
+.pbtn:hover{border-color:var(--c0);color:var(--c0)}
+.pbtn.active{background:rgba(129,140,248,.1);border-color:var(--c0);color:var(--c0)}
+.pbtn.active-green{background:rgba(0,229,160,.08);border-color:var(--green);color:var(--green)}
+.periodo-custom{display:flex;align-items:center;gap:8px;margin-left:auto}
+.periodo-input{background:var(--s1);border:1px solid var(--bdr);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;font-family:'IBM Plex Mono',monospace;outline:none;transition:border-color .2s;width:130px}
+.periodo-input:focus{border-color:var(--c0)}
+.periodo-sep{font-size:11px;color:var(--muted)}
+.periodo-result{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-left:4px;white-space:nowrap}
 
 /* COLLAB COLUMNS */
 .colab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px;align-items:start}
@@ -125,131 +138,12 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 
 @media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr)}.colab-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.shell{padding:0 16px 60px}}
-    /* ===== SIDEBAR ===== */
-    :root { --sb-w: 240px; --sb-w-collapsed: 64px; }
-
-    .sidebar {
-      position: fixed; top: 0; left: 0; height: 100vh;
-      width: var(--sb-w); background: #0e1018;
-      border-right: 1px solid #1e2030;
-      display: flex; flex-direction: column;
-      z-index: 999; transition: width 0.25s cubic-bezier(.4,0,.2,1);
-      overflow: hidden;
-    }
-    .sidebar.collapsed { width: var(--sb-w-collapsed); }
-
-    .sb-logo {
-      display: flex; align-items: center; gap: 13px;
-      padding: 22px 16px 18px; border-bottom: 1px solid #1e2030;
-      flex-shrink: 0; min-width: var(--sb-w); overflow: hidden;
-    }
-    .sb-logo-mark {
-      width: 36px; height: 36px; flex-shrink: 0;
-      background: linear-gradient(135deg,#818cf8,#e879f9);
-      border-radius: 10px; display: flex; align-items: center;
-      justify-content: center; font-family: 'IBM Plex Mono', monospace;
-      font-weight: 600; font-size: 13px; color: #fff;
-      box-shadow: 0 0 20px rgba(129,140,248,.35);
-    }
-    .sb-logo-text { white-space: nowrap; overflow: hidden; }
-    .sb-logo-text h2 {
-      font-family: 'Syne', sans-serif; font-size: 16px;
-      font-weight: 800; letter-spacing: -.3px; color: #fff;
-    }
-    .sb-logo-text p { font-size: 10px; color: #5a5e78; margin-top: 2px; }
-
-    .sb-nav { flex: 1; padding: 12px 0; overflow-y: auto; overflow-x: hidden; }
-
-    .sb-label {
-      font-family: 'IBM Plex Mono', monospace; font-size: 9px;
-      letter-spacing: 2px; text-transform: uppercase; color: #3a3e58;
-      padding: 10px 20px 4px; white-space: nowrap; opacity: 1;
-      transition: opacity 0.2s;
-    }
-    .sidebar.collapsed .sb-label { opacity: 0; }
-
-    .sb-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 16px; color: #5a5e78; font-size: 13px;
-      font-weight: 500; cursor: pointer; text-decoration: none;
-      transition: all 0.15s; white-space: nowrap; overflow: hidden;
-      border-left: 2px solid transparent; margin: 1px 0;
-    }
-    .sb-item:hover { color: #dde1f0; background: rgba(255,255,255,.04); }
-    .sb-item.active {
-      color: #00e5a0; background: rgba(0,229,160,.07);
-      border-left-color: #00e5a0;
-    }
-    .sb-icon {
-      font-size: 17px; flex-shrink: 0; width: 24px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .sb-text { transition: opacity 0.2s; }
-    .sidebar.collapsed .sb-text { opacity: 0; pointer-events: none; }
-
-    .sb-footer {
-      border-top: 1px solid #1e2030; padding: 12px 16px;
-      flex-shrink: 0;
-    }
-    .sb-toggle {
-      display: flex; align-items: center; gap: 12px;
-      background: transparent; border: 1px solid #1e2030;
-      border-radius: 8px; padding: 9px 12px; color: #5a5e78;
-      font-size: 12px; cursor: pointer; width: 100%;
-      transition: all 0.15s; white-space: nowrap; overflow: hidden;
-    }
-    .sb-toggle:hover { border-color: #3a3e58; color: #dde1f0; }
-    .sb-toggle-icon { font-size: 15px; flex-shrink: 0; transition: transform 0.25s; }
-    .sidebar.collapsed .sb-toggle-icon { transform: rotate(180deg); }
-    .sb-toggle-text { transition: opacity 0.2s; }
-    .sidebar.collapsed .sb-toggle-text { opacity: 0; }
-
-    /* Page shifts right when sidebar open */
-    body { padding-left: var(--sb-w); transition: padding-left 0.25s cubic-bezier(.4,0,.2,1); }
-    body.sb-collapsed { padding-left: var(--sb-w-collapsed); }
 
 </style>
+<script src="sidebar.js"></script>
 </head>
 <body>
-  <!-- ===== SIDEBAR ===== -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sb-logo">
-      <div class="sb-logo-mark">GR7</div>
-      <div class="sb-logo-text">
-        <h2>GR7</h2>
-        <p>Sistema de Instalações</p>
-      </div>
-    </div>
-    <nav class="sb-nav">
-      
-      <div class="sb-label">Menu</div>
-      <a class="sb-item " href="index.html"><span class="sb-icon">🏠</span><span class="sb-text">Dashboard</span></a>
-      <a class="sb-item " href="clientes.html"><span class="sb-icon">🏢</span><span class="sb-text">Clientes</span></a>
-      <a class="sb-item " href="implantacao.html"><span class="sb-icon">🚀</span><span class="sb-text">Implantação</span></a>
-      <a class="sb-item " href="Checklist.html"><span class="sb-icon">✅</span><span class="sb-text">Checklist</span></a>
-      <a class="sb-item active" href="relatorios-checklist.html"><span class="sb-icon">📊</span><span class="sb-text">Relatórios</span></a>
-    </nav>
-    <div class="sb-footer">
-      <button class="sb-toggle" onclick="toggleSidebar()">
-        <span class="sb-toggle-icon">◀</span>
-        <span class="sb-toggle-text">Recolher menu</span>
-      </button>
-    </div>
-  </aside>
-  <script>
-    function toggleSidebar(){
-      const sb=document.getElementById('sidebar');
-      sb.classList.toggle('collapsed');
-      document.body.classList.toggle('sb-collapsed');
-      localStorage.setItem('sb_collapsed', sb.classList.contains('collapsed'));
-    }
-    (function(){
-      if(localStorage.getItem('sb_collapsed')==='true'){
-        document.getElementById('sidebar').classList.add('collapsed');
-        document.body.classList.add('sb-collapsed');
-      }
-    })();
-  </script>
+
 
   <div class="blob blob1"></div>
 <div class="blob blob2"></div>
@@ -274,9 +168,23 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 </div>
 
 <p class="sec">Por Colaborador</p>
-<div class="colab-grid" id="colabGrid">
-  <div class="loader" style="grid-column:1/-1"><div class="spin"></div>Carregando...</div>
+<div class="periodo-bar">
+  <span class="periodo-label">Período</span>
+  <div class="periodo-btns">
+    <button class="pbtn active" id="pb-all"   onclick="setPeriodo('all')">Todos</button>
+    <button class="pbtn"        id="pb-hoje"  onclick="setPeriodo('hoje')">Hoje</button>
+    <button class="pbtn"        id="pb-semana"onclick="setPeriodo('semana')">Esta semana</button>
+    <button class="pbtn"        id="pb-mes"   onclick="setPeriodo('mes')">Este mês</button>
+    <button class="pbtn"        id="pb-trim"  onclick="setPeriodo('trim')">3 meses</button>
+  </div>
+  <div class="periodo-custom">
+    <input type="date" class="periodo-input" id="pdataInicio" onchange="setPeriodo('custom')">
+    <span class="periodo-sep">→</span>
+    <input type="date" class="periodo-input" id="pdataFim"    onchange="setPeriodo('custom')">
+    <span class="periodo-result" id="periodoResult"></span>
+  </div>
 </div>
+<div class="colab-grid" id="colabGrid"></div>
 
 </div>
 
@@ -290,7 +198,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
       </div>
       <button class="m-close" onclick="closeModal()">✕</button>
     </div>
-    <div class="mbody" id="mBody"><div class="loader"><div class="spin"></div>Carregando...</div></div>
+    <div class="mbody" id="mBody"></div>
   </div>
 </div>
 
@@ -306,9 +214,68 @@ function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('pt-
 
 let allClientes=[];
 let colaboradores=[];
+let periodoAtual='all';
+
+function _startOf(date, unit) {
+  var d = new Date(date);
+  if (unit === 'day')  { d.setHours(0,0,0,0); return d; }
+  if (unit === 'week') { d.setHours(0,0,0,0); d.setDate(d.getDate() - d.getDay()); return d; }
+  if (unit === 'month'){ d.setHours(0,0,0,0); d.setDate(1); return d; }
+  if (unit === 'trim') { d.setHours(0,0,0,0); d.setMonth(d.getMonth()-3,1); return d; }
+}
+
+function filtrarPorPeriodo(lista) {
+  if (periodoAtual === 'all') return lista;
+  var now = new Date();
+  var inicio, fim = now;
+  if (periodoAtual === 'hoje')  { inicio = _startOf(now, 'day'); }
+  if (periodoAtual === 'semana'){ inicio = _startOf(now, 'week'); }
+  if (periodoAtual === 'mes')   { inicio = _startOf(now, 'month'); }
+  if (periodoAtual === 'trim')  { inicio = _startOf(now, 'trim'); }
+  if (periodoAtual === 'custom'){
+    var di = document.getElementById('pdataInicio').value;
+    var df = document.getElementById('pdataFim').value;
+    if (!di && !df) return lista;
+    inicio = di ? new Date(di + 'T00:00:00') : null;
+    fim    = df ? new Date(df + 'T23:59:59') : now;
+  }
+  return lista.filter(function(c) {
+    var raw = c.data || c.criado_em;
+    if (!raw) return false;
+    var d = new Date(raw);
+    if (inicio && d < inicio) return false;
+    if (fim    && d > fim)    return false;
+    return true;
+  });
+}
+
+function setPeriodo(p) {
+  periodoAtual = p;
+  // Atualizar botões
+  var map = {all:'pb-all', hoje:'pb-hoje', semana:'pb-semana', mes:'pb-mes', trim:'pb-trim'};
+  document.querySelectorAll('.pbtn').forEach(function(b){ b.classList.remove('active','active-green'); });
+  var activeBtn = document.getElementById(map[p]);
+  if (activeBtn) activeBtn.classList.add(p === 'all' ? 'active-green' : 'active');
+  // Exibir resultado
+  var filtrado = filtrarPorPeriodo(allClientes);
+  var el = document.getElementById('periodoResult');
+  if (el) el.textContent = p !== 'all' ? filtrado.length + ' registro' + (filtrado.length !== 1 ? 's' : '') : '';
+  // Re-renderizar
+  _renderComFiltro(filtrado);
+}
+
+function _renderComFiltro(lista) {
+  var andamento = lista.filter(function(c){ return (c.percentual||0) < 100; });
+  var concluidos= lista.filter(function(c){ return (c.percentual||0) >= 100; });
+  document.getElementById('sTot').textContent      = lista.length;
+  document.getElementById('sAndamento').textContent = andamento.length;
+  document.getElementById('sConcluido').textContent = concluidos.length;
+  renderColabs(lista);
+}
 
 async function loadAll(){
   document.getElementById('syncChip').textContent='↻ Carregando…';
+  document.getElementById('colabGrid').innerHTML=gr7Skeletons.colabCols(3);
   try{
     var results=await Promise.all([
       dbGet('colaboradores?order=nome&ativo=eq.true'),
@@ -320,21 +287,18 @@ async function loadAll(){
     var andamento=allClientes.filter(function(c){return(c.percentual||0)<100;});
     var concluidos=allClientes.filter(function(c){return(c.percentual||0)>=100;});
 
-    document.getElementById('sTot').textContent=allClientes.length;
-    document.getElementById('sAndamento').textContent=andamento.length;
-    document.getElementById('sConcluido').textContent=concluidos.length;
     document.getElementById('sColab').textContent=colaboradores.length;
-
-    renderColabs();
+    _renderComFiltro(filtrarPorPeriodo(allClientes));
     document.getElementById('syncChip').textContent='✓ Atualizado';
     setTimeout(function(){document.getElementById('syncChip').textContent='↻ Atualizar';},3000);
   }catch(e){
     document.getElementById('syncChip').textContent='⚠ Erro';
-    document.getElementById('colabGrid').innerHTML='<div class="loader" style="color:var(--c4)">❌ '+e.message+'</div>';
+    document.getElementById('colabGrid').innerHTML='<div class="loader" style="color:var(--c4)">⚠️ '+humanizeError(e)+'</div>';
   }
 }
 
-function renderColabs(){
+function renderColabs(lista){
+  lista = lista || filtrarPorPeriodo(allClientes);
   var typeLabel={servidor:'🖥 Servidor',retaguarda:'🗄️ Retaguarda',nfce:'🧾 NFCe'};
   var typeCls={servidor:'servidor',retaguarda:'retaguarda',nfce:'nfce'};
 
@@ -343,7 +307,7 @@ function renderColabs(){
     var ini=initials(u.nome);
 
     // Checklists onde esse colaborador é o responsável principal
-    var meus=allClientes.filter(function(c){
+    var meus=lista.filter(function(c){
       return norm(c.funcionario||'').includes(norm(u.nome))||norm(u.nome).includes(norm(c.funcionario||'').split(' ')[0]);
     });
 
@@ -407,7 +371,7 @@ function renderColabs(){
 // ── MODAL DETALHE ──
 async function openModal(clienteId){
   document.getElementById('modalBg').classList.add('open');
-  document.getElementById('mBody').innerHTML='<div class="loader"><div class="spin"></div>Carregando checklist...</div>';
+  document.getElementById('mBody').innerHTML='<div style="padding:22px 26px">'+'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">'+'<div class="sk" style="height:56px;border-radius:10px"></div>'.repeat(3)+'</div>'+'<div style="background:var(--s2);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:14px">'+'<div style="flex:1;height:8px;background:var(--s3);border-radius:99px;overflow:hidden"><div class="sk" style="width:65%;height:100%;border-radius:99px"></div></div>'+'<div class="sk" style="width:48px;height:20px;border-radius:6px"></div></div>'+[0,0,0,0,0].map(function(){return '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr)"><div class="sk" style="width:18px;height:18px;border-radius:5px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div class="sk" style="width:'+(40+Math.random()*35|0)+'%;height:13px"></div></div></div>';}).join('')+'</div>';
 
   try{
     var c=allClientes.find(function(x){return x.id===clienteId;});
@@ -470,7 +434,7 @@ async function openModal(clienteId){
 
     document.getElementById('mBody').innerHTML=html;
   }catch(e){
-    document.getElementById('mBody').innerHTML='<div class="loader" style="color:var(--c4)">❌ '+e.message+'</div>';
+    document.getElementById('mBody').innerHTML='<div class="loader" style="color:var(--c4)">⚠️ '+humanizeError(e)+'</div>';
   }
 }
 
