@@ -4,1035 +4,591 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checklist GR7</title>
+  <title>GR7 — Checklist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    /* ===== DESIGN TOKENS (idênticos ao restante do sistema) ===== */
+    :root {
+      --bg: #07080d;
+      --s1: #0e1018;
+      --s2: #161820;
+      --s3: #1e2030;
+      --bdr: #252738;
+      --text: #dde1f0;
+      --muted: #5a5e78;
+      --r: 14px;
+      --green: #00e5a0;
+      --green2: #059669;
+      --c0: #818cf8;
+      --c1: #38bdf8;
+      --c2: #34d399;
+      --c3: #fbbf24;
+      --c4: #f87171;
+      --c5: #e879f9;
     }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #1a1a1a;
-      color: #e0e0e0;
-      font-family: 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', 'Apple Color Emoji', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* ----- DRAG HANDLE ----- */
-    .drag-handle {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      flex-shrink: 0;
-      cursor: grab;
-      color: #3a3a3a;
-      font-size: 16px;
-      line-height: 1;
-      transition: color 0.2s;
-      user-select: none;
-      padding: 2px 0;
-    }
-
-    .drag-handle:hover {
-      color: #666;
-    }
-
-    .drag-handle:active {
-      cursor: grabbing;
-    }
-
-    .check-item.dragging {
-      opacity: 0.4;
-      border-color: #00e5a0 !important;
-    }
-
-    .check-item.drag-over {
-      border-color: #00e5a0 !important;
-      background: rgba(0, 229, 160, 0.06) !important;
-      transform: scale(1.01);
-    }
-
-    /* ----- ADD TASK BUTTON ----- */
-    .add-task-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 14px;
-      background: transparent;
-      border: 1.5px dashed #3a3a3a;
-      border-radius: 10px;
-      padding: 12px 16px;
-      color: #555;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      transition: all 0.2s;
-    }
-
-    .add-task-btn:hover {
-      border-color: #00e5a0;
-      color: #00e5a0;
-      background: rgba(0, 229, 160, 0.04);
-    }
-
-    /* ----- ADD TASK MODAL ----- */
-    .add-task-overlay {
-      display: none;
+    /* ruído de fundo sutil */
+    body::after {
+      content: '';
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.75);
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: .5;
     }
 
-    .add-task-overlay.active {
-      display: flex;
-    }
+    /* blobs decorativos */
+    .blob { position: fixed; border-radius: 50%; filter: blur(130px); pointer-events: none; z-index: 0; opacity: .1; }
+    .blob1 { width: 600px; height: 600px; top: -200px; left: -100px; background: var(--c0); }
+    .blob2 { width: 500px; height: 500px; bottom: -200px; right: -100px; background: var(--c5); }
 
-    .add-task-modal {
-      background: #2a2a2a;
-      border-radius: 12px;
-      padding: 28px;
-      width: 480px;
-      max-width: 95vw;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    }
 
-    .add-task-modal .modal-title {
-      font-size: 18px;
-      margin-bottom: 20px;
-    }
-
-    /* ----- TOAST ----- */
+    /* ===== TOAST ===== */
     .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: #2a2a2a;
-      border: 1px solid #333;
-      border-radius: 10px;
-      padding: 12px 18px;
-      font-size: 13px;
-      color: #ccc;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      z-index: 9999;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.3s;
-      max-width: 320px;
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--s2); border: 1px solid var(--bdr);
+      border-radius: 10px; padding: 12px 18px;
+      font-size: 13px; color: var(--text);
+      display: flex; align-items: center; gap: 10px;
+      z-index: 9999; opacity: 0; transform: translateY(10px);
+      transition: all .3s; max-width: 320px;
+      font-family: 'Outfit', sans-serif;
     }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-color: rgba(0,229,160,.4); color: var(--green); }
+    .toast.error { border-color: rgba(248,113,113,.4); color: var(--c4); }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .toast.success {
-      border-color: rgba(0, 229, 160, 0.4);
-    }
-
-    .toast.error {
-      border-color: rgba(255, 80, 80, 0.4);
-      color: #ff8080;
-    }
-
-    /* ----- MODAL OVERLAY ----- */
+    /* ===== MODAL BASE ===== */
     .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.75); z-index: 1000;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(6px); padding: 20px;
     }
-
-    .modal-overlay.active {
-      display: flex;
-    }
+    .modal-overlay.active { display: flex; }
 
     .modal {
-      background: #2a2a2a;
-      border-radius: 12px;
-      padding: 32px;
-      width: 560px;
-      max-width: 95vw;
-      max-height: 90vh;
-      overflow-y: auto;
+      background: var(--s1); border: 1px solid var(--bdr);
+      border-radius: 20px; padding: 32px;
+      width: 560px; max-width: 95vw;
+      max-height: 90vh; overflow-y: auto;
       position: relative;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: mIn .2s ease;
     }
-
-    .who-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      border-radius: 12px;
-      z-index: 10;
-      padding: 18px;
-    }
-
-    .who-overlay.active {
-      display: flex;
-    }
-
-    .who-card {
-      width: 100%;
-      max-width: 420px;
-      background: #2a2a2a;
-      border: 1.5px solid #3a3a3a;
-      border-radius: 12px;
-      padding: 22px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    }
+    @keyframes mIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
     .modal-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      position: relative;
+      font-family: 'Syne', sans-serif;
+      font-size: 20px; font-weight: 800;
+      color: var(--text); margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
     }
 
-    /* ----- MODAL TABS ----- */
+    /* overlay "quem vai retomar" */
+    .who-overlay {
+      position: absolute; inset: 0;
+      background: rgba(7,8,13,.85);
+      display: none; align-items: center; justify-content: center;
+      border-radius: 20px; z-index: 10; padding: 18px;
+    }
+    .who-overlay.active { display: flex; }
+
+    .who-card {
+      width: 100%; max-width: 420px;
+      background: var(--s2); border: 1.5px solid var(--bdr);
+      border-radius: 14px; padding: 24px;
+    }
+
+    /* ===== TABS DO MODAL ===== */
     .modal-tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      border: 1.5px solid #3a3a3a;
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 24px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      border: 1.5px solid var(--bdr);
+      border-radius: 10px; overflow: hidden; margin-bottom: 24px;
     }
-
     .modal-tab-btn {
-      background: transparent;
-      border: none;
-      padding: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #666;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: transparent; border: none;
+      padding: 11px; font-size: 13px; font-weight: 600;
+      color: var(--muted); cursor: pointer;
+      transition: all .2s; font-family: 'Outfit', sans-serif;
     }
+    .modal-tab-btn.active { background: rgba(0,229,160,.08); color: var(--green); }
+    .modal-tab-btn:first-child { border-right: 1.5px solid var(--bdr); }
+    .modal-section { display: none; }
+    .modal-section.active { display: block; }
 
-    .modal-tab-btn.active {
-      background: rgba(0, 229, 160, 0.1);
-      color: #00e5a0;
-    }
-
-    .modal-tab-btn:first-child {
-      border-right: 1.5px solid #3a3a3a;
-    }
-
-    .modal-section {
-      display: none;
-    }
-
-    .modal-section.active {
-      display: block;
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
+    /* ===== FORMULÁRIOS ===== */
+    .form-group { margin-bottom: 16px; }
     .form-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #888;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-      display: block;
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      letter-spacing: .08em; text-transform: uppercase;
+      margin-bottom: 6px; display: block;
     }
-
     .form-input {
-      width: 100%;
-      background: #1e1e1e;
-      border: 1.5px solid #3a3a3a;
-      border-radius: 8px;
-      padding: 12px 14px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s;
+      width: 100%; background: var(--s2);
+      border: 1.5px solid var(--bdr);
+      border-radius: 9px; padding: 11px 14px;
+      color: var(--text); font-size: 14px;
+      font-family: 'Outfit', sans-serif;
+      outline: none; transition: border-color .2s;
     }
-
-    .form-input:focus {
-      border-color: #00e5a0;
-    }
-
-    .form-input::placeholder {
-      color: #555;
-    }
-
+    .form-input:focus { border-color: var(--c0); }
+    .form-input::placeholder { color: var(--muted); }
     select.form-input {
-      appearance: none;
-      -webkit-appearance: none;
-      cursor: pointer;
+      appearance: none; cursor: pointer;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      padding-right: 36px;
+      background-repeat: no-repeat; background-position: right 14px center;
+      padding-right: 36px; background-color: var(--s2);
     }
+    select.form-input option { background: var(--s2); color: var(--text); }
 
-    select.form-input option {
-      background: #1e1e1e;
-      color: #fff;
-    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .type-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      margin-top: 4px;
-    }
-
+    /* botões de tipo de instalação */
+    .type-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 4px; }
     .type-btn {
-      background: #1e1e1e;
-      border: 1.5px solid #3a3a3a;
-      border-radius: 8px;
-      padding: 12px;
-      color: #ccc;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      background: var(--s2); border: 1.5px solid var(--bdr);
+      border-radius: 9px; padding: 12px;
+      color: var(--muted); font-size: 13px;
+      cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-family: 'Outfit', sans-serif;
     }
+    .type-btn.active { border-color: var(--green); background: rgba(0,229,160,.08); color: var(--green); }
 
-    .type-btn.active {
-      border-color: #00e5a0;
-      background: rgba(0, 229, 160, 0.08);
-      color: #00e5a0;
-    }
-
-    .modal-actions {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 10px;
-      margin-top: 24px;
-    }
+    .modal-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: 24px; }
 
     .btn-cancel {
-      background: transparent;
-      border: 1.5px solid #3a3a3a;
-      border-radius: 8px;
-      padding: 12px;
-      color: #ccc;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: transparent; border: 1.5px solid var(--bdr);
+      border-radius: 9px; padding: 12px;
+      color: var(--muted); font-size: 14px; cursor: pointer;
+      transition: all .2s; font-family: 'Outfit', sans-serif;
     }
-
-    .btn-cancel:hover {
-      border-color: #666;
-      color: #fff;
-    }
+    .btn-cancel:hover { border-color: #666; color: var(--text); }
 
     .btn-create {
-      background: #00e5a0;
-      border: none;
-      border-radius: 8px;
-      padding: 12px;
-      color: #000;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      background: var(--green); border: none;
+      border-radius: 9px; padding: 12px;
+      color: #000; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-family: 'Outfit', sans-serif;
     }
+    .btn-create:hover { background: #00ffb3; }
+    .btn-create:disabled { opacity: .5; cursor: not-allowed; }
 
-    .btn-create:hover {
-      background: #00ffb3;
+    /* ===== LISTA CLIENTES (retomar) ===== */
+    .clients-loading, .clients-empty {
+      text-align: center; padding: 32px;
+      color: var(--muted); font-size: 14px;
     }
-
-    .btn-create:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* ----- LISTA CLIENTES RECENTES ----- */
-    .clients-loading {
-      text-align: center;
-      padding: 32px;
-      color: #555;
-      font-size: 14px;
-    }
-
-    .clients-empty {
-      text-align: center;
-      padding: 32px;
-      color: #555;
-      font-size: 14px;
-    }
-
-    .clients-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+    .clients-list { display: flex; flex-direction: column; gap: 8px; }
 
     .client-row {
-      background: #1e1e1e;
-      border: 1.5px solid #333;
-      border-radius: 10px;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: var(--s2); border: 1.5px solid var(--bdr);
+      border-radius: 10px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 14px;
+      cursor: pointer; transition: all .2s;
     }
-
-    .client-row:hover {
-      border-color: #00e5a0;
-      background: rgba(0, 229, 160, 0.04);
-    }
-
-    .client-row-info {
-      flex: 1;
-    }
-
-    .client-row-name {
-      font-size: 15px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 4px;
-    }
-
-    .client-row-meta {
-      font-size: 11px;
-      color: #555;
-      display: flex;
-      gap: 12px;
-    }
-
+    .client-row:hover { border-color: var(--green); background: rgba(0,229,160,.04); }
+    .client-row-info { flex: 1; }
+    .client-row-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .client-row-meta { font-size: 11px; color: var(--muted); display: flex; gap: 12px; }
     .client-row-badge {
-      background: rgba(0, 229, 160, 0.12);
-      color: #00e5a0;
-      border: 1px solid rgba(0, 229, 160, 0.25);
-      border-radius: 20px;
-      padding: 3px 10px;
-      font-size: 11px;
-      font-weight: 600;
-      flex-shrink: 0;
+      background: rgba(0,229,160,.1); color: var(--green);
+      border: 1px solid rgba(0,229,160,.25);
+      border-radius: 99px; padding: 3px 10px;
+      font-size: 11px; font-weight: 600; flex-shrink: 0;
     }
-
-    .client-row-arrow {
-      color: #444;
-      font-size: 18px;
-    }
+    .client-row-arrow { color: var(--muted); font-size: 18px; }
 
     .search-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #1e1e1e;
-      border: 1.5px solid #3a3a3a;
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 10px;
+      background: var(--s2); border: 1.5px solid var(--bdr);
+      border-radius: 9px; padding: 10px 14px; margin-bottom: 14px;
     }
-
     .search-box input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #fff;
-      font-size: 14px;
-      flex: 1;
+      background: transparent; border: none;
+      outline: none; color: var(--text);
+      font-size: 14px; flex: 1; font-family: 'Outfit', sans-serif;
     }
+    .search-box input::placeholder { color: var(--muted); }
 
-    .search-box input::placeholder {
-      color: #555;
-    }
+    /* ===== APP (tela principal) ===== */
+    .app { display: none; position: relative; z-index: 10; }
+    .app.active { display: block; }
 
-    /* ----- MAIN APP ----- */
-    .app {
-      display: none;
-    }
-
-    .app.active {
-      display: block;
-    }
-
-    /* ----- TOP BAR ----- */
+    /* ===== TOPBAR ===== */
     .topbar {
-      background: #222;
-      border-bottom: 1px solid #333;
+      background: var(--s1);
+      border-bottom: 1px solid var(--bdr);
       padding: 0 24px;
-      display: flex;
-      align-items: center;
-      gap: 0;
-      height: 52px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      display: flex; align-items: center; gap: 0;
+      height: 56px;
+      position: sticky; top: 0; z-index: 100;
+      flex-wrap: wrap;
     }
 
     .client-info {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-right: auto;
+      display: flex; align-items: center; gap: 12px;
+      margin-right: auto; min-width: 0;
     }
-
     .client-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 16px; font-weight: 700; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-
     .client-badge {
-      background: rgba(0, 229, 160, 0.15);
-      color: #00e5a0;
-      border: 1px solid rgba(0, 229, 160, 0.3);
-      border-radius: 20px;
-      padding: 3px 10px;
-      font-size: 11px;
-      font-weight: 600;
+      background: rgba(0,229,160,.12); color: var(--green);
+      border: 1px solid rgba(0,229,160,.3);
+      border-radius: 99px; padding: 3px 11px;
+      font-size: 11px; font-weight: 600; flex-shrink: 0;
+      font-family: 'IBM Plex Mono', monospace;
     }
 
     .topbar-btn {
       background: transparent;
-      border: 1.5px solid #3a3a3a;
-      border-radius: 8px;
-      padding: 6px 14px;
-      color: #aaa;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-right: 16px;
-      white-space: nowrap;
+      border: 1.5px solid var(--bdr);
+      border-radius: 9px; padding: 7px 14px;
+      color: var(--muted); font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+      margin-right: 12px; white-space: nowrap;
+      font-family: 'Outfit', sans-serif;
     }
+    .topbar-btn:hover { border-color: var(--c0); color: var(--c0); }
 
-    .topbar-btn:hover {
-      border-color: #666;
-      color: #fff;
-    }
-
-    /* save indicator */
+    /* indicador de salvamento */
     .save-indicator {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #444;
-      flex-shrink: 0;
-      margin-right: 8px;
-      transition: background 0.3s;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--muted); flex-shrink: 0;
+      margin-right: 6px; transition: background .3s;
     }
+    .save-indicator.saving { background: var(--c3); }
+    .save-indicator.saved { background: var(--green); }
+    .save-indicator.error { background: var(--c4); }
 
-    .save-indicator.saving {
-      background: #ffaa00;
-    }
-
-    .save-indicator.saved {
-      background: #00e5a0;
-    }
-
-    .save-indicator.error {
-      background: #ff5050;
-    }
-
-    /* ----- TABS ----- */
-    .tabs {
-      display: flex;
-      gap: 0;
-      height: 100%;
-      align-items: flex-end;
-    }
-
+    /* usuário atual */
     .current-user {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-right: 16px;
-      color: #aaa;
-      font-size: 12px;
-      white-space: nowrap;
+      display: flex; align-items: center; gap: 6px;
+      margin-right: 14px; color: var(--muted);
+      font-size: 12px; white-space: nowrap;
+      font-family: 'IBM Plex Mono', monospace;
     }
+    .current-user strong { color: var(--text); }
 
+    /* ===== TABS DE TIPO ===== */
+    .tabs {
+      display: flex; gap: 0;
+      height: 100%; align-items: flex-end;
+    }
     .tab {
-      padding: 0 20px;
-      height: 52px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #666;
-      cursor: pointer;
+      padding: 0 18px; height: 56px;
+      display: flex; align-items: center; gap: 7px;
+      font-size: 13px; font-weight: 600;
+      color: var(--muted); cursor: pointer;
       border-bottom: 2px solid transparent;
-      transition: all 0.2s;
-      white-space: nowrap;
+      transition: all .2s; white-space: nowrap;
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px;
     }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--green); border-bottom-color: var(--green); }
 
-    .tab:hover {
-      color: #aaa;
-    }
+    /* ===== CONTEÚDO PRINCIPAL ===== */
+    .content { padding: 28px 32px; max-width: 900px; }
 
-    .tab.active {
-      color: #00e5a0;
-      border-bottom-color: #00e5a0;
-    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
 
-    /* ----- CONTENT ----- */
-    .content {
-      padding: 28px 28px;
-      max-width: 860px;
-    }
-
-    .tab-panel {
-      display: none;
-    }
-
-    .tab-panel.active {
-      display: block;
-    }
-
-    /* ----- SECTION TITLE ----- */
+    /* ===== SECTION TITLE ===== */
     .section-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 17px; font-weight: 700; color: var(--text);
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 10px;
     }
-
     .section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #333;
-      margin-left: 8px;
+      content: ''; flex: 1; height: 1px; background: var(--bdr); margin-left: 8px;
     }
 
-    /* ----- CHECKLIST ITEMS ----- */
-    .checklist {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .check-item {
-      background: #252525;
-      border: 1px solid #333;
-      border-radius: 10px;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-    }
-
-    .check-item:hover {
-      border-color: #444;
-      background: #2a2a2a;
-    }
-
-    .check-item.done {
-      opacity: 0.5;
-    }
-
-    .check-item.done .item-text {
-      text-decoration: line-through;
-      color: #666;
-    }
-
-    .check-box {
-      width: 22px;
-      height: 22px;
-      border: 2px solid #444;
-      border-radius: 6px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      font-size: 13px;
-      color: transparent;
-    }
-
-    .check-item.done .check-box {
-      background: #00e5a0;
-      border-color: #00e5a0;
-      color: #000;
-    }
-
-    /* Item bloqueado — marcado por outro colaborador */
-    .check-item.locked {
-      cursor: not-allowed;
-      opacity: 0.75;
-    }
-    .check-item.locked .check-box {
-      background: #2a7a5a;
-      border-color: #2a7a5a;
-      color: #aaa;
-    }
-    .check-item.locked::after {
-      content: '🔒';
-      font-size: 12px;
-      margin-left: 6px;
-      opacity: 0.6;
-    }
-
-    .item-number {
-      font-size: 11px;
-      font-weight: 700;
-      color: #555;
-      min-width: 20px;
-    }
-
-    .check-item.done .item-number {
-      color: #444;
-    }
-
-    .item-content {
-      flex: 1;
-    }
-
-    .item-text {
-      font-size: 14px;
-      color: #ddd;
-      font-weight: 500;
-      margin-bottom: 2px;
-    }
-
-    .item-manual {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      color: #00e5a0;
-      text-decoration: none;
-      padding: 4px 10px;
-      border: 1px solid rgba(0, 229, 160, 0.25);
-      border-radius: 20px;
-      white-space: nowrap;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-
-    .item-manual:hover {
-      background: rgba(0, 229, 160, 0.1);
-      border-color: rgba(0, 229, 160, 0.5);
-    }
-
-    .item-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .item-resp-badge {
-      font-size: 11px;
-      color: #00e5a0;
-      background: rgba(0, 229, 160, 0.08);
-      border: 1px solid rgba(0, 229, 160, 0.25);
-      border-radius: 20px;
-      padding: 4px 10px;
-      display: none;
-    }
-
-    /* Extra step highlight */
-    .check-item.extra-step {
-      border-color: rgba(255, 170, 0, 0.3);
-      background: rgba(255, 170, 0, 0.05);
-    }
-
-    .check-item.extra-step .item-number {
-      color: #ffaa00;
-    }
-
-    /* ── OBSERVAÇÃO ── */
-    .check-item { flex-wrap: wrap; }
-
-    .obs-area {
-      display: none;
-      width: 100%;
-      padding-top: 10px;
-      margin-top: 8px;
-      border-top: 1px solid #2e2e2e;
-      gap: 8px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-    .obs-area.visible { display: flex; }
-
-    .obs-label {
-      font-size: 11px;
-      color: #ff8c42;
-      font-weight: 700;
-      white-space: nowrap;
-      margin-top: 8px;
-      letter-spacing: .04em;
-    }
-
-    .obs-input {
-      flex: 1;
-      min-width: 180px;
-      background: #1a1a1a;
-      border: 1.5px solid rgba(255,140,66,.35);
-      border-radius: 8px;
-      padding: 7px 11px;
-      color: #ddd;
-      font-size: 13px;
-      font-family: inherit;
-      outline: none;
-      resize: none;
-      line-height: 1.4;
-      transition: border-color .2s;
-    }
-    .obs-input:focus { border-color: rgba(255,140,66,.75); }
-    .obs-input::placeholder { color: #555; }
-
-    .obs-save-btn {
-      background: rgba(255,140,66,.15);
-      border: 1.5px solid rgba(255,140,66,.4);
-      border-radius: 8px;
-      padding: 7px 14px;
-      color: #ff8c42;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all .2s;
-      white-space: nowrap;
-      align-self: flex-end;
-    }
-    .obs-save-btn:hover { background: rgba(255,140,66,.28); }
-    .obs-save-btn:disabled { opacity: .5; cursor: default; }
-
-    .obs-saved-tag {
-      font-size: 11px;
-      color: #00e5a0;
-      align-self: flex-end;
-      margin-bottom: 8px;
-      display: none;
-    }
-    .obs-saved-tag.show { display: block; }
-
-    .obs-toggle-btn {
-      background: transparent;
-      border: 1px solid #3a3a3a;
-      border-radius: 6px;
-      padding: 4px 9px;
-      color: #666;
-      font-size: 11px;
-      cursor: pointer;
-      transition: all .2s;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .obs-toggle-btn:hover { border-color: #ff8c42; color: #ff8c42; }
-    .obs-toggle-btn.has-obs {
-      border-color: rgba(255,140,66,.5);
-      color: #ff8c42;
-      background: rgba(255,140,66,.08);
-    }
-
-    /* ----- PROGRESS BAR ----- */
-    .progress-bar-wrap {
-      background: #2a2a2a;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .progress-track {
-      flex: 1;
-      height: 6px;
-      background: #1a1a1a;
-      border-radius: 99px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #00e5a0, #00b37a);
-      border-radius: 99px;
-      transition: width 0.4s ease;
-    }
-
-    .progress-text {
-      font-size: 13px;
-      font-weight: 700;
-      color: #00e5a0;
-      white-space: nowrap;
-    }
-
-    .progress-label {
-      font-size: 12px;
-      color: #666;
-    }
-
-    /* ----- INFO PANEL ----- */
+    /* ===== INFO CARDS ===== */
     .info-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px; margin-bottom: 24px;
     }
-
     .info-card {
-      background: #252525;
-      border: 1px solid #333;
-      border-radius: 10px;
-      padding: 14px 16px;
+      background: var(--s1); border: 1px solid var(--bdr);
+      border-radius: var(--r); padding: 14px 16px;
     }
-
     .info-card-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: #555;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .12em; margin-bottom: 6px;
+    }
+    .info-card-value { font-size: 14px; font-weight: 600; color: var(--text); }
+
+    /* ===== BARRA DE PROGRESSO ===== */
+    .progress-bar-wrap {
+      background: var(--s1); border: 1px solid var(--bdr);
+      border-radius: var(--r); padding: 16px 20px;
+      margin-bottom: 22px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .progress-track {
+      flex: 1; height: 7px;
+      background: var(--s3); border-radius: 99px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--green2));
+      border-radius: 99px; transition: width .4s ease;
+      position: relative;
+    }
+    .progress-fill::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+      animation: shim 2.5s ease-in-out infinite;
+    }
+    @keyframes shim { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .progress-text {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px; font-weight: 600; color: var(--green); white-space: nowrap;
+    }
+    .progress-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+    /* ===== CHECKLIST ITEMS ===== */
+    .checklist { display: flex; flex-direction: column; gap: 7px; }
+
+    .check-item {
+      background: var(--s1); border: 1px solid var(--bdr);
+      border-radius: 10px; padding: 13px 16px;
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer; transition: all .18s;
+      position: relative; flex-wrap: wrap;
+    }
+    .check-item:hover { border-color: rgba(129,140,248,.3); background: var(--s2); }
+    .check-item.done { opacity: .55; }
+    .check-item.done .item-text { text-decoration: line-through; color: var(--muted); }
+
+    .check-box {
+      width: 22px; height: 22px;
+      border: 2px solid var(--bdr); border-radius: 6px;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: all .2s; font-size: 12px; color: transparent;
+    }
+    .check-item.done .check-box {
+      background: var(--green); border-color: var(--green); color: #000; font-weight: 700;
     }
 
-    .info-card-value {
-      font-size: 14px;
-      font-weight: 600;
-      color: #ddd;
+    /* bloqueado por outro colaborador */
+    .check-item.locked { cursor: not-allowed; opacity: .75; }
+    .check-item.locked .check-box { background: rgba(0,229,160,.2); border-color: rgba(0,229,160,.4); color: var(--muted); }
+    .check-item.locked::after { content: '🔒'; font-size: 11px; margin-left: 4px; opacity: .6; }
+
+    .item-number {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; font-weight: 700; color: var(--muted); min-width: 22px;
+    }
+    .check-item.done .item-number { color: var(--s3); }
+
+    .item-content { flex: 1; }
+    .item-text { font-size: 14px; color: var(--text); font-weight: 500; }
+
+    /* step extra */
+    .check-item.extra-step { border-color: rgba(251,191,36,.2); background: rgba(251,191,36,.04); }
+    .check-item.extra-step .item-number { color: var(--c3); }
+
+    .item-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    .item-manual {
+      display: flex; align-items: center; gap: 5px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; color: var(--c0);
+      text-decoration: none; padding: 4px 10px;
+      border: 1px solid rgba(129,140,248,.25); border-radius: 99px;
+      white-space: nowrap; transition: all .2s; flex-shrink: 0;
+    }
+    .item-manual:hover { background: rgba(129,140,248,.1); border-color: rgba(129,140,248,.5); }
+
+    .item-resp-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; color: var(--green);
+      background: rgba(0,229,160,.08);
+      border: 1px solid rgba(0,229,160,.25);
+      border-radius: 99px; padding: 3px 9px; display: none;
     }
 
-    /* spinner */
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+    /* ===== OBSERVAÇÃO ===== */
+    .obs-area {
+      display: none; width: 100%;
+      padding-top: 10px; margin-top: 8px;
+      border-top: 1px solid var(--bdr);
+      gap: 8px; align-items: flex-start; flex-wrap: wrap;
     }
+    .obs-area.visible { display: flex; }
+    .obs-label {
+      font-size: 11px; color: var(--c3); font-weight: 700;
+      white-space: nowrap; margin-top: 8px; letter-spacing: .04em;
+    }
+    .obs-input {
+      flex: 1; min-width: 180px;
+      background: var(--s2); border: 1.5px solid rgba(251,191,36,.3);
+      border-radius: 8px; padding: 8px 11px;
+      color: var(--text); font-size: 13px;
+      font-family: 'Outfit', sans-serif;
+      outline: none; resize: none; line-height: 1.4;
+      transition: border-color .2s;
+    }
+    .obs-input:focus { border-color: rgba(251,191,36,.65); }
+    .obs-input::placeholder { color: var(--muted); }
+    .obs-save-btn {
+      background: rgba(251,191,36,.1); border: 1.5px solid rgba(251,191,36,.35);
+      border-radius: 8px; padding: 7px 14px;
+      color: var(--c3); font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: all .2s; white-space: nowrap;
+      align-self: flex-end; font-family: 'Outfit', sans-serif;
+    }
+    .obs-save-btn:hover { background: rgba(251,191,36,.22); }
+    .obs-save-btn:disabled { opacity: .5; cursor: default; }
+    .obs-saved-tag {
+      font-size: 11px; color: var(--green);
+      align-self: flex-end; margin-bottom: 8px; display: none;
+    }
+    .obs-saved-tag.show { display: block; }
+    .obs-toggle-btn {
+      background: transparent; border: 1px solid var(--bdr);
+      border-radius: 6px; padding: 4px 9px;
+      color: var(--muted); font-size: 11px;
+      cursor: pointer; transition: all .2s;
+      white-space: nowrap; flex-shrink: 0;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .obs-toggle-btn:hover { border-color: var(--c3); color: var(--c3); }
+    .obs-toggle-btn.has-obs { border-color: rgba(251,191,36,.4); color: var(--c3); background: rgba(251,191,36,.07); }
 
+    /* ===== DRAG HANDLE ===== */
+    .drag-handle {
+      display: flex; align-items: center; justify-content: center;
+      width: 20px; flex-shrink: 0;
+      cursor: grab; color: var(--s3);
+      font-size: 16px; line-height: 1;
+      transition: color .2s; user-select: none; padding: 2px 0;
+    }
+    .drag-handle:hover { color: var(--muted); }
+    .drag-handle:active { cursor: grabbing; }
+    .check-item.dragging { opacity: .4; border-color: var(--green) !important; }
+    .check-item.drag-over { border-color: var(--green) !important; background: rgba(0,229,160,.06) !important; transform: scale(1.01); }
+
+    /* ===== ADD TASK BUTTON ===== */
+    .add-task-btn {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 14px; background: transparent;
+      border: 1.5px dashed var(--bdr);
+      border-radius: 10px; padding: 12px 16px;
+      color: var(--muted); font-size: 13px; font-weight: 600;
+      cursor: pointer; width: 100%; transition: all .2s;
+      font-family: 'Outfit', sans-serif;
+    }
+    .add-task-btn:hover { border-color: var(--green); color: var(--green); background: rgba(0,229,160,.04); }
+
+    /* ===== ADD TASK MODAL ===== */
+    .add-task-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.75); z-index: 2000;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .add-task-overlay.active { display: flex; }
+    .add-task-modal {
+      background: var(--s1); border: 1px solid var(--bdr);
+      border-radius: 16px; padding: 28px;
+      width: 480px; max-width: 95vw;
+      animation: mIn .2s ease;
+    }
+    .add-task-modal .modal-title { font-size: 17px; margin-bottom: 20px; }
+
+    /* ===== SPINNER ===== */
+    @keyframes spin { to { transform: rotate(360deg); } }
     .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid #333;
-      border-top-color: #00e5a0;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      flex-shrink: 0;
+      width: 16px; height: 16px;
+      border: 2px solid var(--bdr); border-top-color: var(--c0);
+      border-radius: 50%; animation: spin .65s linear infinite; flex-shrink: 0;
+    }
+
+    /* ===== RESPONSIVO ===== */
+    @media (max-width: 768px) {
+      .content { padding: 16px 16px 60px; }
+      .topbar { padding: 0 16px; height: auto; min-height: 56px; padding-top: 8px; padding-bottom: 8px; }
+      .tabs { height: auto; }
+      .tab { height: 40px; padding: 0 12px; }
+      .form-row { grid-template-columns: 1fr; }
+      .type-buttons { grid-template-columns: 1fr 1fr; }
+      .info-grid { grid-template-columns: 1fr 1fr; }
+      .current-user { display: none; }
     }
   </style>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="sidebar.js"></script>
 </head>
 
 <body>
-  <!-- ===== SIDEBAR ===== -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sb-logo">
-      <div class="sb-logo-mark">GR7</div>
-      <div class="sb-logo-text">
-        <h2>GR7</h2>
-        <p>Sistema de Instalações</p>
-      </div>
-    </div>
-    <nav class="sb-nav">
-      
-      <div class="sb-label">Menu</div>
-      <a class="sb-item " href="index.html"><span class="sb-icon">🏠</span><span class="sb-text">Dashboard</span></a>
-      <a class="sb-item " href="clientes.html"><span class="sb-icon">🏢</span><span class="sb-text">Clientes</span></a>
-      <a class="sb-item " href="implantacao.html"><span class="sb-icon">🚀</span><span class="sb-text">Implantação</span></a>
-      <a class="sb-item active" href="Checklist.html"><span class="sb-icon">✅</span><span class="sb-text">Checklist</span></a>
-      <a class="sb-item " href="relatorios-checklist.html"><span class="sb-icon">📊</span><span class="sb-text">Relatórios</span></a>
-    </nav>
-    <div class="sb-footer">
-      <button class="sb-toggle" onclick="toggleSidebar()">
-        <span class="sb-toggle-icon">◀</span>
-        <span class="sb-toggle-text">Recolher menu</span>
-      </button>
-    </div>
-  </aside>
-  <script>
-    function toggleSidebar(){
-      const sb=document.getElementById('sidebar');
-      sb.classList.toggle('collapsed');
-      document.body.classList.toggle('sb-collapsed');
-      localStorage.setItem('sb_collapsed', sb.classList.contains('collapsed'));
-    }
-    (function(){
-      if(localStorage.getItem('sb_collapsed')==='true'){
-        document.getElementById('sidebar').classList.add('collapsed');
-        document.body.classList.add('sb-collapsed');
-      }
-    })();
-  </script>
+  <!-- ===== BLOBS ===== -->
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
 
 
-  <!-- --------------------------- TOAST --------------------------- -->
+  <!-- ===== TOAST ===== -->
   <div class="toast" id="toast"></div>
 
-  <!-- --------------------------- MODAL NOVO CLIENTE --------------------------- -->
+  <!-- ===== MODAL NOVO CLIENTE / RETOMAR ===== -->
   <div class="modal-overlay active" id="modalOverlay">
     <div class="modal">
       <div class="modal-title">
-        <span>📝 Checklist GR7</span>
-        <button onclick="voltarDashboard()" title="Voltar ao Dashboard" style="margin-left:auto;background:transparent;border:1px solid #444;border-radius:8px;color:#888;font-size:16px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0" onmouseover="this.style.borderColor='#f87171';this.style.color='#f87171'" onmouseout="this.style.borderColor='#444';this.style.color='#888'">✕</button>
+        <span>✅ Checklist GR7</span>
+        <button onclick="voltarDashboard()" title="Voltar"
+          style="margin-left:auto;background:transparent;border:1px solid var(--bdr);border-radius:8px;color:var(--muted);font-size:16px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0"
+          onmouseover="this.style.borderColor='var(--c4)';this.style.color='var(--c4)'"
+          onmouseout="this.style.borderColor='var(--bdr)';this.style.color='var(--muted)'">✕</button>
       </div>
 
-      <!-- Tabs -->
       <div class="modal-tabs">
         <button class="modal-tab-btn active" id="tabNovoBtn" onclick="showModalTab('novo')">➕ Novo Cliente</button>
         <button class="modal-tab-btn" id="tabRetomarBtn" onclick="showModalTab('retomar')">🔄 Retomar</button>
       </div>
 
+      <!-- overlay "quem vai retomar" -->
       <div class="who-overlay" id="whoOverlay" aria-hidden="true">
         <div class="who-card">
-          <div class="modal-title" style="margin-bottom: 16px">👤 Quem vai retomar?</div>
+          <div class="modal-title" style="margin-bottom:16px;font-size:17px">👤 Quem vai retomar?</div>
           <div class="form-group">
             <label class="form-label">Responsável</label>
             <select class="form-input" id="whoName">
               <option value="">⏳ Carregando...</option>
             </select>
           </div>
-          <div class="modal-actions" style="margin-top: 16px">
+          <div class="modal-actions" style="margin-top:16px">
             <button class="btn-cancel" id="whoCancel" type="button">Cancelar</button>
             <button class="btn-create" id="whoContinue" type="button" disabled>Continuar</button>
           </div>
         </div>
       </div>
 
-      <!-- -- Seção: Novo Cliente -- -->
+      <!-- Seção: Novo Cliente -->
       <div class="modal-section active" id="sectionNovo">
         <div class="form-group">
           <label class="form-label">Nome do Cliente</label>
           <input class="form-input" id="clientName" type="text" placeholder="Ex: WF Frutaria">
         </div>
-
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Data</label>
@@ -1043,14 +599,12 @@
             <input class="form-input" id="clientPC" type="text" placeholder="DESKTOP-XXXXXXX">
           </div>
         </div>
-
         <div class="form-group">
           <label class="form-label">👤 Funcionário Responsável</label>
           <select class="form-input" id="clientEmployee">
             <option value="">⏳ Carregando colaboradores...</option>
           </select>
         </div>
-
         <div class="form-group">
           <label class="form-label">Tipo de Instalação</label>
           <div class="type-buttons">
@@ -1059,54 +613,54 @@
             <button class="type-btn" id="btnNFCe" onclick="selectType('NFCe / Caixa')">🧾 NFCe / Caixa</button>
           </div>
         </div>
-
         <div class="modal-actions">
           <button class="btn-cancel" id="btnCancelar" onclick="cancelModal()" style="display:none">Cancelar</button>
-          <button class="btn-create" id="btnCriar" onclick="createClient()" style="grid-column: 1 / -1">
+          <button class="btn-create" id="btnCriar" onclick="createClient()" style="grid-column:1/-1">
             🚀 Criar e Iniciar Checklist
           </button>
         </div>
       </div>
 
-      <!-- -- Seção: Retomar -- -->
+      <!-- Seção: Retomar -->
       <div class="modal-section" id="sectionRetomar">
         <div class="search-box">
-          <span>🔍</span>
+          <span style="color:var(--muted)">🔍</span>
           <input type="text" id="searchClients" placeholder="Buscar cliente..." oninput="filterClients(this.value)">
         </div>
         <div id="clientsList" class="clients-loading">
-          <div class="spinner" style="margin: 0 auto 10px"></div>
+          <div class="spinner" style="margin:0 auto 10px"></div>
           Carregando clientes...
         </div>
       </div>
     </div>
   </div>
 
-  <!-- --------------------------- APP --------------------------- -->
+  <!-- ===== APP ===== -->
   <div class="app" id="app">
 
-    <!-- TOP BAR -->
+    <!-- TOPBAR -->
     <div class="topbar">
       <div class="client-info">
         <div class="save-indicator" id="saveIndicator" title="Status de sincronização"></div>
         <span class="client-name" id="displayName">—</span>
         <span class="client-badge" id="displayType">—</span>
-        <span id="displayPC" style="font-size:12px;color:#666;margin-left:6px"></span>
+        <span id="displayPC" style="font-size:11px;color:var(--muted);margin-left:4px;font-family:'IBM Plex Mono',monospace"></span>
       </div>
       <div class="current-user">
-        <span>👤 Responsável:</span>
+        <span>👤</span>
         <strong id="currentUserName">—</strong>
       </div>
-      <button class="topbar-btn" onclick="voltarDashboard()" style="background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.4);color:#818cf8">← Dashboard</button>
-      <button class="topbar-btn" onclick="openModal()">? Novo / Trocar</button>
+      <button class="topbar-btn" onclick="voltarDashboard()"
+        style="background:rgba(129,140,248,.1);border-color:rgba(129,140,248,.35);color:var(--c0)">← Dashboard</button>
+      <button class="topbar-btn" onclick="openModal()">⊕ Novo / Trocar</button>
       <div class="tabs">
         <div class="tab active" onclick="switchTab('servidor')">🖥️ Servidor</div>
         <div class="tab" onclick="switchTab('retaguarda')">🗄️ Retaguarda</div>
-        <div class="tab" onclick="switchTab('nfce')">🧾 NFCe / Caixa</div>
+        <div class="tab" onclick="switchTab('nfce')">🧾 NFCe</div>
       </div>
     </div>
 
-    <!-- --- CONTEÚDO --- -->
+    <!-- CONTEÚDO -->
     <div class="content">
 
       <!-- INFO CARDS -->
@@ -1129,7 +683,7 @@
         </div>
       </div>
 
-      <!-- ---------- TAB: SERVIDOR ---------- -->
+      <!-- TAB: SERVIDOR -->
       <div class="tab-panel active" id="panel-servidor">
         <div class="progress-bar-wrap">
           <span class="progress-label">Progresso</span>
@@ -1143,7 +697,7 @@
         <button class="add-task-btn" onclick="openAddTask('servidor')">＋ Nova Tarefa</button>
       </div>
 
-      <!-- ---------- TAB: RETAGUARDA ---------- -->
+      <!-- TAB: RETAGUARDA -->
       <div class="tab-panel" id="panel-retaguarda">
         <div class="progress-bar-wrap">
           <span class="progress-label">Progresso</span>
@@ -1157,7 +711,7 @@
         <button class="add-task-btn" onclick="openAddTask('retaguarda')">＋ Nova Tarefa</button>
       </div>
 
-      <!-- ---------- TAB: NFCe ---------- -->
+      <!-- TAB: NFCe -->
       <div class="tab-panel" id="panel-nfce">
         <div class="progress-bar-wrap">
           <span class="progress-label">Progresso</span>
@@ -1207,78 +761,49 @@
       'Prefer': 'return=representation'
     };
 
-    // INSERT numa tabela, retorna { data, error }
     async function dbInsert(table, body) {
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-          method: 'POST',
-          headers: HEADERS,
-          body: JSON.stringify(body)
-        });
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, { method: 'POST', headers: HEADERS, body: JSON.stringify(body) });
         const json = await res.json();
         if (!res.ok) return { data: null, error: json };
-        const row = Array.isArray(json) ? json[0] : json;
-        return { data: row, error: null };
-      } catch (e) {
-        return { data: null, error: { message: e.message } };
-      }
+        return { data: Array.isArray(json) ? json[0] : json, error: null };
+      } catch (e) { return { data: null, error: { message: e.message } }; }
     }
 
-    // SELECT com filtros simples: filters = { coluna: valor, ... }
     async function dbSelect(table, filters = {}, opts = {}) {
       try {
         let url = `${SUPABASE_URL}/rest/v1/${table}?select=*`;
-        for (const [k, v] of Object.entries(filters)) {
-          url += `&${k}=eq.${encodeURIComponent(v)}`;
-        }
+        for (const [k, v] of Object.entries(filters)) url += `&${k}=eq.${encodeURIComponent(v)}`;
         if (opts.order) url += `&order=${opts.order}`;
         if (opts.limit) url += `&limit=${opts.limit}`;
         const res = await fetch(url, { method: 'GET', headers: HEADERS });
         const json = await res.json();
         if (!res.ok) return { data: null, error: json };
         return { data: json, error: null };
-      } catch (e) {
-        return { data: null, error: { message: e.message } };
-      }
+      } catch (e) { return { data: null, error: { message: e.message } }; }
     }
 
-    // UPSERT (insert or update) — conflito por unique key
     async function dbUpsert(table, body, onConflict) {
       try {
-        const h = { ...HEADERS, 'Prefer': `resolution=merge-duplicates,return=representation` };
-        const url = `${SUPABASE_URL}/rest/v1/${table}?on_conflict=${onConflict}`;
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: h,
-          body: JSON.stringify(body)
-        });
+        const h = { ...HEADERS, 'Prefer': 'resolution=merge-duplicates,return=representation' };
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?on_conflict=${onConflict}`, { method: 'POST', headers: h, body: JSON.stringify(body) });
         const json = await res.json();
         if (!res.ok) return { data: null, error: json };
         return { data: json, error: null };
-      } catch (e) {
-        return { data: null, error: { message: e.message } };
-      }
+      } catch (e) { return { data: null, error: { message: e.message } }; }
     }
 
     async function dbPatch(table, filters = {}, body = {}) {
       try {
         let url = `${SUPABASE_URL}/rest/v1/${table}`;
         const parts = [];
-        for (const [k, v] of Object.entries(filters)) {
-          parts.push(`${k}=eq.${encodeURIComponent(v)}`);
-        }
+        for (const [k, v] of Object.entries(filters)) parts.push(`${k}=eq.${encodeURIComponent(v)}`);
         if (parts.length) url += `?${parts.join('&')}`;
-        const res = await fetch(url, {
-          method: 'PATCH',
-          headers: HEADERS,
-          body: JSON.stringify(body)
-        });
+        const res = await fetch(url, { method: 'PATCH', headers: HEADERS, body: JSON.stringify(body) });
         const json = await res.json();
         if (!res.ok) return { data: null, error: json };
         return { data: json, error: null };
-      } catch (e) {
-        return { data: null, error: { message: e.message } };
-      }
+      } catch (e) { return { data: null, error: { message: e.message } }; }
     }
 
     async function updateClientResponsavel(clientId, responsavel) {
@@ -1286,85 +811,85 @@
     }
 
     // ------------------------------------------
-    //  DATA
+    //  DATA — steps dos checklists
     // ------------------------------------------
     const servidorSteps = [
-      { num: 1, text: "Preparar acesso pelo AnyDesk", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480bdb716d7a4ce8f6b5b" },
-      { num: 2, text: "Instalar o Master Remote no cliente", manual: "https://gr7autocom.notion.site/INSTALANDO-REMOTE-NO-CLIENTE-E-ADICIONANDO-AO-CONTROL-2659a16d674481069e5df972792afa0e" },
-      { num: 3, text: "Transferir arquivos GR7 pelo Master", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744808b8c38d7791241ade3" },
+      { num: 1,     text: "Preparar acesso pelo AnyDesk", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480bdb716d7a4ce8f6b5b" },
+      { num: 2,     text: "Instalar o Master Remote no cliente", manual: "https://gr7autocom.notion.site/INSTALANDO-REMOTE-NO-CLIENTE-E-ADICIONANDO-AO-CONTROL-2659a16d674481069e5df972792afa0e" },
+      { num: 3,     text: "Transferir arquivos GR7 pelo Master", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744808b8c38d7791241ade3" },
       { num: "Extra", text: "Otimização do Windows para Uso do Sistema GR7", manual: "https://gr7autocom.notion.site/CONFIGURANDO-WINDOWS-PARA-O-USUARIO-2689a16d674480c08d43c5867b2177dc", extra: true },
-      { num: 4, text: "Ajustes rápidos no Windows", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448085bbfef928d9f39a9a" },
-      { num: 5, text: "Pastas na Área de Trabalho", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744800790e2d496e564ada0" },
-      { num: 6, text: "(Se possível) Renomear o computador", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480c393c1e8ad3b8580e6" },
-      { num: 7, text: "Compartilhamento de redes do Windows", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480ee8ff6cf2becf374f8" },
-      { num: 8, text: "Fixar pastas no Acesso Rápido", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744807bb47fdb698a6bb6b9" },
-      { num: 9, text: "(Se dedicado) Instalar WASSetup (Wise Auto Shutdown)", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744805fb740f32f1f828e9d" },
-      { num: 10, text: "Instalar e definir Notepad++", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480f1acaec0f3fddae730" },
-      { num: 11, text: "Instalar a fonte dos relatórios", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e?pvs=97#2699a16d67448067b3eaef32c6975911" },
-      { num: 12, text: "Copiar o registro do cliente", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744802b8643e06706c62a19" },
+      { num: 4,     text: "Ajustes rápidos no Windows", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448085bbfef928d9f39a9a" },
+      { num: 5,     text: "Pastas na Área de Trabalho", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744800790e2d496e564ada0" },
+      { num: 6,     text: "(Se possível) Renomear o computador", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480c393c1e8ad3b8580e6" },
+      { num: 7,     text: "Compartilhamento de redes do Windows", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480ee8ff6cf2becf374f8" },
+      { num: 8,     text: "Fixar pastas no Acesso Rápido", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744807bb47fdb698a6bb6b9" },
+      { num: 9,     text: "(Se dedicado) Instalar WASSetup (Wise Auto Shutdown)", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744805fb740f32f1f828e9d" },
+      { num: 10,    text: "Instalar e definir Notepad++", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480f1acaec0f3fddae730" },
+      { num: 11,    text: "Instalar a fonte dos relatórios", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e?pvs=97#2699a16d67448067b3eaef32c6975911" },
+      { num: 12,    text: "Copiar o registro do cliente", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744802b8643e06706c62a19" },
       { num: "13a", text: "Instalar e configurar o MySQL 5.7", manual: "https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-SERVER-5-7-38-a125c940921143429f7c5b25d5cfdab9" },
       { num: "13b", text: "Configuração MySQL Server / My.ini", manual: "https://gr7autocom.notion.site/CONFIGURA-O-MYSQL-SERVER-MY-INI-2659a16d67448053b567d2673f45d5f8" },
       { num: "13c", text: "Instalar e configurar o MySQL Administrator", manual: "https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-ADMINISTRATOR-4de01b2e6580441098c482691842f347" },
       { num: "13d", text: "Instalar e configurar o MySQL Manager 2007", manual: "https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-MANAGER-2007-c4ee483a15774877875a370be49cb784" },
-      { num: 14, text: "Restaurar a base no Administrator", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448080873ef00890f2343f" },
-      { num: "??", text: "Restaurar as bases em ordem", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e?pvs=97#27d9a16d6744808894b2f569143defb3" },
-      { num: 15, text: "Compartilhar pastas do servidor", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480bf9dd7dc3db6e2aa77" },
-      { num: 16, text: "Ajustar Demo.ini e config.ini", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448086859fc99e61ee26e5" },
-      { num: 17, text: "Criar atalhos GR7 e organizar", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448065bcefd02e8da923c0" },
-      { num: 18, text: "Configurar diretórios no Retaguarda", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448025841af612a7ce3124" },
-      { num: 19, text: "Rodar o ATUALIZA GR7", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480648992c41cd28ced47" },
-      { num: 20, text: "Configurar o Verificador GR7 na inicialização", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744809e911fcea916537e40" },
-      { num: 21, text: "Instalando WebCharts e ServerMobile como serviço", manual: "https://gr7autocom.notion.site/INSTALANDO-WEBCHARTS-E-SERVERMOBILE-COMO-SERVI-O-1389a16d674480f08f6bfcdea16bb71d" },
-      { num: 22, text: "Criando e Configurando Rotina de Backup MySQL", manual: "https://gr7autocom.notion.site/CRIANDO-E-CONFIGURANDO-ROTINA-DE-BACKUP-MYSQL-2699a16d674480b284b6f9c0c8b64a22" },
-      { num: 23, text: "Criar exceções no Windows Defender (Executar BAT no Tutorial abaixo)", manual: "https://gr7autocom.notion.site/CRIAR-EXCE-ES-NO-WINDOWS-DEFENDER-2809a16d674480c0a7fbf1353b1b6aa1" },
+      { num: 14,    text: "Restaurar a base no Administrator", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448080873ef00890f2343f" },
+      { num: "??",  text: "Restaurar as bases em ordem", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e?pvs=97#27d9a16d6744808894b2f569143defb3" },
+      { num: 15,    text: "Compartilhar pastas do servidor", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480bf9dd7dc3db6e2aa77" },
+      { num: 16,    text: "Ajustar Demo.ini e config.ini", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448086859fc99e61ee26e5" },
+      { num: 17,    text: "Criar atalhos GR7 e organizar", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448065bcefd02e8da923c0" },
+      { num: 18,    text: "Configurar diretórios no Retaguarda", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d67448025841af612a7ce3124" },
+      { num: 19,    text: "Rodar o ATUALIZA GR7", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d674480648992c41cd28ced47" },
+      { num: 20,    text: "Configurar o Verificador GR7 na inicialização", manual: "https://gr7autocom.notion.site/INSTALANDO-SERVIDOR-GR7-MYSQL-31f3b8c99a2946fb8db6777287e7ae6e#2699a16d6744809e911fcea916537e40" },
+      { num: 21,    text: "Instalando WebCharts e ServerMobile como serviço", manual: "https://gr7autocom.notion.site/INSTALANDO-WEBCHARTS-E-SERVERMOBILE-COMO-SERVI-O-1389a16d674480f08f6bfcdea16bb71d" },
+      { num: 22,    text: "Criando e Configurando Rotina de Backup MySQL", manual: "https://gr7autocom.notion.site/CRIANDO-E-CONFIGURANDO-ROTINA-DE-BACKUP-MYSQL-2699a16d674480b284b6f9c0c8b64a22" },
+      { num: 23,    text: "Criar exceções no Windows Defender (Executar BAT no Tutorial abaixo)", manual: "https://gr7autocom.notion.site/CRIAR-EXCE-ES-NO-WINDOWS-DEFENDER-2809a16d674480c0a7fbf1353b1b6aa1" },
     ];
 
     const retaguardaSteps = [
-      { num: 1, text: "Preparar acesso pelo AnyDesk", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480178a79fdd8401b3027" },
-      { num: 2, text: "Instalar o Master Remote no cliente", manual: "https://gr7autocom.notion.site/INSTALANDO-REMOTE-NO-CLIENTE-E-ADICIONANDO-AO-CONTROL-2659a16d674481069e5df972792afa0e" },
-      { num: 3, text: "Transferir arquivos GR7 pelo Master", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744807fa3cffc97531bd8df" },
+      { num: 1,     text: "Preparar acesso pelo AnyDesk", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480178a79fdd8401b3027" },
+      { num: 2,     text: "Instalar o Master Remote no cliente", manual: "https://gr7autocom.notion.site/INSTALANDO-REMOTE-NO-CLIENTE-E-ADICIONANDO-AO-CONTROL-2659a16d674481069e5df972792afa0e" },
+      { num: 3,     text: "Transferir arquivos GR7 pelo Master", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744807fa3cffc97531bd8df" },
       { num: "Extra", text: "Otimização do Windows para Uso do Sistema GR7", manual: "https://gr7autocom.notion.site/CONFIGURANDO-WINDOWS-PARA-O-USUARIO-2689a16d674480c08d43c5867b2177dc", extra: true },
-      { num: 4, text: "Ajustes rápidos no Windows", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d67448052adb4ebe04c134262" },
-      { num: 5, text: "Pastas na Área de Trabalho", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744800587a5c44f8db0f085" },
-      { num: 6, text: "(Se possível) Renomear o computador", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480d19123fe57b8703144" },
-      { num: 7, text: "Compartilhamento de redes do Windows", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744803ba6e8effb3970d0f2" },
-      { num: 8, text: "Fixar pastas no Acesso Rápido", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480eb901dcd4a3d32f02c" },
-      { num: 9, text: "Instalar a fonte dos relatórios", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480928a08e13c773bf520" },
-      { num: 10, text: "Atualizar Registro e colocar no Servidor", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d67448056a7e7c962d4946609" },
-      { num: 11, text: "Instalar MySQL Manager", manual: "https://www.notion.so/INSTALANDO-E-CONFIGURANDO-O-MYSQL-MANAGER-2007-c4ee483a15774877875a370be49cb784?pvs=21" },
-      { num: 12, text: "Ajustar Demo.ini e config.ini", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b?pvs=97#26a9a16d6744801cb6fac09b5c6c72ae" },
-      { num: 13, text: "Criar atalhos GR7 e organizar", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d67448042b1e4c03012197f63" },
-      { num: 14, text: "Rodar o ATUALIZA GR7", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b?pvs=97#26a9a16d6744803e90a3f3f2927e3180" },
-      { num: 15, text: "Configurar o ATUALIZA GR7 na inicialização", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744809eaa5bfc5498c29d64" },
-      { num: 16, text: "Permissão para acessar rede compartilhada / Credenciais do Windows", manual: "https://gr7autocom.notion.site/PERMISS-O-PARA-ACESSAR-REDE-COMPARTILHADA-CREDENCIAIS-DO-WINDOWS-27e9a16d67448008a4b1fbccf7423f17" },
-      { num: 17, text: "Configurando periféricos no Sistema GR7 (Caso tenha Impressora/Etiqueta)", manual: "https://gr7autocom.notion.site/CONFIGURANDO-PERIFERICOS-NO-SISTEMA-GR7-2699a16d6744806eb63cff2b84c2cd7e" },
-      { num: 18, text: "Criar exceções no Windows Defender", manual: "https://gr7autocom.notion.site/CRIAR-EXCE-ES-NO-WINDOWS-DEFENDER-2809a16d674480c0a7fbf1353b1b6aa1" },
+      { num: 4,     text: "Ajustes rápidos no Windows", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d67448052adb4ebe04c134262" },
+      { num: 5,     text: "Pastas na Área de Trabalho", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744800587a5c44f8db0f085" },
+      { num: 6,     text: "(Se possível) Renomear o computador", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480d19123fe57b8703144" },
+      { num: 7,     text: "Compartilhamento de redes do Windows", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744803ba6e8effb3970d0f2" },
+      { num: 8,     text: "Fixar pastas no Acesso Rápido", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480eb901dcd4a3d32f02c" },
+      { num: 9,     text: "Instalar a fonte dos relatórios", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d674480928a08e13c773bf520" },
+      { num: 10,    text: "Atualizar Registro e colocar no Servidor", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d67448056a7e7c962d4946609" },
+      { num: 11,    text: "Instalar MySQL Manager", manual: "https://www.notion.so/INSTALANDO-E-CONFIGURANDO-O-MYSQL-MANAGER-2007-c4ee483a15774877875a370be49cb784?pvs=21" },
+      { num: 12,    text: "Ajustar Demo.ini e config.ini", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b?pvs=97#26a9a16d6744801cb6fac09b5c6c72ae" },
+      { num: 13,    text: "Criar atalhos GR7 e organizar", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d67448042b1e4c03012197f63" },
+      { num: 14,    text: "Rodar o ATUALIZA GR7", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b?pvs=97#26a9a16d6744803e90a3f3f2927e3180" },
+      { num: 15,    text: "Configurar o ATUALIZA GR7 na inicialização", manual: "https://gr7autocom.notion.site/INSTALANDO-RETAGUARDA-GR7-8ac205a8fab74a6682cccb3c1ea8de5b#26a9a16d6744809eaa5bfc5498c29d64" },
+      { num: 16,    text: "Permissão para acessar rede compartilhada / Credenciais do Windows", manual: "https://gr7autocom.notion.site/PERMISS-O-PARA-ACESSAR-REDE-COMPARTILHADA-CREDENCIAIS-DO-WINDOWS-27e9a16d67448008a4b1fbccf7423f17" },
+      { num: 17,    text: "Configurando periféricos no Sistema GR7 (Caso tenha Impressora/Etiqueta)", manual: "https://gr7autocom.notion.site/CONFIGURANDO-PERIFERICOS-NO-SISTEMA-GR7-2699a16d6744806eb63cff2b84c2cd7e" },
+      { num: 18,    text: "Criar exceções no Windows Defender", manual: "https://gr7autocom.notion.site/CRIAR-EXCE-ES-NO-WINDOWS-DEFENDER-2809a16d674480c0a7fbf1353b1b6aa1" },
     ];
 
     const nfceSteps = [
-      { num: 1, text: "Preparar acesso pelo AnyDesk", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448056bd9cccf8e9d2f691" },
-      { num: 2, text: "Instalar o Master Remote no cliente", manual: "https://gr7autocom.notion.site/INSTALANDO-REMOTE-NO-CLIENTE-E-ADICIONANDO-AO-CONTROL-2659a16d674481069e5df972792afa0e" },
-      { num: 3, text: "Transferir arquivos GR7 pelo Master", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d6744803dada5d076fb6ac295" },
+      { num: 1,     text: "Preparar acesso pelo AnyDesk", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448056bd9cccf8e9d2f691" },
+      { num: 2,     text: "Instalar o Master Remote no cliente", manual: "https://gr7autocom.notion.site/INSTALANDO-REMOTE-NO-CLIENTE-E-ADICIONANDO-AO-CONTROL-2659a16d674481069e5df972792afa0e" },
+      { num: 3,     text: "Transferir arquivos GR7 pelo Master", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d6744803dada5d076fb6ac295" },
       { num: "Extra", text: "Otimização do Windows para Uso do Sistema GR7", manual: "https://gr7autocom.notion.site/CONFIGURANDO-WINDOWS-PARA-O-USUARIO-2689a16d674480c08d43c5867b2177dc", extra: true },
-      { num: 4, text: "Ajustes rápidos no Windows", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448017a540d6796c95f95e" },
-      { num: 5, text: "Pastas na Área de Trabalho", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d674480b493b6e55c05001f42" },
-      { num: 6, text: "(Se possível) Renomear o computador", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448031a488cf28707c1eda" },
-      { num: 7, text: "Compartilhamento de redes do Windows", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448033848adb5c79fedf05" },
-      { num: 8, text: "Fixar pastas no Acesso Rápido", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497?pvs=97#26a9a16d674480b980a0df9fce9b96f6" },
-      { num: 9, text: "Atualizar Registro e colocar no Servidor", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497?pvs=97#26a9a16d674480579240f028f87242ea" },
+      { num: 4,     text: "Ajustes rápidos no Windows", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448017a540d6796c95f95e" },
+      { num: 5,     text: "Pastas na Área de Trabalho", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d674480b493b6e55c05001f42" },
+      { num: 6,     text: "(Se possível) Renomear o computador", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448031a488cf28707c1eda" },
+      { num: 7,     text: "Compartilhamento de redes do Windows", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448033848adb5c79fedf05" },
+      { num: 8,     text: "Fixar pastas no Acesso Rápido", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497?pvs=97#26a9a16d674480b980a0df9fce9b96f6" },
+      { num: 9,     text: "Atualizar Registro e colocar no Servidor", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497?pvs=97#26a9a16d674480579240f028f87242ea" },
       { num: "10a", text: "Instalar e configurar o MySQL 5.7", manual: "https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-SERVER-5-7-38-a125c940921143429f7c5b25d5cfdab9" },
       { num: "10b", text: "Configuração MySQL Server / My.ini", manual: "https://gr7autocom.notion.site/CONFIGURA-O-MYSQL-SERVER-MY-INI-2659a16d67448053b567d2673f45d5f8" },
       { num: "10c", text: "Instalar e configurar o MySQL Administrator", manual: "https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-ADMINISTRATOR-4de01b2e6580441098c482691842f347" },
       { num: "10d", text: "Instalar e configurar o MySQL Manager 2007", manual: "https://gr7autocom.notion.site/INSTALANDO-E-CONFIGURANDO-O-MYSQL-MANAGER-2007-c4ee483a15774877875a370be49cb784" },
-      { num: 11, text: "Restaurar a base no Administrator", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448030bcfdc5c1c8367c99" },
-      { num: 12, text: "Ajustar Demo.ini e config.ini", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d674480dd8e62e28be4d9bb54" },
-      { num: 13, text: "Criar atalhos GR7 e organizar", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d674480f09e2dea6378df59a2" },
+      { num: 11,    text: "Restaurar a base no Administrator", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d67448030bcfdc5c1c8367c99" },
+      { num: 12,    text: "Ajustar Demo.ini e config.ini", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d674480dd8e62e28be4d9bb54" },
+      { num: 13,    text: "Criar atalhos GR7 e organizar", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#26a9a16d674480f09e2dea6378df59a2" },
       { num: "14a", text: "Rodar o ATUALIZA GR7", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497?pvs=97#26b9a16d674480d38a7ae23f70954fc9" },
       { num: "14b", text: "Permissão para acessar rede compartilhada / Credenciais do Windows", manual: "https://gr7autocom.notion.site/PERMISS-O-PARA-ACESSAR-REDE-COMPARTILHADA-CREDENCIAIS-DO-WINDOWS-27e9a16d67448008a4b1fbccf7423f17" },
-      { num: 15, text: "Configurar o ATUALIZA GR7 na inicialização", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#2b59a16d6744805db5dbe4bcf72e6e2b" },
-      { num: 16, text: "Configurando periféricos no Sistema GR7 (Caso tenha Impressora/Balança)", manual: "https://gr7autocom.notion.site/CONFIGURANDO-PERIFERICOS-NO-SISTEMA-GR7-2699a16d6744806eb63cff2b84c2cd7e" },
-      { num: 17, text: "Instalando fonte para relatório (Caso vá usar Retaguarda)", manual: "https://gr7autocom.notion.site/INSTALANDO-FONTE-PARA-RELAT-RIO-27e9a16d6744800aad99f4fffd8385b1" },
-      { num: 18, text: "Criar exceções no Windows Defender", manual: "https://gr7autocom.notion.site/CRIAR-EXCE-ES-NO-WINDOWS-DEFENDER-2809a16d674480c0a7fbf1353b1b6aa1" },
+      { num: 15,    text: "Configurar o ATUALIZA GR7 na inicialização", manual: "https://gr7autocom.notion.site/INSTALANDO-FRENTE-DE-CAIXA-GR7-6cae4ac927b345888ecb61eab9b16497#2b59a16d6744805db5dbe4bcf72e6e2b" },
+      { num: 16,    text: "Configurando periféricos no Sistema GR7 (Caso tenha Impressora/Balança)", manual: "https://gr7autocom.notion.site/CONFIGURANDO-PERIFERICOS-NO-SISTEMA-GR7-2699a16d6744806eb63cff2b84c2cd7e" },
+      { num: 17,    text: "Instalando fonte para relatório (Caso vá usar Retaguarda)", manual: "https://gr7autocom.notion.site/INSTALANDO-FONTE-PARA-RELAT-RIO-27e9a16d6744800aad99f4fffd8385b1" },
+      { num: 18,    text: "Criar exceções no Windows Defender", manual: "https://gr7autocom.notion.site/CRIAR-EXCE-ES-NO-WINDOWS-DEFENDER-2809a16d674480c0a7fbf1353b1b6aa1" },
     ];
 
     // ------------------------------------------
@@ -1373,21 +898,20 @@
     let clientData = {};
     let selectedType = 'Servidor';
     let currentTab = 'servidor';
-    let currentClientId = null;    // UUID do cliente no Supabase
-    let allClients = [];        // cache da lista de clientes
+    let currentClientId = null;
+    let allClients = [];
     let saveDebounce = null;
     let currentUserName = localStorage.getItem('gr7_current_user') || '';
     let pendingResumeResponsible = '';
 
     // ------------------------------------------
-    //  CARREGAR COLABORADORES DO SUPABASE
+    //  COLABORADORES
     // ------------------------------------------
     async function loadColaboradores() {
       try {
         const r = await fetch(SUPABASE_URL + '/rest/v1/colaboradores?order=nome&ativo=eq.true', { headers: HEADERS });
         if (!r.ok) throw new Error(await r.text());
         const colaboradores = await r.json();
-
         const makeOptions = (selectId, selectedName) => {
           const sel = document.getElementById(selectId);
           if (!sel) return;
@@ -1395,25 +919,19 @@
             + colaboradores.map(c =>
                 `<option value="${c.nome}"${c.nome === selectedName ? ' selected' : ''}>${c.nome}${c.cargo ? ' — ' + c.cargo : ''}</option>`
               ).join('');
-          // habilita botão continuar se já tem seleção (whoName)
           if (selectId === 'whoName') {
             const btn = document.getElementById('whoContinue');
             if (btn) btn.disabled = !sel.value;
             sel.addEventListener('change', () => { if (btn) btn.disabled = !sel.value; });
           }
         };
-
         makeOptions('clientEmployee', currentUserName);
         makeOptions('whoName', currentUserName);
-
       } catch(e) {
         console.error('Erro ao carregar colaboradores:', e);
-        // fallback: input de texto
         ['clientEmployee', 'whoName'].forEach(id => {
           const el = document.getElementById(id);
-          if (el && el.tagName === 'SELECT') {
-            el.innerHTML = '<option value="">Erro ao carregar</option>';
-          }
+          if (el && el.tagName === 'SELECT') el.innerHTML = '<option value="">Erro ao carregar</option>';
         });
       }
     }
@@ -1435,54 +953,35 @@
         const select  = document.getElementById('whoName');
         const btnCancel   = document.getElementById('whoCancel');
         const btnContinue = document.getElementById('whoContinue');
-
-        // Pré-seleciona o usuário atual
         if (select) {
           select.value = currentUserName || '';
           btnContinue.disabled = !select.value;
           select.onchange = () => { btnContinue.disabled = !select.value; };
         }
-
         overlay.classList.add('active');
         overlay.setAttribute('aria-hidden', 'false');
-
         const cleanup = () => {
           overlay.classList.remove('active');
           overlay.setAttribute('aria-hidden', 'true');
           btnCancel.removeEventListener('click', onCancel);
           btnContinue.removeEventListener('click', onContinue);
         };
-
         const onCancel = () => { cleanup(); resolve(currentUserName || ''); };
         const onContinue = () => {
           const name = select ? select.value.trim() : '';
           if (!name) return;
-          cleanup();
-          resolve(name);
+          cleanup(); resolve(name);
         };
-
         btnCancel.addEventListener('click', onCancel);
         btnContinue.addEventListener('click', onContinue);
       });
     }
 
-    function localMetaKey() {
-      return 'gr7_progress_meta';
-    }
-
-    function getLocalMeta() {
-      try {
-        const j = localStorage.getItem(localMetaKey());
-        return j ? JSON.parse(j) : {};
-      } catch {
-        return {};
-      }
-    }
-
-    function saveLocalMeta(meta) {
-      localStorage.setItem(localMetaKey(), JSON.stringify(meta));
-    }
-
+    // ------------------------------------------
+    //  LOCAL META (histórico de itens)
+    // ------------------------------------------
+    function getLocalMeta() { try { const j = localStorage.getItem('gr7_progress_meta'); return j ? JSON.parse(j) : {}; } catch { return {}; } }
+    function saveLocalMeta(meta) { localStorage.setItem('gr7_progress_meta', JSON.stringify(meta)); }
     function setItemMeta(clientId, group, itemNum, data) {
       const meta = getLocalMeta();
       if (!meta[clientId]) meta[clientId] = {};
@@ -1490,26 +989,19 @@
       if (data) meta[clientId][key] = data; else delete meta[clientId][key];
       saveLocalMeta(meta);
     }
-
     function getItemMeta(clientId, group, itemNum) {
       const meta = getLocalMeta();
-      const key = `${group}:${itemNum}`;
-      return (meta[clientId] && meta[clientId][key]) || null;
+      return (meta[clientId] && meta[clientId][`${group}:${itemNum}`]) || null;
     }
 
     function updateItemBadge(el, name) {
       const badge = el.querySelector('.item-resp-badge');
       if (!badge) return;
-      // Guarda quem marcou no dataset do item para verificação de bloqueio
       el.dataset.marcadoPor = (name || '').trim();
-      if (name && name.trim()) {
-        badge.textContent = `👤 ${name.trim()}`;
-        badge.style.display = 'inline-flex';
-      } else {
-        badge.textContent = '';
-        badge.style.display = 'none';
-      }
+      if (name && name.trim()) { badge.textContent = `👤 ${name.trim()}`; badge.style.display = 'inline-flex'; }
+      else { badge.textContent = ''; badge.style.display = 'none'; }
     }
+
     // ------------------------------------------
     //  TOAST
     // ------------------------------------------
@@ -1525,8 +1017,7 @@
     //  SAVE INDICATOR
     // ------------------------------------------
     function setSaveStatus(status) {
-      const el = document.getElementById('saveIndicator');
-      el.className = 'save-indicator ' + status;
+      document.getElementById('saveIndicator').className = 'save-indicator ' + status;
     }
 
     // ------------------------------------------
@@ -1537,9 +1028,7 @@
       document.getElementById('tabRetomarBtn').classList.toggle('active', tab === 'retomar');
       document.getElementById('sectionNovo').classList.toggle('active', tab === 'novo');
       document.getElementById('sectionRetomar').classList.toggle('active', tab === 'retomar');
-      if (tab === 'retomar') {
-        loadClientsList();
-      }
+      if (tab === 'retomar') loadClientsList();
     }
 
     function openModal() {
@@ -1550,7 +1039,7 @@
     }
 
     // ------------------------------------------
-    //  TIPO INSTALAÇÃO
+    //  TIPO DE INSTALAÇÃO
     // ------------------------------------------
     function selectType(type) {
       selectedType = type;
@@ -1560,41 +1049,30 @@
     }
 
     function voltarDashboard() {
-      // Tenta fechar a aba (se foi aberta pelo dashboard)
-      // Se não conseguir, redireciona para index.html
-      if (window.opener && !window.opener.closed) {
-        window.close();
-      } else {
-        window.location.href = 'index.html';
-      }
+      if (window.opener && !window.opener.closed) window.close();
+      else window.location.href = 'index.html';
     }
 
-    function cancelModal() {
-      document.getElementById('modalOverlay').classList.remove('active');
-    }
+    function cancelModal() { document.getElementById('modalOverlay').classList.remove('active'); }
 
     // ------------------------------------------
-    //  CRIAR CLIENTE (salva no Supabase)
+    //  CRIAR CLIENTE
     // ------------------------------------------
     async function createClient() {
       const btn = document.getElementById('btnCriar');
       const name = document.getElementById('clientName').value.trim() || 'Cliente';
       const date = document.getElementById('clientDate').value;
-      const pc = document.getElementById('clientPC').value.trim() || 'DESKTOP-XXXXXXX';
-      const emp = document.getElementById('clientEmployee').value.trim() || '—';
+      const pc   = document.getElementById('clientPC').value.trim() || 'DESKTOP-XXXXXXX';
+      const emp  = document.getElementById('clientEmployee').value.trim() || '—';
 
       btn.disabled = true;
       btn.innerHTML = '<div class="spinner"></div> Salvando...';
 
-      // Salvar no Supabase
-      const { data, error } = await dbInsert('clientes', {
-        nome: name, data: date || null, computador: pc, funcionario: emp, tipo: selectedType
-      });
+      const { data, error } = await dbInsert('clientes', { nome: name, data: date || null, computador: pc, funcionario: emp, tipo: selectedType });
 
       if (error) {
-        showToast('Erro ao salvar cliente: ' + error.message, 'error');
-        btn.disabled = false;
-        btn.innerHTML = '? Criar e Iniciar Checklist';
+        showToast(humanizeError(error), 'error');
+        btn.disabled = false; btn.innerHTML = '🚀 Criar e Iniciar Checklist';
         return;
       }
 
@@ -1602,19 +1080,15 @@
       clientData = { name, date, pc, emp, type: selectedType };
       setCurrentUserName(emp);
       applyClientUI();
-
       document.getElementById('modalOverlay').classList.remove('active');
       document.getElementById('app').classList.add('active');
-
       buildLists();
       loadCustomTasks(currentClientId);
       ['servidor','retaguarda','nfce'].forEach(g => loadOrderFromStorage(currentClientId, g));
       switchToTypeTab(selectedType);
       showToast('Cliente criado e sincronizado!', 'success');
       setSaveStatus('saved');
-
-      btn.disabled = false;
-      btn.innerHTML = '? Criar e Iniciar Checklist';
+      btn.disabled = false; btn.innerHTML = '🚀 Criar e Iniciar Checklist';
     }
 
     function applyClientUI() {
@@ -1623,131 +1097,92 @@
       const pcEl = document.getElementById('displayPC');
       if (pcEl) pcEl.textContent = clientData.pc ? '· ' + clientData.pc : '';
       document.getElementById('infoName').textContent = clientData.name;
-      document.getElementById('infoDate').textContent = clientData.date
-        ? new Date(clientData.date + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
+      document.getElementById('infoDate').textContent = clientData.date ? new Date(clientData.date + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
       document.getElementById('infoPC').textContent = clientData.pc;
       document.getElementById('infoEmployee').textContent = clientData.emp;
     }
 
     function switchToTypeTab(type) {
-      // Mostra APENAS a aba do tipo desta máquina — oculta as demais
       const tabMap = { 'Servidor': 'servidor', 'Retaguarda': 'retaguarda', 'NFCe / Caixa': 'nfce' };
       const activeKey = tabMap[type] || 'servidor';
-
       document.querySelectorAll('.tab').forEach((t, i) => {
         const keys = ['servidor', 'retaguarda', 'nfce'];
-        if (keys[i] === activeKey) {
-          t.style.display = '';
-          t.classList.add('active');
-        } else {
-          t.style.display = 'none';
-          t.classList.remove('active');
-        }
+        if (keys[i] === activeKey) { t.style.display = ''; t.classList.add('active'); }
+        else { t.style.display = 'none'; t.classList.remove('active'); }
       });
-
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       document.getElementById('panel-' + activeKey).classList.add('active');
       currentTab = activeKey;
     }
 
     // ------------------------------------------
-    //  LISTA DE CLIENTES EXISTENTES
+    //  LISTA DE CLIENTES (retomar)
     // ------------------------------------------
     async function loadClientsList() {
       const container = document.getElementById('clientsList');
       container.innerHTML = '<div class="clients-loading"><div class="spinner" style="margin:0 auto 10px"></div>Carregando...</div>';
-
-      // Usa a view que já tem percentual calculado
       const { data, error } = await dbSelect('vw_progresso_clientes', {}, { order: 'criado_em.desc', limit: 200 });
-
       if (error) {
-        // fallback para tabela clientes se a view não existir ainda
         const fb = await dbSelect('clientes', {}, { order: 'criado_em.desc', limit: 50 });
         if (fb.error) { container.innerHTML = '<div class="clients-empty">Erro ao carregar clientes.</div>'; return; }
         allClients = fb.data || [];
       } else {
-        // Filtra projetos ainda não concluídos (percentual < 100)
         allClients = (data || []).filter(c => (c.percentual || 0) < 100);
       }
-
       renderClientsList(allClients);
     }
 
     function renderClientsList(list) {
       const container = document.getElementById('clientsList');
-      if (!list.length) {
-        container.innerHTML = '<div class="clients-empty">Nenhum cliente encontrado.</div>';
-        return;
-      }
-
-      const typeIcons = { 'Servidor': '🖥️', 'Retaguarda': '🗄️', 'NFCe / Caixa': '🧾' };
-      const typeColors = { 'Servidor': '#818cf8', 'Retaguarda': '#38bdf8', 'NFCe / Caixa': '#34d399' };
+      if (!list.length) { container.innerHTML = '<div class="clients-empty">Nenhum cliente encontrado.</div>'; return; }
+      const typeIcons  = { 'Servidor': '🖥️', 'Retaguarda': '🗄️', 'NFCe / Caixa': '🧾' };
+      const typeColors = { 'Servidor': 'var(--c0)', 'Retaguarda': 'var(--c1)', 'NFCe / Caixa': 'var(--green)' };
       container.innerHTML = '';
       const ul = document.createElement('div');
       ul.className = 'clients-list';
-
-      // Agrupa por nome do cliente
       const grouped = {};
-      list.forEach(c => {
-        if (!grouped[c.nome]) grouped[c.nome] = [];
-        grouped[c.nome].push(c);
-      });
-
+      list.forEach(c => { if (!grouped[c.nome]) grouped[c.nome] = []; grouped[c.nome].push(c); });
       Object.entries(grouped).forEach(([nomeCliente, maquinas]) => {
-        // Cabeçalho do cliente (só aparece se tiver mais de 1 máquina)
         if (maquinas.length > 1) {
           const header = document.createElement('div');
-          header.style.cssText = 'padding:8px 12px 4px;font-size:11px;font-weight:700;color:#555;letter-spacing:.06em;text-transform:uppercase;';
+          header.style.cssText = 'padding:8px 4px 4px;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-family:"IBM Plex Mono",monospace';
           header.textContent = '📁 ' + nomeCliente + ' · ' + maquinas.length + ' máquinas';
           ul.appendChild(header);
         }
-
         maquinas.forEach(c => {
           const row = document.createElement('div');
           row.className = 'client-row';
           const dateStr = c.data ? new Date(c.data + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
-          const cor = typeColors[c.tipo] || '#888';
           row.innerHTML = `
-        <div class="client-row-info">
-          <div class="client-row-name">${c.nome} <span style="font-size:11px;color:#555;font-weight:400">· ${c.computador || '—'}</span></div>
-          <div class="client-row-meta">
-            <span>📅 ${dateStr}</span>
-            <span>👤 ${c.funcionario || '—'}</span>
-          </div>
-        </div>
-        <span class="client-row-badge" style="background:${cor}22;color:${cor};border-color:${cor}44">${typeIcons[c.tipo] || ''} ${c.tipo}</span>
-        <span class="client-row-arrow">›</span>
-      `;
+            <div class="client-row-info">
+              <div class="client-row-name">${c.nome} <span style="font-size:11px;color:var(--muted);font-weight:400">· ${c.computador || '—'}</span></div>
+              <div class="client-row-meta"><span>📅 ${dateStr}</span><span>👤 ${c.funcionario || '—'}</span></div>
+            </div>
+            <span class="client-row-badge">${typeIcons[c.tipo] || ''} ${c.tipo}</span>
+            <span class="client-row-arrow">›</span>`;
           row.onclick = () => resumeClient(c);
           ul.appendChild(row);
         });
       });
-
       container.appendChild(ul);
     }
 
     function filterClients(query) {
       const q = query.toLowerCase();
-      const filtered = allClients.filter(c =>
+      renderClientsList(allClients.filter(c =>
         c.nome.toLowerCase().includes(q) ||
         (c.computador || '').toLowerCase().includes(q) ||
         (c.funcionario || '').toLowerCase().includes(q)
-      );
-      renderClientsList(filtered);
+      ));
     }
 
     // ------------------------------------------
-    //  RETOMAR CLIENTE EXISTENTE
+    //  RETOMAR CLIENTE
     // ------------------------------------------
     async function resumeClient(c) {
-      // Pergunta quem é o técnico AGORA que escolheu a atividade
       const name = await requestResponsibleForRetomar();
-      if (name && name.trim()) {
-        pendingResumeResponsible = name.trim();
-        setCurrentUserName(pendingResumeResponsible);
-      } else {
-        pendingResumeResponsible = '';
-      }
+      if (name && name.trim()) { pendingResumeResponsible = name.trim(); setCurrentUserName(pendingResumeResponsible); }
+      else pendingResumeResponsible = '';
 
       document.getElementById('clientsList').innerHTML =
         '<div class="clients-loading"><div class="spinner" style="margin:0 auto 10px"></div>Carregando progresso...</div>';
@@ -1768,37 +1203,26 @@
 
       if (novoResponsavel && novoResponsavel !== (c.funcionario || '—')) {
         const { error } = await updateClientResponsavel(currentClientId, novoResponsavel);
-        if (error) showToast('Não foi possível atualizar responsável do cliente: ' + (error.message || 'Erro'), 'error');
+        if (error) showToast('Não foi possível atualizar responsável: ' + (error.message || 'Erro'), 'error');
       }
 
-      // Carregar progresso salvo
-      const { data: progresso, error } = await dbSelect(
-        'checklist_progresso',
-        { cliente_id: currentClientId, concluido: true }
-      );
+      const { data: progresso, error } = await dbSelect('checklist_progresso', { cliente_id: currentClientId, concluido: true });
 
       if (error) {
-        showToast('Erro ao carregar progresso: ' + error.message, 'error');
+        showToast(humanizeError(error), 'error');
       } else if (progresso && progresso.length > 0) {
         progresso.forEach(p => {
-          const selectors = [
-            `#list-${p.grupo}-steps .check-item[data-num="${p.item_num}"]`,
-            `#list-${p.grupo} .check-item[data-num="${p.item_num}"]`
-          ];
-          selectors.forEach(sel => {
+          [`#list-${p.grupo}-steps .check-item[data-num="${p.item_num}"]`,
+           `#list-${p.grupo} .check-item[data-num="${p.item_num}"]`].forEach(sel => {
             const el = document.querySelector(sel);
             if (el) {
               el.classList.add('done');
               const by = p.marcado_por || (currentClientId ? getItemMeta(currentClientId, p.grupo, p.item_num)?.by : null);
               if (by) {
                 updateItemBadge(el, by);
-                // Bloqueia visualmente se foi marcado por outro colaborador
                 const euSou = (currentUserName || '').trim();
-                if (euSou && by.trim().toLowerCase() !== euSou.toLowerCase()) {
-                  el.classList.add('locked');
-                }
+                if (euSou && by.trim().toLowerCase() !== euSou.toLowerCase()) el.classList.add('locked');
               }
-              // Restaurar observação
               if (p.observacao) {
                 const obsInput = el.querySelector('.obs-input');
                 const obsBtn   = el.querySelector('.obs-toggle-btn');
@@ -1808,9 +1232,7 @@
             }
           });
         });
-        updateProgress('servidor');
-        updateProgress('retaguarda');
-        updateProgress('nfce');
+        updateProgress('servidor'); updateProgress('retaguarda'); updateProgress('nfce');
         showToast(`Progresso restaurado (${progresso.length} item${progresso.length > 1 ? 's' : ''})`, 'success');
       } else {
         showToast('Cliente carregado — sem progresso anterior', 'info');
@@ -1824,33 +1246,22 @@
     //  BUILD LISTS
     // ------------------------------------------
     function buildLists() {
-      // Constrói APENAS a lista do tipo desta máquina
       const type = clientData.type || selectedType || 'Servidor';
       const tabMap = { 'Servidor': 'servidor', 'Retaguarda': 'retaguarda', 'NFCe / Caixa': 'nfce' };
       const group = tabMap[type] || 'servidor';
-      const stepsMap = { servidor: servidorSteps, retaguarda: retaguardaSteps, nfce: nfceSteps };
+      const stepsMap  = { servidor: servidorSteps, retaguarda: retaguardaSteps, nfce: nfceSteps };
       const listIdMap = { servidor: 'list-servidor-steps', retaguarda: 'list-retaguarda', nfce: 'list-nfce' };
-
-      // Limpa todas as listas e reconstrói só a necessária
-      ['servidor', 'retaguarda', 'nfce'].forEach(g => {
-        const listId = g === 'servidor' ? 'list-servidor-steps' : 'list-' + g;
-        const el = document.getElementById(listId);
+      ['servidor','retaguarda','nfce'].forEach(g => {
+        const el = document.getElementById(g === 'servidor' ? 'list-servidor-steps' : 'list-' + g);
         if (el) el.innerHTML = '';
       });
-
-      const steps = stepsMap[group] || [];
+      const steps  = stepsMap[group] || [];
       const listEl = document.getElementById(listIdMap[group]);
-      if (listEl) {
-        steps.forEach(s => listEl.appendChild(makeItem(s.num, s.text, s.manual || null, s.extra || false, group)));
-      }
-
+      if (listEl) steps.forEach(s => listEl.appendChild(makeItem(s.num, s.text, s.manual || null, s.extra || false, group)));
       updateProgress(group);
-
-      // Reaplicar badges do armazenamento local
       if (currentClientId) {
         document.querySelectorAll(`#${listIdMap[group]} .check-item`).forEach(el => {
-          const itemNum = el.dataset.num;
-          const meta = getItemMeta(currentClientId, group, itemNum);
+          const meta = getItemMeta(currentClientId, group, el.dataset.num);
           if (meta && el.classList.contains('done')) updateItemBadge(el, meta.by);
         });
       }
@@ -1862,37 +1273,33 @@
       div.dataset.group = group;
       div.dataset.num = String(num);
       div.draggable = true;
-      div.onclick = function (e) {
+      div.onclick = function(e) {
         if (e.target.closest('.obs-area') || e.target.closest('.obs-toggle-btn') || e.target.closest('.drag-handle')) return;
         toggle(this);
       };
-
-      // Drag events
       div.addEventListener('dragstart', onDragStart);
       div.addEventListener('dragend', onDragEnd);
       div.addEventListener('dragover', onDragOver);
       div.addEventListener('dragleave', onDragLeave);
       div.addEventListener('drop', onDrop);
-
       div.innerHTML = `
-    <div class="drag-handle" title="Arrastar para reorganizar" onclick="event.stopPropagation()">⠿</div>
-    <div class="check-box">✓</div>
-    <span class="item-number">${num}</span>
-    <div class="item-content">
-      <div class="item-text">${text}</div>
-    </div>
-    <div class="item-meta">
-      <span class="item-resp-badge" title="Marcado por"></span>
-      ${manual ? `<a class="item-manual" href="${manual}" target="_blank" onclick="event.stopPropagation()">📖 Manual</a>` : ''}
-      <button class="obs-toggle-btn" onclick="event.stopPropagation(); toggleObs(this)" title="Adicionar observação">💬 Obs</button>
-    </div>
-    <div class="obs-area">
-      <span class="obs-label">⚠️ Motivo:</span>
-      <textarea class="obs-input" rows="2" placeholder="Explique o motivo de não realizar esta etapa…" onclick="event.stopPropagation()"></textarea>
-      <button class="obs-save-btn" onclick="event.stopPropagation(); saveObs(this)">Salvar</button>
-      <span class="obs-saved-tag">✓ Salvo</span>
-    </div>
-  `;
+        <div class="drag-handle" title="Arrastar para reorganizar" onclick="event.stopPropagation()">⠿</div>
+        <div class="check-box">✓</div>
+        <span class="item-number">${num}</span>
+        <div class="item-content">
+          <div class="item-text">${text}</div>
+        </div>
+        <div class="item-meta">
+          <span class="item-resp-badge" title="Marcado por"></span>
+          ${manual ? `<a class="item-manual" href="${manual}" target="_blank" onclick="event.stopPropagation()">📖 Manual</a>` : ''}
+          <button class="obs-toggle-btn" onclick="event.stopPropagation(); toggleObs(this)" title="Observação">💬 Obs</button>
+        </div>
+        <div class="obs-area">
+          <span class="obs-label">⚠️ Motivo:</span>
+          <textarea class="obs-input" rows="2" placeholder="Explique o motivo de não realizar esta etapa…" onclick="event.stopPropagation()"></textarea>
+          <button class="obs-save-btn" onclick="event.stopPropagation(); saveObs(this)">Salvar</button>
+          <span class="obs-saved-tag">✓ Salvo</span>
+        </div>`;
       return div;
     }
 
@@ -1903,155 +1310,93 @@
     }
 
     async function saveObs(btn) {
-      const area   = btn.closest('.obs-area');
-      const item   = btn.closest('.check-item');
-      const input  = area.querySelector('.obs-input');
-      const tag    = area.querySelector('.obs-saved-tag');
-      const obsBtn = item.querySelector('.obs-toggle-btn');
-      const obs    = input.value.trim();
-      const group  = item.dataset.group || currentTab;
+      const area    = btn.closest('.obs-area');
+      const item    = btn.closest('.check-item');
+      const input   = area.querySelector('.obs-input');
+      const tag     = area.querySelector('.obs-saved-tag');
+      const obsBtn  = item.querySelector('.obs-toggle-btn');
+      const obs     = input.value.trim();
+      const group   = item.dataset.group || currentTab;
       const itemNum = item.dataset.num;
-
       if (!currentClientId) { showToast('Abra um cliente antes de salvar.', 'error'); return; }
-
-      btn.disabled = true;
-      btn.textContent = '…';
-
-      const { error } = await dbUpsert(
-        'checklist_progresso',
-        {
-          cliente_id: currentClientId,
-          grupo: group,
-          item_num: itemNum,
-          concluido: item.classList.contains('done'),
-          observacao: obs,
-          marcado_por: currentUserName || '—',
-          marcado_em: new Date().toISOString()
-        },
-        'cliente_id,grupo,item_num'
-      );
-
-      btn.disabled = false;
-      btn.textContent = 'Salvar';
-
-      if (error) {
-        showToast('Erro ao salvar obs: ' + error.message, 'error');
-      } else {
-        tag.classList.add('show');
-        setTimeout(() => tag.classList.remove('show'), 2500);
+      btn.disabled = true; btn.textContent = '…';
+      const { error } = await dbUpsert('checklist_progresso',
+        { cliente_id: currentClientId, grupo: group, item_num: itemNum,
+          concluido: item.classList.contains('done'), observacao: obs,
+          marcado_por: currentUserName || '—', marcado_em: new Date().toISOString() },
+        'cliente_id,grupo,item_num');
+      btn.disabled = false; btn.textContent = 'Salvar';
+      if (error) { showToast(humanizeError(error), 'error'); }
+      else {
+        tag.classList.add('show'); setTimeout(() => tag.classList.remove('show'), 2500);
         if (obs) { obsBtn.classList.add('has-obs'); obsBtn.title = obs; }
-        else     { obsBtn.classList.remove('has-obs'); obsBtn.title = 'Adicionar observação'; }
+        else { obsBtn.classList.remove('has-obs'); obsBtn.title = 'Adicionar observação'; }
         showToast('Observação salva!', 'success');
       }
     }
 
     // ------------------------------------------
-    //  TOGGLE + SALVAR NO SUPABASE
+    //  TOGGLE + SALVAR
     // ------------------------------------------
     async function toggle(el) {
-      // ── BLOQUEIO: item marcado por outro colaborador não pode ser alterado
       const marcadoPorAtual = (el.dataset.marcadoPor || '').trim();
       const euSou = (currentUserName || '').trim();
       if (el.classList.contains('done') && marcadoPorAtual && euSou &&
           marcadoPorAtual.toLowerCase() !== euSou.toLowerCase()) {
-        showToast(`🔒 Marcado por ${marcadoPorAtual} — só ele pode desmarcar`, 'error');
-        return; // bloqueia sem alterar nada
+        showToast(`🔒 Marcado por ${marcadoPorAtual} — só ele pode desmarcar`, 'error'); return;
       }
-
       el.classList.toggle('done');
-      const group = el.dataset.group || currentTab;
-      const itemNum = el.dataset.num;
+      const group    = el.dataset.group || currentTab;
+      const itemNum  = el.dataset.num;
       const concluido = el.classList.contains('done');
       const marcadoPor = currentUserName || clientData.emp || '—';
-      const marcadoEm = new Date().toISOString();
-
+      const marcadoEm  = new Date().toISOString();
       updateProgress(group);
-
       if (!currentClientId) return;
-
       setSaveStatus('saving');
-
-      // Atualiza badge e armazenamento local
-      if (concluido) {
-        updateItemBadge(el, marcadoPor);
-        el.classList.remove('locked'); // marcou agora, é dono
-        setItemMeta(currentClientId, group, itemNum, { by: marcadoPor, at: marcadoEm });
-      } else {
-        updateItemBadge(el, '');
-        el.classList.remove('locked');
-        setItemMeta(currentClientId, group, itemNum, null);
-      }
-
-      // Tentativa 1: salvar com campos de autoria (se existir na tabela)
-      let { error } = await dbUpsert(
-        'checklist_progresso',
+      if (concluido) { updateItemBadge(el, marcadoPor); el.classList.remove('locked'); setItemMeta(currentClientId, group, itemNum, { by: marcadoPor, at: marcadoEm }); }
+      else { updateItemBadge(el, ''); el.classList.remove('locked'); setItemMeta(currentClientId, group, itemNum, null); }
+      let { error } = await dbUpsert('checklist_progresso',
         { cliente_id: currentClientId, grupo: group, item_num: itemNum, concluido, marcado_por: marcadoPor, marcado_em: marcadoEm },
-        'cliente_id,grupo,item_num'
-      );
-
-      // Fallback: caso a tabela não possua colunas de autoria
+        'cliente_id,grupo,item_num');
       if (error) {
-        ({ error } = await dbUpsert(
-          'checklist_progresso',
+        ({ error } = await dbUpsert('checklist_progresso',
           { cliente_id: currentClientId, grupo: group, item_num: itemNum, concluido },
-          'cliente_id,grupo,item_num'
-        ));
+          'cliente_id,grupo,item_num'));
       }
-
-      if (error) {
-        setSaveStatus('error');
-        showToast('Erro ao salvar: ' + error.message, 'error');
-      } else {
-        setSaveStatus('saved');
-      }
+      if (error) { setSaveStatus('error'); showToast(humanizeError(error), 'error'); }
+      else setSaveStatus('saved');
     }
 
     // ------------------------------------------
-    //  PROGRESS
+    //  CONFETES
     // ------------------------------------------
-    // ── CONFETES ──────────────────────────────
     function launchConfetti() {
       const canvas = document.createElement('canvas');
       canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999';
       document.body.appendChild(canvas);
       const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
+      canvas.width = window.innerWidth; canvas.height = window.innerHeight;
       const colors = ['#818cf8','#38bdf8','#34d399','#fbbf24','#f87171','#e879f9','#fb923c','#4ade80'];
       const pieces = Array.from({length: 160}, () => ({
-        x: Math.random() * canvas.width,
-        y: -10 - Math.random() * 200,
-        r: 4 + Math.random() * 6,
-        d: 1.5 + Math.random() * 3,
+        x: Math.random() * canvas.width, y: -10 - Math.random() * 200,
+        r: 4 + Math.random() * 6, d: 1.5 + Math.random() * 3,
         color: colors[Math.floor(Math.random() * colors.length)],
-        tilt: Math.random() * 10 - 5,
-        tiltSpeed: 0.1 + Math.random() * 0.2,
-        tiltAngle: 0,
-        shape: Math.random() > 0.5 ? 'circle' : 'rect'
+        tilt: Math.random() * 10 - 5, tiltSpeed: .1 + Math.random() * .2,
+        tiltAngle: 0, shape: Math.random() > .5 ? 'circle' : 'rect'
       }));
-
       let frame = 0;
-      const maxFrames = 220;
-
       function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         pieces.forEach(p => {
-          ctx.beginPath();
-          ctx.fillStyle = p.color;
-          p.tiltAngle += p.tiltSpeed;
-          p.y += p.d;
-          p.x += Math.sin(p.tiltAngle) * 1.5;
-          if (p.shape === 'circle') {
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          } else {
-            ctx.rect(p.x + p.tilt, p.y, p.r * 1.5, p.r * 0.7);
-          }
+          ctx.beginPath(); ctx.fillStyle = p.color;
+          p.tiltAngle += p.tiltSpeed; p.y += p.d; p.x += Math.sin(p.tiltAngle) * 1.5;
+          if (p.shape === 'circle') ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          else ctx.rect(p.x + p.tilt, p.y, p.r * 1.5, p.r * .7);
           ctx.fill();
         });
         frame++;
-        if (frame < maxFrames) requestAnimationFrame(draw);
-        else canvas.remove();
+        if (frame < 220) requestAnimationFrame(draw); else canvas.remove();
       }
       draw();
     }
@@ -2060,16 +1405,12 @@
     //  PROGRESS
     // ------------------------------------------
     function updateProgress(group) {
-      const items = document.querySelectorAll(
-        `#list-${group}-steps .check-item, #list-${group} .check-item`
-      );
+      const items = document.querySelectorAll(`#list-${group}-steps .check-item, #list-${group} .check-item`);
       const total = items.length;
-      const done = [...items].filter(i => i.classList.contains('done')).length;
-      const pct = total ? Math.round((done / total) * 100) : 0;
+      const done  = [...items].filter(i => i.classList.contains('done')).length;
+      const pct   = total ? Math.round((done / total) * 100) : 0;
       document.getElementById(`prog-${group}`).style.width = pct + '%';
       document.getElementById(`prog-${group}-text`).textContent = `${done}/${total} (${pct}%)`;
-
-      // Detecta conclusão (chegou a 100% agora)
       const fillEl = document.getElementById(`prog-${group}`);
       const wasComplete = fillEl.dataset.wasComplete === 'true';
       if (pct === 100 && !wasComplete && total > 0) {
@@ -2088,61 +1429,28 @@
     // ------------------------------------------
     function switchTab(tab) {
       currentTab = tab;
-      document.querySelectorAll('.tab').forEach((t, i) => {
-        t.classList.toggle('active', ['servidor', 'retaguarda', 'nfce'][i] === tab);
-      });
+      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['servidor','retaguarda','nfce'][i] === tab));
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       document.getElementById('panel-' + tab).classList.add('active');
     }
 
     // ------------------------------------------
-    //  DRAG & DROP — REORGANIZAR TAREFAS
+    //  DRAG & DROP
     // ------------------------------------------
     let dragSrc = null;
-
-    function onDragStart(e) {
-      dragSrc = this;
-      this.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', '');
-    }
-
-    function onDragEnd() {
-      this.classList.remove('dragging');
-      document.querySelectorAll('.check-item').forEach(el => el.classList.remove('drag-over'));
-      saveOrderToStorage(this.dataset.group || currentTab);
-    }
-
-    function onDragOver(e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      if (dragSrc && dragSrc !== this) {
-        document.querySelectorAll('.check-item').forEach(el => el.classList.remove('drag-over'));
-        this.classList.add('drag-over');
-      }
-    }
-
-    function onDragLeave() {
-      this.classList.remove('drag-over');
-    }
-
+    function onDragStart(e) { dragSrc = this; this.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', ''); }
+    function onDragEnd() { this.classList.remove('dragging'); document.querySelectorAll('.check-item').forEach(el => el.classList.remove('drag-over')); saveOrderToStorage(this.dataset.group || currentTab); }
+    function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; if (dragSrc && dragSrc !== this) { document.querySelectorAll('.check-item').forEach(el => el.classList.remove('drag-over')); this.classList.add('drag-over'); } }
+    function onDragLeave() { this.classList.remove('drag-over'); }
     function onDrop(e) {
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       if (!dragSrc || dragSrc === this) return;
       this.classList.remove('drag-over');
-
       const list = this.parentElement;
       const allItems = [...list.querySelectorAll('.check-item')];
-      const srcIdx = allItems.indexOf(dragSrc);
-      const tgtIdx = allItems.indexOf(this);
-
-      if (srcIdx < tgtIdx) {
-        list.insertBefore(dragSrc, this.nextSibling);
-      } else {
-        list.insertBefore(dragSrc, this);
-      }
-
+      const srcIdx = allItems.indexOf(dragSrc), tgtIdx = allItems.indexOf(this);
+      if (srcIdx < tgtIdx) list.insertBefore(dragSrc, this.nextSibling);
+      else list.insertBefore(dragSrc, this);
       updateProgress(dragSrc.dataset.group || currentTab);
     }
 
@@ -2151,25 +1459,16 @@
       const listIdMap = { servidor: 'list-servidor-steps', retaguarda: 'list-retaguarda', nfce: 'list-nfce' };
       const listEl = document.getElementById(listIdMap[group]);
       if (!listEl) return;
-      const order = [...listEl.querySelectorAll('.check-item')].map(el => el.dataset.num);
-      const key = `taskOrder_${currentClientId}_${group}`;
-      localStorage.setItem(key, JSON.stringify(order));
+      localStorage.setItem(`taskOrder_${currentClientId}_${group}`, JSON.stringify([...listEl.querySelectorAll('.check-item')].map(el => el.dataset.num)));
     }
 
     function loadOrderFromStorage(clientId, group) {
       const listIdMap = { servidor: 'list-servidor-steps', retaguarda: 'list-retaguarda', nfce: 'list-nfce' };
       const listEl = document.getElementById(listIdMap[group]);
       if (!listEl) return;
-      const key = `taskOrder_${clientId}_${group}`;
-      const saved = localStorage.getItem(key);
+      const saved = localStorage.getItem(`taskOrder_${clientId}_${group}`);
       if (!saved) return;
-      try {
-        const order = JSON.parse(saved);
-        order.forEach(num => {
-          const el = listEl.querySelector(`[data-num="${num}"]`);
-          if (el) listEl.appendChild(el);
-        });
-      } catch(e) {}
+      try { JSON.parse(saved).forEach(num => { const el = listEl.querySelector(`[data-num="${num}"]`); if (el) listEl.appendChild(el); }); } catch(e) {}
     }
 
     // ------------------------------------------
@@ -2179,90 +1478,50 @@
     updateCurrentUserUI();
     loadColaboradores();
 
-    // ── AUTO-LOAD via URL params: ?clienteId=XXX&tipo=servidor&maquina=servidor_1&nome=NomeCliente ──
+    // Auto-load via URL params
     (async function autoLoadFromURL() {
       const params = new URLSearchParams(window.location.search);
       const pClienteId = params.get('clienteId');
-      const pTipo      = params.get('tipo');      // servidor | retaguarda | nfce
-      const pMaquina   = params.get('maquina');   // servidor_1 | retaguarda_2 | nfce_1
+      const pTipo      = params.get('tipo');
+      const pMaquina   = params.get('maquina');
       const pNome      = params.get('nome');
       const pPC        = params.get('pc') || pMaquina || '';
       const pEmp       = params.get('emp') || '—';
-
-      if (!pClienteId || !pTipo) return; // nenhum param, mostra modal normalmente
-
-      // Mapeia tipo para o formato esperado
+      if (!pClienteId || !pTipo) return;
       const tipoMap = { servidor: 'Servidor', retaguarda: 'Retaguarda', nfce: 'NFCe / Caixa' };
       const tipoLabel = tipoMap[pTipo] || 'Servidor';
-
-      // Tenta carregar o cliente existente da tabela clientes pelo nome/id
-      // Primeiro verifica se já existe na tabela clientes (checklist antigo)
       const { data: existingClients } = await dbSelect('clientes', { nome: pNome || '', tipo: tipoLabel });
-      
-      let clientRecord = null;
-      if (existingClients && existingClients.length > 0) {
-        // Pega o mais recente
-        clientRecord = existingClients[existingClients.length - 1];
-      }
-
+      let clientRecord = existingClients && existingClients.length > 0 ? existingClients[existingClients.length - 1] : null;
       if (!clientRecord) {
-        // Cria novo registro na tabela clientes para este checklist
-        const { data: newClient, error } = await dbInsert('clientes', {
-          nome: pNome || 'Cliente',
-          data: new Date().toISOString().split('T')[0],
-          computador: pPC,
-          funcionario: pEmp,
-          tipo: tipoLabel
-        });
-        if (error) { showToast('Erro ao iniciar checklist: ' + error.message, 'error'); return; }
+        const { data: newClient, error } = await dbInsert('clientes', { nome: pNome || 'Cliente', data: new Date().toISOString().split('T')[0], computador: pPC, funcionario: pEmp, tipo: tipoLabel });
+        if (error) { showToast(humanizeError(error), 'error'); return; }
         clientRecord = newClient;
       }
-
       if (!clientRecord) return;
-
-      // Simula resumeClient sem pedir responsável
       currentClientId = clientRecord.id;
       selectedType = tipoLabel;
-      clientData = {
-        name: clientRecord.nome,
-        date: clientRecord.data,
-        pc: clientRecord.computador || pPC,
-        emp: clientRecord.funcionario || pEmp,
-        type: tipoLabel
-      };
+      clientData = { name: clientRecord.nome, date: clientRecord.data, pc: clientRecord.computador || pPC, emp: clientRecord.funcionario || pEmp, type: tipoLabel };
       setCurrentUserName(clientData.emp);
       applyClientUI();
-
       document.getElementById('modalOverlay').classList.remove('active');
       document.getElementById('app').classList.add('active');
       buildLists();
       loadCustomTasks(currentClientId);
       ['servidor','retaguarda','nfce'].forEach(g => loadOrderFromStorage(currentClientId, g));
       switchToTypeTab(tipoLabel);
-
-      // Carrega progresso salvo
       const { data: progresso } = await dbSelect('checklist_progresso', { cliente_id: currentClientId, concluido: true });
       if (progresso && progresso.length > 0) {
         const listIdMap2 = { servidor: 'list-servidor-steps', retaguarda: 'list-retaguarda', nfce: 'list-nfce' };
         progresso.forEach(p => {
-          const listId = listIdMap2[p.grupo];
-          if (!listId) return;
-          const el = document.querySelector(`#${listId} [data-num="${p.item_num}"]`);
-          if (el) {
-            el.classList.add('done');
-            const by = p.marcado_por || '';
-            if (by) updateItemBadge(el, by);
-            setItemMeta(currentClientId, p.grupo, p.item_num, { by, at: p.marcado_em });
-          }
+          const el = document.querySelector(`#${listIdMap2[p.grupo]} [data-num="${p.item_num}"]`);
+          if (el) { el.classList.add('done'); const by = p.marcado_por || ''; if (by) updateItemBadge(el, by); setItemMeta(currentClientId, p.grupo, p.item_num, { by, at: p.marcado_em }); }
         });
         ['servidor','retaguarda','nfce'].forEach(g => updateProgress(g));
       }
-
-      // Botão Voltar deve fechar aba
       const btnVoltar = document.querySelector('.topbar-btn');
       if (btnVoltar && btnVoltar.textContent.includes('Dashboard')) {
         btnVoltar.textContent = '← Voltar ao Projeto';
-        btnVoltar.onclick = () => { window.close(); };
+        btnVoltar.onclick = () => window.close();
       }
     })();
 
@@ -2270,7 +1529,6 @@
     //  ADICIONAR NOVA TAREFA
     // ------------------------------------------
     let addTaskGroup = null;
-    const customTasksKey = () => `customTasks_${currentClientId}`;
 
     function openAddTask(group) {
       if (!currentClientId) { showToast('Abra um cliente antes de adicionar tarefas.', 'error'); return; }
@@ -2281,32 +1539,23 @@
       setTimeout(() => document.getElementById('newTaskText').focus(), 100);
     }
 
-    function closeAddTask() {
-      document.getElementById('addTaskOverlay').classList.remove('active');
-      addTaskGroup = null;
-    }
+    function closeAddTask() { document.getElementById('addTaskOverlay').classList.remove('active'); addTaskGroup = null; }
 
     function confirmAddTask() {
       const text = document.getElementById('newTaskText').value.trim();
       if (!text) { showToast('Digite a descrição da tarefa.', 'error'); return; }
       const manual = document.getElementById('newTaskManual').value.trim() || null;
-
       const listIdMap = { servidor: 'list-servidor-steps', retaguarda: 'list-retaguarda', nfce: 'list-nfce' };
       const listEl = document.getElementById(listIdMap[addTaskGroup]);
-      const existingItems = listEl.querySelectorAll('.check-item');
-      const num = 'C' + (existingItems.length + 1);
-
+      const num = 'C' + (listEl.querySelectorAll('.check-item').length + 1);
       const item = makeItem(num, text, manual, false, addTaskGroup);
       item.classList.add('custom-task');
       listEl.appendChild(item);
       updateProgress(addTaskGroup);
-
-      // Salvar no localStorage para persistir durante a sessão
-      const stored = JSON.parse(localStorage.getItem(customTasksKey()) || '{}');
+      const stored = JSON.parse(localStorage.getItem(`customTasks_${currentClientId}`) || '{}');
       if (!stored[addTaskGroup]) stored[addTaskGroup] = [];
       stored[addTaskGroup].push({ num, text, manual });
-      localStorage.setItem(customTasksKey(), JSON.stringify(stored));
-
+      localStorage.setItem(`customTasks_${currentClientId}`, JSON.stringify(stored));
       showToast('Tarefa adicionada!', 'success');
       closeAddTask();
     }
@@ -2317,25 +1566,13 @@
       for (const [group, tasks] of Object.entries(stored)) {
         const listEl = document.getElementById(listIdMap[group]);
         if (!listEl) continue;
-        tasks.forEach(t => {
-          const item = makeItem(t.num, t.text, t.manual || null, false, group);
-          item.classList.add('custom-task');
-          listEl.appendChild(item);
-        });
+        tasks.forEach(t => { const item = makeItem(t.num, t.text, t.manual || null, false, group); item.classList.add('custom-task'); listEl.appendChild(item); });
         updateProgress(group);
       }
     }
 
-    // Fechar overlay clicando fora
-    document.getElementById('addTaskOverlay').addEventListener('click', function(e) {
-      if (e.target === this) closeAddTask();
-    });
-
-    // Enter para confirmar
-    document.getElementById('newTaskText').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') confirmAddTask();
-    });
+    document.getElementById('addTaskOverlay').addEventListener('click', function(e) { if (e.target === this) closeAddTask(); });
+    document.getElementById('newTaskText').addEventListener('keydown', function(e) { if (e.key === 'Enter') confirmAddTask(); });
   </script>
 </body>
-
 </html>
