@@ -166,6 +166,7 @@ select.fbtn option{background:var(--s2);color:var(--text)}
 
 @media(max-width:900px){.shell{padding:0 16px 60px}.form-row{grid-template-columns:1fr}.form-row.cols3{grid-template-columns:1fr 1fr}.prio-grid,.status-grid-form{grid-template-columns:1fr 1fr}.summary-strip{gap:8px}}
 </style>
+<script src="auth.js"></script>
 <script src="sidebar.js"></script>
 </head>
 <body>
@@ -181,7 +182,7 @@ select.fbtn option{background:var(--s2);color:var(--text)}
     <div class="hd-right">
       <div class="chip" id="dateChip"></div>
       <div class="chip btn" onclick="loadTarefas()">↺ Atualizar</div>
-      <div class="chip green" onclick="abrirModal()">+ Nova Tarefa</div>
+      <div class="chip green" onclick="abrirModal()" data-admin-only>+ Nova Tarefa</div>
     </div>
   </header>
 
@@ -324,7 +325,7 @@ select.fbtn option{background:var(--s2);color:var(--text)}
 
     </div>
     <div class="m-footer">
-      <button class="btn-danger" id="btnExcluir" onclick="excluirTarefa()" style="display:none">🗑️ Excluir</button>
+      <button class="btn-danger" id="btnExcluir" onclick="excluirTarefa()" style="display:none" data-admin-only>🗑️ Excluir</button>
       <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
       <button class="btn-save" id="btnSalvar" onclick="salvarTarefa()">💾 Salvar Tarefa</button>
     </div>
@@ -711,6 +712,10 @@ document.getElementById('dateChip').textContent = new Date().toLocaleDateString(
     });
   }
 })();
+
+GR7Auth.require();
+GR7Auth.injectSessionBar();
+GR7Auth.applyPermissions();
 
 loadTarefas();
 </script>
