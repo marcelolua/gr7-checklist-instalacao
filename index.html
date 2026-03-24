@@ -180,6 +180,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 
 
 </style>
+<script src="auth.js"></script>
 <script src="sidebar.js"></script>
 </head>
 <body>
@@ -197,7 +198,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
   <div class="hd-right">
     <div class="chip live">AO VIVO</div>
     <div class="chip" id="dateChip"></div>
-    <div class="chip btn" onclick="openUModal()">&#128101; Usuários</div>
+    <div class="chip btn" onclick="openUModal()" data-admin-only>&#128101; Usuários</div>
     <div class="chip btn" id="syncChip" onclick="loadAll()">&#8635; Atualizar</div>
   </div>
 </header>
@@ -234,10 +235,23 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 </div>
 
 <div class="umodal-bg" id="umodalBg">
-  <div class="umodal">
+  <div class="umodal" onclick="event.stopPropagation()">
     <h2 id="umodalTitle">Novo Colaborador</h2>
-    <div class="ufield"><label>Nome</label><input id="uNome" type="text" placeholder="Ex: João Silva"/></div>
-    <div class="ufield"><label>Cargo</label><input id="uCargo" type="text" placeholder="Ex: Técnico, Instalador"/></div>
+    <div class="ufield"><label>Nome</label><input id="uNome" type="text" placeholder="Ex: João Silva" onclick="event.stopPropagation()"/></div>
+    <div class="ufield"><label>Cargo</label><input id="uCargo" type="text" placeholder="Ex: Técnico, Instalador" onclick="event.stopPropagation()"/></div>
+    <div class="ufield"><label>Perfil de Acesso</label>
+      <div style="display:flex;gap:8px">
+        <div id="optAdmin" onclick="selectPerfil('admin')" style="flex:1;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s">👑 Administrador</div>
+        <div id="optColab" onclick="selectPerfil('colaborador')" style="flex:1;background:rgba(56,189,248,.1);border:1.5px solid rgba(56,189,248,.35);border-radius:9px;padding:10px;text-align:center;font-size:12px;font-weight:600;color:var(--c1);cursor:pointer;transition:all .2s">👤 Colaborador</div>
+      </div>
+    </div>
+    <div class="ufield"><label>PIN de Acesso (4 dígitos)</label>
+      <div style="position:relative">
+        <input id="uPin" type="password" placeholder="••••" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)" style="letter-spacing:8px;font-size:20px;padding-right:44px"/>
+        <button onclick="var e=document.getElementById('uPin');e.type=e.type==='password'?'text':'password'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px">👁</button>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:5px">Deixe em branco para manter o PIN atual (ao editar)</div>
+    </div>
     <div class="ufield"><label>Cor</label><div class="color-grid" id="colorGrid"></div></div>
     <div class="umodal-btns">
       <button class="btn btn-cancel" onclick="closeUModal()">Cancelar</button>
@@ -258,7 +272,15 @@ const PALETTE = ['#818cf8','#38bdf8','#34d399','#fbbf24','#f87171','#e879f9','#f
 let USERS = [];
 let editingUserId = null;
 let selectedColor = PALETTE[0];
+let selectedPerfil = 'colaborador';
 let _colaboradorGuard = null;
+
+function selectPerfil(p){
+  selectedPerfil=p;
+  const isA=p==='admin';
+  document.getElementById('optAdmin').style.cssText=`flex:1;background:${isA?'rgba(232,121,249,.1)':'var(--s2)'};border:1.5px solid ${isA?'rgba(232,121,249,.35)':'var(--bdr)'};border-radius:9px;padding:10px;text-align:center;font-size:12px;font-weight:600;color:${isA?'var(--c5)':'var(--muted)'};cursor:pointer;transition:all .2s`;
+  document.getElementById('optColab').style.cssText=`flex:1;background:${!isA?'rgba(56,189,248,.1)':'var(--s2)'};border:1.5px solid ${!isA?'rgba(56,189,248,.35)':'var(--bdr)'};border-radius:9px;padding:10px;text-align:center;font-size:12px;font-weight:600;color:${!isA?'var(--c1)':'var(--muted)'};cursor:pointer;transition:all .2s`;
+}
 
 function initials(n){var p=(n||'').trim().split(' ');return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():(n||'??').slice(0,2).toUpperCase();}
 function norm(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
@@ -284,9 +306,9 @@ async function dbPatch(table,id,body){
 async function loadUsers(){
   try{
     let data;
-    try{ data=await dbGet('colaboradores?order=id&ativo=eq.true'); }
+    try{ data=await dbGet('colaboradores?order=id&ativo=eq.true&select=id,nome,cargo,cor,perfil'); }
     catch(e){ data=await dbGet('colaboradores?order=id'); }
-    USERS=data.map(function(u){return{id:u.id,key:norm(u.nome),label:u.nome,cargo:u.cargo||'Colaborador',color:u.cor||'#818cf8'};});
+    USERS=data.map(function(u){return{id:u.id,key:norm(u.nome),label:u.nome,cargo:u.cargo||'Colaborador',color:u.cor||'#818cf8',perfil:u.perfil||'colaborador'};});
     renderUsersList();
     document.getElementById('totalUsers').textContent=USERS.length+' membros';
   }catch(e){
@@ -297,16 +319,22 @@ async function loadUsers(){
 
 function renderUsersList(){
   var el=document.getElementById('usersList');
+  var isAdmin=GR7Auth.isAdmin();
   var html=USERS.map(function(u){
+    var badge=u.perfil==='admin'
+      ?'<span style="padding:2px 8px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(232,121,249,.12);color:#e879f9;border:1px solid rgba(232,121,249,.2)">👑 Admin</span>'
+      :'<span style="padding:2px 8px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.2)">👤 Colab</span>';
+    var actions=isAdmin
+      ?'<button class="pill-btn" onclick="openUModal('+u.id+')">✏️</button>'
+       +'<button class="pill-btn del" onclick="deleteUser('+u.id+',\''+u.label+'\')">✕</button>'
+      :'';
     return '<div class="user-pill">'
       +'<div class="user-pill-av" style="background:'+u.color+'22;color:'+u.color+'">'+initials(u.label)+'</div>'
       +'<div class="user-pill-info"><div class="user-pill-name">'+u.label+'</div><div class="user-pill-cargo">'+u.cargo+'</div></div>'
-      +'<div class="user-pill-actions">'
-        +'<button class="pill-btn" onclick="openUModal('+u.id+')">✏️</button>'
-        +'<button class="pill-btn del" onclick="deleteUser('+u.id+',\''+u.label+'\')">✕</button>'
-      +'</div></div>';
+      +badge
+      +'<div class="user-pill-actions">'+actions+'</div></div>';
   }).join('');
-  el.innerHTML=html+'<div class="add-user-btn" onclick="openUModal()">＋ Adicionar colaborador</div>';
+  el.innerHTML=html+(isAdmin?'<div class="add-user-btn" onclick="openUModal()">＋ Adicionar colaborador</div>':'');
 }
 
 function buildColorGrid(sel){
@@ -323,17 +351,20 @@ function pickColor(c,el){
 
 function openUModal(id){
   editingUserId=id||null;
+  document.getElementById('uPin').value='';
   if(id){
     var u=USERS.find(function(u){return u.id===id;});
     if(!u)return;
     document.getElementById('umodalTitle').textContent='✏️ Editar Colaborador';
     document.getElementById('uNome').value=u.label;
     document.getElementById('uCargo').value=u.cargo;
+    selectPerfil(u.perfil||'colaborador');
     buildColorGrid(u.color);
   }else{
     document.getElementById('umodalTitle').textContent='➕ Novo Colaborador';
     document.getElementById('uNome').value='';
     document.getElementById('uCargo').value='';
+    selectPerfil('colaborador');
     buildColorGrid(PALETTE[USERS.length%PALETTE.length]);
   }
   document.getElementById('umodalBg').classList.add('open');
@@ -348,13 +379,17 @@ function closeUModal(){
 async function saveUser(){
   var nome=document.getElementById('uNome').value.trim();
   var cargo=document.getElementById('uCargo').value.trim()||'Colaborador';
-  if(!nome){
-    gr7Alert({title:'Campo obrigatório',message:'Digite o nome do colaborador.',icon:'✏️'});
-    return;
-  }
+  var pinRaw=document.getElementById('uPin').value.trim();
+  if(!nome){gr7Alert({title:'Campo obrigatório',message:'Digite o nome do colaborador.',icon:'✏️'});return;}
+  if(!editingUserId&&pinRaw.length!==4){gr7Alert({title:'PIN obrigatório',message:'Digite um PIN de 4 dígitos para o novo colaborador.',icon:'🔐'});return;}
   try{
-    if(editingUserId){await dbPatch('colaboradores',editingUserId,{nome:nome,cargo:cargo,cor:selectedColor});}
-    else{await dbPost('colaboradores',{nome:nome,cargo:cargo,cor:selectedColor,ativo:true});}
+    var payload={nome:nome,cargo:cargo,cor:selectedColor,perfil:selectedPerfil};
+    if(pinRaw.length===4){
+      var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pinRaw));
+      payload.pin_hash=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+    if(editingUserId){await dbPatch('colaboradores',editingUserId,payload);}
+    else{await dbPost('colaboradores',{...payload,ativo:true});}
     if(_colaboradorGuard){_colaboradorGuard.destroy();_colaboradorGuard=null;}
     closeUModal();
     await loadUsers();
@@ -566,7 +601,7 @@ function _initColaboradorGuard(){
   _colaboradorGuard = gr7DirtyGuard({
     fieldIds: ['uNome','uCargo'],
     closeFn: closeUModal,
-    interceptEl: [btnCancel, modalBg],
+    interceptEl: [btnCancel],
     confirmOpts: {
       title: 'Descartar alterações?',
       message: 'Os dados do colaborador serão perdidos se você sair agora.',
@@ -577,6 +612,11 @@ function _initColaboradorGuard(){
 }
 
 document.getElementById('dateChip').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+/* ── Auth ── */
+if(!GR7Auth.require())throw new Error('not logged');
+GR7Auth.injectSessionBar();
+GR7Auth.applyPermissions();
+
 loadAll();
 setInterval(loadAll,60000);
 
