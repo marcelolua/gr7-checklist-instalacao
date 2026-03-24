@@ -538,6 +538,7 @@
       .current-user { display: none; }
     }
   </style>
+<script src="auth.js"></script>
 <script src="sidebar.js"></script>
 </head>
 
@@ -927,6 +928,15 @@
         };
         makeOptions('clientEmployee', currentUserName);
         makeOptions('whoName', currentUserName);
+        // Non-admins: lock selects to their own name
+        if (!GR7Auth.isAdmin()) {
+          ['clientEmployee','whoName'].forEach(id => {
+            const sel = document.getElementById(id);
+            if (!sel) return;
+            sel.innerHTML = `<option value="${currentUserName}">${currentUserName}</option>`;
+            sel.disabled = true;
+          });
+        }
       } catch(e) {
         console.error('Erro ao carregar colaboradores:', e);
         ['clientEmployee', 'whoName'].forEach(id => {
@@ -1474,6 +1484,17 @@
     // ------------------------------------------
     //  INIT
     // ------------------------------------------
+    GR7Auth.require();
+    GR7Auth.injectSessionBar();
+    GR7Auth.applyPermissions();
+
+    // Pre-fill currentUserName from auth session
+    const _authSession = GR7Auth.getSession();
+    if (_authSession && _authSession.nome) {
+      currentUserName = _authSession.nome;
+      localStorage.setItem('gr7_current_user', currentUserName);
+    }
+
     document.getElementById('clientDate').valueAsDate = new Date();
     updateCurrentUserUI();
     loadColaboradores();
