@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GR7 — Entrar</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#07080d;--s1:#0e1018;--s2:#161820;--s3:#1e2030;--bdr:#252738;--text:#dde1f0;--muted:#5a5e78;--green:#00e5a0;--c0:#818cf8;--c1:#38bdf8;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+.blob{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;opacity:.12}
+.blob1{width:700px;height:700px;top:-250px;left:-200px;background:var(--c0)}
+.blob2{width:500px;height:500px;bottom:-200px;right:-100px;background:var(--c5)}
+
+.card{position:relative;z-index:10;background:var(--s1);border:1px solid var(--bdr);border-radius:24px;padding:44px 40px;width:100%;max-width:400px;margin:20px;animation:slideUp .45s cubic-bezier(.4,0,.2,1)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c0),var(--c5));border-radius:24px 24px 0 0}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+.logo{display:flex;align-items:center;gap:14px;margin-bottom:32px}
+.logo-mark{width:50px;height:50px;background:linear-gradient(135deg,var(--c0),var(--c5));border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;color:#fff;box-shadow:0 0 30px rgba(129,140,248,.4);flex-shrink:0}
+.logo-text h1{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.3px}
+.logo-text p{font-size:12px;color:var(--muted);margin-top:2px}
+
+.lbl{display:block;font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
+.select-wrap{position:relative;margin-bottom:22px}
+.user-select{width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:11px;padding:12px 40px 12px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;appearance:none;cursor:pointer;transition:border-color .2s}
+.user-select:focus{border-color:var(--c0)}
+.select-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:12px}
+
+.pin-section{margin-bottom:4px}
+.pin-dots{display:flex;gap:12px;justify-content:center;margin:12px 0 18px}
+.dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--bdr);background:transparent;transition:all .2s}
+.dot.on{background:var(--c0);border-color:var(--c0);box-shadow:0 0 12px rgba(129,140,248,.55);transform:scale(1.1)}
+.dot.err{background:var(--c4);border-color:var(--c4);box-shadow:0 0 12px rgba(248,113,113,.5)}
+
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.key{background:var(--s2);border:1px solid var(--bdr);border-radius:11px;padding:15px 10px;text-align:center;font-family:'Syne',sans-serif;font-size:22px;font-weight:700;cursor:pointer;transition:all .15s;user-select:none;-webkit-tap-highlight-color:transparent}
+.key:hover{background:var(--s3);border-color:rgba(129,140,248,.4);color:var(--c0)}
+.key:active{transform:scale(.92)}
+.key.del{font-family:'Outfit',sans-serif;font-size:16px;color:var(--muted)}
+.key.zero{grid-column:2}
+
+.enter-btn{width:100%;margin-top:16px;padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--c0),#6366f1);border:none;color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.4px}
+.enter-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 36px rgba(99,102,241,.45)}
+.enter-btn:disabled{opacity:.35;cursor:default;transform:none}
+
+.msg{height:20px;text-align:center;font-size:12px;margin-top:10px;transition:all .2s}
+.msg.err{color:var(--c4)}.msg.ok{color:var(--green)}
+
+.lock-bar{display:none;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:12px 16px;text-align:center;font-size:12px;color:var(--c4);margin-top:12px}
+.lock-bar.show{display:block}
+
+/* Denied banner */
+.denied{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--c4);margin-bottom:20px;text-align:center;display:none}
+.denied.show{display:block}
+
+.version{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;z-index:10}
+</style>
+<script src="auth.js"></script>
+</head>
+<body>
+<div class="blob blob1"></div><div class="blob blob2"></div>
+
+<div class="card">
+  <div class="denied" id="deniedMsg">🚫 Acesso restrito. Faça login como administrador.</div>
+
+  <div class="logo">
+    <div class="logo-mark">GR7</div>
+    <div class="logo-text"><h1>Bem-vindo</h1><p>Identifique-se para continuar</p></div>
+  </div>
+
+  <label class="lbl">Selecione seu usuário</label>
+  <div class="select-wrap">
+    <select class="user-select" id="userSelect">
+      <option value="">— escolha seu nome —</option>
+    </select>
+    <div class="select-arrow">▼</div>
+  </div>
+
+  <div class="pin-section">
+    <label class="lbl">PIN de acesso (4 dígitos)</label>
+    <div class="pin-dots">
+      <div class="dot" id="d0"></div>
+      <div class="dot" id="d1"></div>
+      <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
+    </div>
+    <div class="numpad">
+      <div class="key" onclick="addPin(1)">1</div><div class="key" onclick="addPin(2)">2</div><div class="key" onclick="addPin(3)">3</div>
+      <div class="key" onclick="addPin(4)">4</div><div class="key" onclick="addPin(5)">5</div><div class="key" onclick="addPin(6)">6</div>
+      <div class="key" onclick="addPin(7)">7</div><div class="key" onclick="addPin(8)">8</div><div class="key" onclick="addPin(9)">9</div>
+      <div class="key del" onclick="delPin()">⌫</div>
+      <div class="key zero" onclick="addPin(0)">0</div>
+    </div>
+  </div>
+
+  <div class="lock-bar" id="lockBar">🔒 Muitas tentativas — aguarde <span id="lockCount">30</span>s</div>
+  <div class="msg" id="msg"></div>
+  <button class="enter-btn" id="enterBtn" onclick="doLogin()">Entrar →</button>
+</div>
+
+<div class="version">GR7 · v2.0</div>
+
+<script>
+let pin='',tries=0,locked=false,lockTimer=null;
+
+/* ── Verificar se já logado ── */
+if(GR7Auth.isLogged()){
+  const redir=sessionStorage.getItem('gr7_redirect')||'index.html';
+  sessionStorage.removeItem('gr7_redirect');
+  window.location.href=redir;
+}
+
+/* ── Denied message ── */
+if(new URLSearchParams(location.search).get('denied')){
+  document.getElementById('deniedMsg').classList.add('show');
+}
+
+/* ── Carregar colaboradores ── */
+async function loadUsers(){
+  try{
+    const sel=document.getElementById('userSelect');
+    sel.innerHTML='<option value="">— carregando... —</option>';
+    const data=await GR7Auth.loadColaboradores();
+    if(!Array.isArray(data)||!data.length){
+      sel.innerHTML='<option value="">⚠️ Nenhum colaborador cadastrado</option>';
+      return;
+    }
+    sel.innerHTML='<option value="">— escolha seu nome —</option>'+
+      data.map(u=>`<option value="${u.id}">${u.nome}${u.perfil==='admin'?' 👑':''}</option>`).join('');
+  }catch(e){
+    document.getElementById('userSelect').innerHTML='<option value="">⚠️ Erro ao carregar</option>';
+  }
+}
+loadUsers();
+
+/* ── PIN ── */
+function updateDots(){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('d'+i);
+    d.className='dot'+(i<pin.length?' on':'');
+  }
+}
+function addPin(n){
+  if(locked||pin.length>=4)return;
+  pin+=n;updateDots();
+  setMsg('','');
+  if(pin.length===4)document.getElementById('enterBtn').focus();
+}
+function delPin(){if(locked)return;pin=pin.slice(0,-1);updateDots();}
+function setMsg(txt,type){const m=document.getElementById('msg');m.textContent=txt;m.className='msg'+(type?' '+type:'');}
+
+/* ── Login ── */
+async function doLogin(){
+  if(locked)return;
+  const id=document.getElementById('userSelect').value;
+  if(!id){setMsg('⚠️ Selecione seu nome primeiro','err');return;}
+  if(pin.length<4){setMsg('⚠️ Digite os 4 dígitos do PIN','err');return;}
+  const btn=document.getElementById('enterBtn');
+  btn.disabled=true;btn.textContent='Verificando...';
+  try{
+    const user=await GR7Auth.doLogin(id,pin);
+    if(user){
+      setMsg('✅ Acesso liberado!','ok');
+      btn.textContent='✅ Entrando...';
+      // Salvar nome em localStorage para compatibilidade com Checklist
+      localStorage.setItem('gr7_current_user',user.nome);
+      setTimeout(()=>{
+        const redir=sessionStorage.getItem('gr7_redirect')||'index.html';
+        sessionStorage.removeItem('gr7_redirect');
+        window.location.href=redir;
+      },700);
+    }else{
+      tries++;pin='';updateDots();
+      if(tries>=3){startLock();}
+      else{
+        const left=3-tries;
+        setMsg(`❌ PIN incorreto. ${left} tentativa${left>1?'s':''} restante${left>1?'s':''}...`,'err');
+        shakeDots();
+        btn.disabled=false;btn.textContent='Entrar →';
+      }
+    }
+  }catch(e){
+    setMsg('⚠️ Erro de conexão. Tente novamente.','err');
+    btn.disabled=false;btn.textContent='Entrar →';
+  }
+}
+
+function shakeDots(){
+  const wrap=document.querySelector('.pin-dots');
+  wrap.style.animation='none';
+  requestAnimationFrame(()=>{wrap.style.animation='shake .4s ease';});
+  setTimeout(()=>wrap.style.animation='',500);
+  for(let i=0;i<4;i++){const d=document.getElementById('d'+i);d.className='dot err';}
+  setTimeout(updateDots,500);
+}
+
+function startLock(){
+  locked=true;tries=0;
+  document.getElementById('enterBtn').disabled=true;
+  let s=30;
+  document.getElementById('lockCount').textContent=s;
+  document.getElementById('lockBar').classList.add('show');
+  setMsg('','');
+  lockTimer=setInterval(()=>{
+    s--;document.getElementById('lockCount').textContent=s;
+    if(s<=0){
+      clearInterval(lockTimer);locked=false;
+      document.getElementById('lockBar').classList.remove('show');
+      document.getElementById('enterBtn').disabled=false;
+      document.getElementById('enterBtn').textContent='Entrar →';
+    }
+  },1000);
+}
+
+/* ── Teclado ── */
+document.addEventListener('keydown',e=>{
+  if(e.key>='0'&&e.key<='9')addPin(parseInt(e.key));
+  else if(e.key==='Backspace')delPin();
+  else if(e.key==='Enter')doLogin();
+});
+
+/* ── CSS shake ── */
+document.head.insertAdjacentHTML('beforeend',`<style>@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}</style>`);
+</script>
+</body>
+</html>
