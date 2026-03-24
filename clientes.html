@@ -160,6 +160,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
   .detail-grid{grid-template-columns:1fr 1fr}
 }
 </style>
+<script src="auth.js"></script>
 <script src="sidebar.js"></script>
 </head>
 <body>
@@ -180,7 +181,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
     <div class="hd-right">
       <div class="chip" id="dateChip"></div>
       <div class="chip btn" onclick="loadClientes()">↺ Atualizar</div>
-      <div class="chip green" onclick="openCadastro()">+ Novo Cliente</div>
+      <div class="chip green" onclick="openCadastro()" data-admin-only>+ Novo Cliente</div>
     </div>
   </header>
 
@@ -319,7 +320,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
     </div>
     <div class="m-footer">
       <button class="btn-cancel" onclick="closeDetalhe()">Fechar</button>
-      <button class="btn-save" style="background:var(--c0);color:#fff" onclick="editarFromDetalhe()">✏️ Editar</button>
+      <button class="btn-save" style="background:var(--c0);color:#fff" onclick="editarFromDetalhe()" data-admin-only>✏️ Editar</button>
     </div>
   </div>
 </div>
@@ -447,8 +448,8 @@ function renderTable(){
       <div>${statusMap[status]||statusMap.novo}</div>
       <div class="tbl-modules">${modsHtml}</div>
       <div class="tbl-actions" onclick="event.stopPropagation()">
-        <button class="act-btn" title="Editar" onclick="openEditar('${c.id}')">✏️</button>
-        <button class="act-btn del" title="Excluir" onclick="excluirCliente('${c.id}')">🗑️</button>
+        ${GR7Auth.isAdmin()?`<button class="act-btn" title="Editar" onclick="openEditar('${c.id}')">✏️</button>
+        <button class="act-btn del" title="Excluir" onclick="excluirCliente('${c.id}')">🗑️</button>`:''}
       </div>
     </div>`;
   }).join('');
@@ -663,6 +664,11 @@ function _initCadastroGuard(){
     },
   });
 }
+
+// Auth
+GR7Auth.require();
+GR7Auth.injectSessionBar();
+GR7Auth.applyPermissions();
 
 // Init
 buildModulos();
