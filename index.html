@@ -181,6 +181,36 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 
 </style>
 <script src="sidebar.js"></script>
+
+<script>
+/* ══ GR7 FIX: DirtyGuard seguro — não fecha modal ao clicar dentro ══ */
+window.gr7DirtyGuard = function(opts){
+  opts = opts || {};
+  var fieldIds   = opts.fieldIds   || [];
+  var closeFn    = opts.closeFn    || function(){};
+  var interceptEl= opts.interceptEl|| [];
+  var confirmOpts= opts.confirmOpts|| {};
+  var initVals   = {};
+  fieldIds.forEach(function(id){ var el=document.getElementById(id); if(el) initVals[id]=el.value; });
+  function isDirty(){ return fieldIds.some(function(id){ var el=document.getElementById(id); return el&&el.value!==initVals[id]; }); }
+  async function intercept(e){
+    /* Só age se clicou EXATAMENTE neste elemento (não em filhos) */
+    if(e && e.target !== e.currentTarget) return;
+    if(!isDirty()){ closeFn(); return; }
+    var msg = (confirmOpts.message||'Alterações serão perdidas.');
+    var ok  = confirm((confirmOpts.title||'Descartar alterações?')+'\n'+msg);
+    if(ok) closeFn();
+  }
+  var handlers = [];
+  interceptEl.forEach(function(el){
+    if(!el) return;
+    var fn = function(e){ intercept(e); };
+    el.addEventListener('click', fn);
+    handlers.push({el:el, fn:fn});
+  });
+  return { destroy: function(){ handlers.forEach(function(h){ h.el.removeEventListener('click',h.fn); }); } };
+};
+</script>
 </head>
 <body>
 
@@ -234,10 +264,10 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 </div>
 
 <div class="umodal-bg" id="umodalBg">
-  <div class="umodal">
+  <div class="umodal" onclick="event.stopPropagation()">
     <h2 id="umodalTitle">Novo Colaborador</h2>
-    <div class="ufield"><label>Nome</label><input id="uNome" type="text" placeholder="Ex: João Silva"/></div>
-    <div class="ufield"><label>Cargo</label><input id="uCargo" type="text" placeholder="Ex: Técnico, Instalador"/></div>
+    <div class="ufield"><label>Nome</label><input id="uNome" type="text" placeholder="Ex: João Silva" onclick="event.stopPropagation()"/></div>
+    <div class="ufield"><label>Cargo</label><input id="uCargo" type="text" placeholder="Ex: Técnico, Instalador" onclick="event.stopPropagation()"/></div>
     <div class="ufield"><label>Cor</label><div class="color-grid" id="colorGrid"></div></div>
     <div class="umodal-btns">
       <button class="btn btn-cancel" onclick="closeUModal()">Cancelar</button>
@@ -559,6 +589,7 @@ function renderCards(byUser){
 function toggleCli(btn){var l=btn.nextElementSibling;l.classList.toggle('open');btn.querySelector('span:last-child').textContent=l.classList.contains('open')?'▴':'▾';}
 
 function _initColaboradorGuard(){
+  if(typeof gr7DirtyGuard!=='function'){return;}
   if(_colaboradorGuard){_colaboradorGuard.destroy();}
   var modalBg  = document.getElementById('umodalBg');
   var btnCancel= modalBg.querySelector('.btn-cancel');
@@ -566,7 +597,7 @@ function _initColaboradorGuard(){
   _colaboradorGuard = gr7DirtyGuard({
     fieldIds: ['uNome','uCargo'],
     closeFn: closeUModal,
-    interceptEl: [btnCancel, modalBg],
+    interceptEl: [btnCancel],
     confirmOpts: {
       title: 'Descartar alterações?',
       message: 'Os dados do colaborador serão perdidos se você sair agora.',
