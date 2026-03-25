@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GR7 — Colaboradores</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#07080d;--s1:#0e1018;--s2:#161820;--s3:#1e2030;--bdr:#252738;--text:#dde1f0;--muted:#5a5e78;--r:14px;--green:#00e5a0;--green2:#059669;--c0:#818cf8;--c1:#38bdf8;--c2:#34d399;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+.blob{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0;opacity:.12}
+.blob1{width:600px;height:600px;top:-200px;left:-100px;background:var(--c0)}
+.blob2{width:500px;height:500px;bottom:-200px;right:-100px;background:var(--c5)}
+
+.shell{position:relative;z-index:10;padding:0 44px 80px;max-width:1300px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;padding:32px 0 28px;flex-wrap:wrap;gap:16px}
+.hd-title h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
+.hd-title p{font-size:12px;color:var(--muted);margin-top:3px}
+.hd-right{display:flex;align-items:center;gap:10px}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--s1);border:1px solid var(--bdr);padding:6px 14px;border-radius:99px;color:var(--muted)}
+.chip.btn{cursor:pointer;transition:all .15s}.chip.btn:hover{border-color:var(--c0);color:var(--c0)}
+.chip.green{background:rgba(0,229,160,.08);border-color:rgba(0,229,160,.3);color:var(--green);cursor:pointer}
+.sec{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:18px;margin-top:36px}
+.sec:first-of-type{margin-top:0}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:6px;margin-bottom:28px;flex-wrap:wrap}
+.tab{padding:9px 20px;border-radius:10px;border:1px solid var(--bdr);background:var(--s1);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.tab.active{background:rgba(129,140,248,.12);border-color:var(--c0);color:var(--c0)}
+.tab-pane{display:none}.tab-pane.active{display:block}
+
+/* ── MY PROFILE CARD ── */
+.profile-card{background:var(--s1);border:1px solid var(--bdr);border-radius:18px;padding:30px;margin-bottom:24px;position:relative;overflow:hidden;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.profile-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c0),var(--c5))}
+.profile-av{width:72px;height:72px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;flex-shrink:0}
+.profile-info{flex:1;min-width:0}
+.profile-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
+.profile-cargo{font-size:13px;color:var(--muted);margin-top:4px}
+.profile-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:99px;font-size:11px;font-weight:700;margin-top:10px}
+.profile-badge.admin{background:rgba(232,121,249,.12);color:var(--c5);border:1px solid rgba(232,121,249,.25)}
+.profile-badge.colab{background:rgba(56,189,248,.1);color:var(--c1);border:1px solid rgba(56,189,248,.25)}
+
+/* ── PIN CHANGE CARD ── */
+.pin-card{background:var(--s1);border:1px solid var(--bdr);border-radius:16px;padding:26px;max-width:420px}
+.pin-card h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.pin-input-wrap{position:relative}
+.pin-input{width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:10px;padding:11px 44px 11px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:22px;letter-spacing:10px;outline:none;transition:border-color .2s}
+.pin-input:focus{border-color:var(--c0)}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px}
+.save-pin-btn{width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg,var(--c0),#6366f1);border:none;color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:6px}
+.save-pin-btn:hover{opacity:.88;transform:translateY(-1px)}
+.save-pin-btn:disabled{opacity:.35;cursor:default;transform:none}
+.pin-msg{font-size:12px;margin-top:10px;min-height:18px;text-align:center}
+.pin-msg.ok{color:var(--green)}.pin-msg.err{color:var(--c4)}
+
+/* ── STATS CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.sc{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:20px 22px;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sc.s0::before{background:linear-gradient(90deg,var(--c0),var(--c5))}
+.sc.s1::before{background:linear-gradient(90deg,var(--green),var(--green2))}
+.sc.s2::before{background:linear-gradient(90deg,var(--c3),#f97316)}
+.sc.s3::before{background:linear-gradient(90deg,var(--c4),#dc2626)}
+.sc-num{font-family:'IBM Plex Mono',monospace;font-size:36px;font-weight:600;line-height:1;margin-bottom:4px}
+.sc.s0 .sc-num{color:var(--c0)}.sc.s1 .sc-num{color:var(--green)}.sc.s2 .sc-num{color:var(--c3)}.sc.s3 .sc-num{color:var(--c4)}
+.sc-lbl{font-size:12px;color:var(--muted)}
+
+/* ── PROGRESS BAR ── */
+.prog-box{background:var(--s1);border:1px solid var(--bdr);border-radius:14px;padding:22px 24px;margin-bottom:20px}
+.prog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.prog-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.prog-pct{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:var(--c0)}
+.prog-track{height:10px;background:var(--s3);border-radius:99px;overflow:hidden;margin-bottom:16px}
+.prog-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1);background:linear-gradient(90deg,var(--c0),var(--c5))}
+.prog-groups{display:flex;flex-direction:column;gap:10px}
+.pg-row{display:flex;align-items:center;gap:12px}
+.pg-lbl{font-size:12px;color:var(--muted);width:90px;flex-shrink:0}
+.pg-track{flex:1;height:6px;background:var(--s3);border-radius:99px;overflow:hidden}
+.pg-fill{height:100%;border-radius:99px;transition:width 1s}
+.pg-val{font-family:'IBM Plex Mono',monospace;font-size:11px;width:36px;text-align:right;flex-shrink:0}
+
+/* ── TASKS LIST ── */
+.tasks-box{background:var(--s1);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;margin-bottom:20px}
+.box-head{padding:16px 22px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.box-head-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.task-row{display:flex;align-items:center;gap:12px;padding:12px 22px;border-bottom:1px solid var(--bdr);font-size:13px;transition:background .15s}
+.task-row:last-child{border:none}
+.task-row:hover{background:rgba(255,255,255,.02)}
+.task-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.task-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-cli{font-size:11px;color:var(--muted);flex-shrink:0}
+.task-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;flex-shrink:0}
+.task-status.done{background:rgba(0,229,160,.1);color:var(--green)}
+.task-status.pend{background:rgba(251,191,36,.1);color:var(--c3)}
+
+/* ── TEAM LIST (admin only) ── */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.member-card{background:var(--s1);border:1px solid var(--bdr);border-radius:16px;padding:0;overflow:hidden;transition:border-color .2s}
+.member-card:hover{border-color:rgba(129,140,248,.3)}
+.mc-top{padding:18px 20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bdr)}
+.mc-av{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;flex-shrink:0}
+.mc-info{flex:1;min-width:0}
+.mc-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mc-cargo{font-size:11px;color:var(--muted);margin-top:2px}
+.mc-badge{padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700}
+.mc-badge.admin{background:rgba(232,121,249,.12);color:var(--c5);border:1px solid rgba(232,121,249,.2)}
+.mc-badge.colab{background:rgba(56,189,248,.1);color:var(--c1);border:1px solid rgba(56,189,248,.2)}
+.mc-body{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.mc-prog-row{display:flex;align-items:center;gap:10px}
+.mc-prog-track{flex:1;height:6px;background:var(--s3);border-radius:99px;overflow:hidden}
+.mc-prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--c0),var(--c5));transition:width 1s}
+.mc-pct{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex-shrink:0}
+.mc-actions{display:flex;gap:8px;padding:0 20px 16px}
+.mc-btn{flex:1;padding:8px;border-radius:8px;border:1px solid var(--bdr);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Outfit',sans-serif}
+.mc-btn:hover{border-color:var(--c0);color:var(--c0)}
+.mc-btn.danger:hover{border-color:var(--c4);color:var(--c4)}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9000;backdrop-filter:blur(4px);padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--bdr);border-radius:20px;padding:32px;width:100%;max-width:460px;position:relative;overflow:hidden}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c0),var(--c5))}
+.modal h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:22px}
+.mfield{margin-bottom:15px}
+.mfield label{display:block;font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.mfield input{width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.mfield input:focus{border-color:var(--c0)}
+.mfield input[type=password],.mfield input.pin-style{letter-spacing:8px;font-size:20px}
+.role-row{display:flex;gap:8px}
+.role-opt{flex:1;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px;text-align:center;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;color:var(--muted)}
+.role-opt.sel-admin{background:rgba(232,121,249,.1);border-color:rgba(232,121,249,.4);color:var(--c5)}
+.role-opt.sel-colab{background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.35);color:var(--c1)}
+.color-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.color-dot{width:28px;height:28px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .15s}
+.color-dot.sel{border-color:#fff;transform:scale(1.15)}
+.modal-btns{display:flex;gap:10px;margin-top:22px;justify-content:flex-end}
+.mbtn{padding:9px 22px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s;font-family:'Outfit',sans-serif}
+.mbtn.cancel{background:transparent;border-color:var(--bdr);color:var(--muted)}
+.mbtn.save{background:var(--c0);border-color:var(--c0);color:#fff}
+.mbtn.save:hover{opacity:.85}
+
+.loader{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
+.empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px}
+@media(max-width:700px){.shell{padding:0 16px 60px}.stats-grid{grid-template-columns:1fr 1fr}.team-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="blob blob1"></div><div class="blob blob2"></div>
+
+<div class="shell">
+  <header>
+    <div class="hd-title"><h1>👥 Colaboradores</h1><p id="headerSub">Meu perfil e desempenho</p></div>
+    <div class="hd-right">
+      <div class="chip btn" onclick="loadPage()">↺ Atualizar</div>
+      <div class="chip green" id="btnAddColab" style="display:none" onclick="openModal()">+ Novo Colaborador</div>
+    </div>
+  </header>
+
+  <div class="tabs" id="tabBar">
+    <div class="tab active" id="tabMeu" onclick="showTab('meu')">👤 Meu Perfil</div>
+    <div class="tab" id="tabEquipe" onclick="showTab('equipe')" style="display:none">🏆 Equipe</div>
+  </div>
+
+  <!-- ══ TAB: MEU PERFIL ══ -->
+  <div class="tab-pane active" id="pane-meu">
+
+    <!-- Profile card -->
+    <div class="profile-card" id="profileCard">
+      <div class="loader">Carregando perfil...</div>
+    </div>
+
+    <!-- PIN Change -->
+    <p class="sec">🔐 Alterar meu PIN</p>
+    <div class="pin-card">
+      <h3>🔐 Trocar PIN de acesso</h3>
+      <div class="field">
+        <label>PIN atual</label>
+        <div class="pin-input-wrap">
+          <input class="pin-input" type="password" id="pinAtual" maxlength="4" placeholder="••••" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"/>
+          <button class="eye-btn" onclick="toggleEye('pinAtual',this)">👁</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Novo PIN (4 dígitos)</label>
+        <div class="pin-input-wrap">
+          <input class="pin-input" type="password" id="pinNovo" maxlength="4" placeholder="••••" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"/>
+          <button class="eye-btn" onclick="toggleEye('pinNovo',this)">👁</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Confirmar novo PIN</label>
+        <div class="pin-input-wrap">
+          <input class="pin-input" type="password" id="pinConf" maxlength="4" placeholder="••••" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"/>
+          <button class="eye-btn" onclick="toggleEye('pinConf',this)">👁</button>
+        </div>
+      </div>
+      <button class="save-pin-btn" id="savePinBtn" onclick="salvarPin()">Salvar novo PIN</button>
+      <div class="pin-msg" id="pinMsg"></div>
+    </div>
+
+    <!-- My Stats -->
+    <p class="sec">📊 Meu Desempenho</p>
+    <div class="stats-grid" id="myStats">
+      <div class="sc s0"><div class="sc-num" id="myTarefas">—</div><div class="sc-lbl">Tarefas atribuídas</div></div>
+      <div class="sc s1"><div class="sc-num" id="myDone">—</div><div class="sc-lbl">✅ Concluídas</div></div>
+      <div class="sc s2"><div class="sc-num" id="myPend">—</div><div class="sc-lbl">⏳ Pendentes</div></div>
+      <div class="sc s3"><div class="sc-num" id="myPct">—</div><div class="sc-lbl">% Conclusão</div></div>
+    </div>
+
+    <div class="prog-box" id="myProgBox" style="display:none">
+      <div class="prog-header">
+        <div class="prog-title">Progresso Geral</div>
+        <div class="prog-pct" id="myProgPct">0%</div>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="myProgFill" style="width:0%"></div></div>
+      <div class="prog-groups" id="myProgGroups"></div>
+    </div>
+
+    <div class="tasks-box">
+      <div class="box-head">
+        <div class="box-head-title">📌 Minhas Tarefas</div>
+        <span id="myTaskCount" style="font-size:12px;color:var(--muted)"></span>
+      </div>
+      <div id="myTasksList"><div class="loader">Carregando...</div></div>
+    </div>
+
+  </div><!-- /pane-meu -->
+
+  <!-- ══ TAB: EQUIPE (admin only) ══ -->
+  <div class="tab-pane" id="pane-equipe">
+    <div class="team-grid" id="teamGrid"><div class="loader">Carregando equipe...</div></div>
+  </div>
+
+</div><!-- /shell -->
+
+<!-- ── MODAL NOVO/EDITAR COLABORADOR (admin) ── -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2 id="modalTitle">➕ Novo Colaborador</h2>
+    <div class="mfield"><label>Nome</label><input id="mNome" type="text" placeholder="Ex: João Silva"/></div>
+    <div class="mfield"><label>Cargo</label><input id="mCargo" type="text" placeholder="Ex: Técnico, Instalador"/></div>
+    <div class="mfield"><label>Perfil de Acesso</label>
+      <div class="role-row">
+        <div class="role-opt" id="mOptAdmin" onclick="selPerfil('admin')">👑 Administrador</div>
+        <div class="role-opt sel-colab" id="mOptColab" onclick="selPerfil('colaborador')">👤 Colaborador</div>
+      </div>
+    </div>
+    <div class="mfield"><label>PIN de Acesso (4 dígitos)</label>
+      <div style="position:relative">
+        <input id="mPin" type="password" placeholder="••••" maxlength="4" class="pin-style"
+          oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"
+          style="width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 44px 10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:20px;letter-spacing:8px;outline:none"/>
+        <button onclick="toggleEye('mPin',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px">👁</button>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:5px">Deixe em branco para manter o PIN atual (ao editar)</div>
+    </div>
+    <div class="mfield"><label>Cor</label><div class="color-row" id="mColors"></div></div>
+    <div class="modal-btns">
+      <button class="mbtn cancel" onclick="closeModal()">Cancelar</button>
+      <button class="mbtn save" onclick="saveColab()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script src="sidebar.js"></script>
+<script>
+/* ── SUPABASE ── */
+const SURL='https://nhzjkahbkeusgntheyug.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oemprYWhia2V1c2dudGhleXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjYwMDQsImV4cCI6MjA4ODg0MjAwNH0.hB2bJBMoJoztuNrb4xCRIgWmwMlayBpVOMWq3mI4nH4';
+const SH={'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY,'Prefer':'return=representation'};
+async function dbGet(p){const r=await fetch(SURL+'/rest/v1/'+p,{headers:SH});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function dbPost(t,b){const r=await fetch(SURL+'/rest/v1/'+t,{method:'POST',headers:SH,body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text());return r.status===204?null:r.json();}
+async function dbPatch(t,id,b){const r=await fetch(SURL+'/rest/v1/'+t+'?id=eq.'+id,{method:'PATCH',headers:SH,body:JSON.stringify(b)});if(!r.ok)throw new Error(await r.text());}
+
+/* ── AUTH ── */
+const session = window.GR7Auth ? GR7Auth.getSession() : null;
+const isAdmin = session && session.perfil === 'admin';
+const myName  = session ? session.nome : '';
+
+function ini(n){const p=(n||'').trim().split(' ');return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():(n||'?').slice(0,2).toUpperCase();}
+
+async function sha256(txt){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(txt));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ── INIT UI ── */
+if(isAdmin){
+  document.getElementById('tabEquipe').style.display='';
+  document.getElementById('btnAddColab').style.display='';
+  document.getElementById('headerSub').textContent='Gerencie a equipe e acompanhe desempenhos';
+}
+
+/* ── TABS ── */
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');
+  document.getElementById('pane-'+t).classList.add('active');
+  if(t==='equipe') loadTeam();
+}
+
+/* ══════════════════════════════════════
+   MEU PERFIL
+══════════════════════════════════════ */
+function renderProfile(s){
+  if(!s){ document.getElementById('profileCard').innerHTML='<div class="empty">Sessão não encontrada. <a href="login.html" style="color:var(--c0)">Fazer login</a></div>'; return; }
+  document.getElementById('profileCard').innerHTML=`
+    <div class="profile-av" style="background:${s.cor||'#818cf8'}33;color:${s.cor||'#818cf8'}">${ini(s.nome)}</div>
+    <div class="profile-info">
+      <div class="profile-name">${s.nome}</div>
+      <div class="profile-cargo">${s.cargo||'Colaborador'}</div>
+      <div class="profile-badge ${s.perfil==='admin'?'admin':'colab'}">${s.perfil==='admin'?'👑 Administrador':'👤 Colaborador'}</div>
+    </div>`;
+}
+
+/* ── PIN CHANGE ── */
+function toggleEye(id,btn){
+  const el=document.getElementById(id);
+  el.type=el.type==='password'?'text':'password';
+  btn.textContent=el.type==='password'?'👁':'🙈';
+}
+
+async function salvarPin(){
+  const atual=document.getElementById('pinAtual').value.trim();
+  const novo=document.getElementById('pinNovo').value.trim();
+  const conf=document.getElementById('pinConf').value.trim();
+  const msg=e=>{ document.getElementById('pinMsg').textContent=e; document.getElementById('pinMsg').className='pin-msg '+(e.startsWith('✅')?'ok':'err'); };
+
+  if(!session){ msg('⚠️ Sessão não encontrada.'); return; }
+  if(atual.length!==4){ msg('⚠️ Digite o PIN atual (4 dígitos).'); return; }
+  if(novo.length!==4){ msg('⚠️ O novo PIN deve ter 4 dígitos.'); return; }
+  if(novo!==conf){ msg('⚠️ Os PINs novos não coincidem.'); return; }
+
+  const btn=document.getElementById('savePinBtn');
+  btn.disabled=true; btn.textContent='Verificando...';
+
+  try{
+    // Verify current PIN
+    const hashAtual=await sha256(atual);
+    const check=await dbGet(`colaboradores?id=eq.${session.id}&pin_hash=eq.${hashAtual}&select=id`);
+    if(!Array.isArray(check)||!check.length){ msg('❌ PIN atual incorreto.'); btn.disabled=false; btn.textContent='Salvar novo PIN'; return; }
+
+    // Save new PIN
+    const hashNovo=await sha256(novo);
+    await dbPatch('colaboradores',session.id,{pin_hash:hashNovo});
+    msg('✅ PIN alterado com sucesso!');
+    document.getElementById('pinAtual').value='';
+    document.getElementById('pinNovo').value='';
+    document.getElementById('pinConf').value='';
+  }catch(e){ msg('❌ '+(window.humanizeError?humanizeError(e):e.message)); }
+  btn.disabled=false; btn.textContent='Salvar novo PIN';
+}
+
+/* ── MY STATS ── */
+async function loadMyStats(){
+  try{
+    const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    const myNorm=norm(myName);
+
+    // Tarefas
+    const tarefas=await dbGet('tarefas?ativo=eq.true&select=id,titulo,concluido,cliente_id,responsavel');
+    const minhas=tarefas.filter(t=>norm(t.responsavel||'').includes(myNorm));
+    const done=minhas.filter(t=>t.concluido).length;
+    const pend=minhas.length-done;
+    const pct=minhas.length?Math.round(done/minhas.length*100):0;
+
+    document.getElementById('myTarefas').textContent=minhas.length;
+    document.getElementById('myDone').textContent=done;
+    document.getElementById('myPend').textContent=pend;
+    document.getElementById('myPct').textContent=pct+'%';
+
+    // Tasks list
+    const taskHtml=minhas.length?minhas.slice(0,20).map(t=>`
+      <div class="task-row">
+        <div class="task-dot" style="background:${t.concluido?'var(--green)':'var(--c3)'}"></div>
+        <div class="task-name">${t.titulo||'—'}</div>
+        <div class="task-status ${t.concluido?'done':'pend'}">${t.concluido?'✅ Feita':'⏳ Pendente'}</div>
+      </div>`).join('')
+      :'<div class="empty">Nenhuma tarefa atribuída a você ainda.</div>';
+    document.getElementById('myTasksList').innerHTML=taskHtml;
+    document.getElementById('myTaskCount').textContent=minhas.length+' tarefa'+(minhas.length!==1?'s':'');
+
+    // Checklist progress
+    try{
+      const [pg,mg]=await Promise.all([
+        dbGet('implant_checklist?select=cliente_id,maquina_key,item_num,concluido,marcado_por'),
+        dbGet('implant_modulos?select=cliente_id,modulo,concluido,atualizado_por'),
+      ]);
+      const myPg=pg.filter(p=>norm(p.marcado_por||'').includes(myNorm));
+      const myMg=mg.filter(m=>norm(m.atualizado_por||'').includes(myNorm));
+
+      const srv=myPg.filter(p=>p.maquina_key?.startsWith('servidor'));
+      const ret=myPg.filter(p=>p.maquina_key?.startsWith('retaguarda'));
+      const nfc=myPg.filter(p=>p.maquina_key?.startsWith('nfce'));
+
+      if(myPg.length||myMg.length){
+        document.getElementById('myProgBox').style.display='';
+        const total=myPg.length+myMg.length;
+        const feitos=myPg.filter(p=>p.concluido).length+myMg.filter(m=>m.concluido).length;
+        const p=total?Math.round(feitos/total*100):0;
+        document.getElementById('myProgPct').textContent=p+'%';
+        document.getElementById('myProgFill').style.width=p+'%';
+
+        const groups=[
+          {label:'Servidor',items:srv,color:'#818cf8'},
+          {label:'Retaguarda',items:ret,color:'#38bdf8'},
+          {label:'NFC-e',items:nfc,color:'#00e5a0'},
+          {label:'Módulos',items:myMg,color:'#fbbf24'},
+        ].filter(g=>g.items.length);
+
+        document.getElementById('myProgGroups').innerHTML=groups.map(g=>{
+          const gDone=g.items.filter(i=>i.concluido).length;
+          const gPct=g.items.length?Math.round(gDone/g.items.length*100):0;
+          return `<div class="pg-row">
+            <div class="pg-lbl">${g.label}</div>
+            <div class="pg-track"><div class="pg-fill" style="width:${gPct}%;background:${g.color}"></div></div>
+            <div class="pg-val" style="color:${g.color}">${gPct}%</div>
+          </div>`;
+        }).join('');
+      }
+    }catch(_){}
+  }catch(e){
+    document.getElementById('myTasksList').innerHTML=`<div class="empty" style="color:var(--c4)">⚠️ Erro ao carregar tarefas.</div>`;
+  }
+}
+
+/* ══════════════════════════════════════
+   EQUIPE (admin only)
+══════════════════════════════════════ */
+async function loadTeam(){
+  if(!isAdmin){ document.getElementById('teamGrid').innerHTML='<div class="empty">Acesso restrito a administradores.</div>'; return; }
+  document.getElementById('teamGrid').innerHTML='<div class="loader">Carregando equipe...</div>';
+  try{
+    const colabs=await dbGet('colaboradores?ativo=eq.true&select=id,nome,cargo,cor,perfil&order=nome');
+
+    // Ranking data
+    let ranking=[];
+    try{ ranking=await dbGet('vw_ranking_colaboradores'); }catch(_){}
+
+    const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    const rMap={};
+    ranking.forEach(r=>{ const k=norm(r.colaborador); rMap[k]={concluidos:r.concluidos||0,andamento:r.andamento||0,pct:r.percentual||0}; });
+
+    if(!colabs.length){ document.getElementById('teamGrid').innerHTML='<div class="empty">Nenhum colaborador cadastrado.</div>'; return; }
+
+    document.getElementById('teamGrid').innerHTML=colabs.map(c=>{
+      const key=norm(c.nome);
+      const rd=rMap[key]||{concluidos:0,andamento:0,pct:0};
+      const pct=rd.pct||0;
+      const barCol=pct>=80?'#00e5a0':pct>=50?'#818cf8':pct>=20?'#fbbf24':'#f87171';
+      return `<div class="member-card">
+        <div class="mc-top">
+          <div class="mc-av" style="background:${c.cor||'#818cf8'}22;color:${c.cor||'#818cf8'}">${ini(c.nome)}</div>
+          <div class="mc-info"><div class="mc-name">${c.nome}</div><div class="mc-cargo">${c.cargo||'Colaborador'}</div></div>
+          <div class="mc-badge ${c.perfil==='admin'?'admin':'colab'}">${c.perfil==='admin'?'👑':'👤'} ${c.perfil==='admin'?'Admin':'Colab'}</div>
+        </div>
+        <div class="mc-body">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+            <span>✅ ${rd.concluidos} concluídas</span><span>⏳ ${rd.andamento} pendentes</span>
+          </div>
+          <div class="mc-prog-row">
+            <div class="mc-prog-track"><div class="mc-prog-fill" style="width:${pct}%;background:${barCol}"></div></div>
+            <div class="mc-pct" style="color:${barCol}">${pct}%</div>
+          </div>
+        </div>
+        <div class="mc-actions">
+          <button class="mc-btn" onclick="openModal(${c.id})">✏️ Editar</button>
+          <button class="mc-btn danger" onclick="deleteColab(${c.id},'${c.nome.replace(/'/g,"\\'")}')">✕ Remover</button>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    document.getElementById('teamGrid').innerHTML=`<div class="empty" style="color:var(--c4)">⚠️ ${window.humanizeError?humanizeError(e):e.message}</div>`;
+  }
+}
+
+/* ══════════════════════════════════════
+   MODAL COLABORADOR (admin)
+══════════════════════════════════════ */
+const PAL=['#818cf8','#38bdf8','#34d399','#fbbf24','#f87171','#e879f9','#fb923c','#a78bfa','#f472b6','#4ade80'];
+let editId=null, selColor=PAL[0], selPerfil_='colaborador';
+
+function buildColors(sel){
+  selColor=sel||PAL[0];
+  document.getElementById('mColors').innerHTML=PAL.map(c=>`
+    <div class="color-dot${c===selColor?' sel':''}" style="background:${c}" onclick="pickColor('${c}',this)"></div>`).join('');
+}
+function pickColor(c,el){selColor=c;document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
+
+function selPerfil(p){
+  selPerfil_=p;
+  document.getElementById('mOptAdmin').className='role-opt'+(p==='admin'?' sel-admin':'');
+  document.getElementById('mOptColab').className='role-opt'+(p==='colaborador'?' sel-colab':'');
+}
+
+let _allColabs=[];
+async function openModal(id){
+  editId=id||null;
+  document.getElementById('mPin').value='';
+  if(id){
+    document.getElementById('modalTitle').textContent='✏️ Editar Colaborador';
+    const c=_allColabs.find(x=>x.id===id)||await dbGet(`colaboradores?id=eq.${id}&select=*`).then(r=>r[0]);
+    document.getElementById('mNome').value=c.nome||'';
+    document.getElementById('mCargo').value=c.cargo||'';
+    selPerfil(c.perfil||'colaborador');
+    buildColors(c.cor||PAL[0]);
+  }else{
+    document.getElementById('modalTitle').textContent='➕ Novo Colaborador';
+    document.getElementById('mNome').value='';
+    document.getElementById('mCargo').value='';
+    selPerfil('colaborador');
+    buildColors(PAL[0]);
+  }
+  document.getElementById('modalBg').classList.add('open');
+}
+function closeModal(){ document.getElementById('modalBg').classList.remove('open'); }
+
+async function saveColab(){
+  const nome=document.getElementById('mNome').value.trim();
+  const cargo=document.getElementById('mCargo').value.trim()||'Colaborador';
+  const pinRaw=document.getElementById('mPin').value.trim();
+  if(!nome){ alert('Digite o nome do colaborador.'); return; }
+  if(!editId&&pinRaw.length!==4){ alert('PIN de 4 dígitos obrigatório para novo colaborador.'); return; }
+  try{
+    const payload={nome,cargo,cor:selColor,perfil:selPerfil_};
+    if(pinRaw.length===4) payload.pin_hash=await sha256(pinRaw);
+    if(editId){ await dbPatch('colaboradores',editId,payload); }
+    else{ await dbPost('colaboradores',{...payload,ativo:true}); }
+    closeModal();
+    if(window.toast) toast('Colaborador salvo!','success');
+    loadTeam();
+  }catch(e){ alert('Erro: '+(window.humanizeError?humanizeError(e):e.message)); }
+}
+
+async function deleteColab(id,nome){
+  const ok=confirm(`Remover "${nome}" do sistema?`);
+  if(!ok)return;
+  try{
+    await dbPatch('colaboradores',id,{ativo:false});
+    if(window.toast) toast('Colaborador removido.','success');
+    loadTeam();
+  }catch(e){ alert('Erro: '+(window.humanizeError?humanizeError(e):e.message)); }
+}
+
+/* ── MAIN LOAD ── */
+async function loadPage(){
+  if(window.GR7Auth){ GR7Auth.require(); GR7Auth.injectSessionBar(); GR7Auth.applyPermissions(); }
+  renderProfile(session);
+  loadMyStats();
+  // Prefetch team list for modal
+  if(isAdmin) dbGet('colaboradores?ativo=eq.true&select=id,nome,cargo,cor,perfil&order=nome').then(d=>_allColabs=d).catch(()=>{});
+}
+
+document.getElementById('modalBg').onclick=e=>{ if(e.target===e.currentTarget) closeModal(); };
+
+loadPage();
+</script>
+</body>
+</html>
