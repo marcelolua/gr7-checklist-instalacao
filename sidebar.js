@@ -198,75 +198,72 @@ const NAV_ITEMS = [
 
 
 /* ══════════════════════════════════════════
-   3. SIDEBAR — Colapsada por padrão, expande no hover
-   Largura colapsada : 56px (só ícones)
-   Largura expandida : 200px (ícones + labels)
-   Comportamento     : hover expande, mouse fora colapsa
-   Mobile (<900px)   : slide-in via botão hamburguer
+   3. SIDEBAR — Colapsada + hover expande + dropdowns por grupo
+   Colapsada  : 56px (só ícones)
+   Expandida  : 220px (ícones + labels + setas)
+   Dropdown   : submenu abre no hover do item pai
+   Mobile     : slide-in via hamburguer
 ══════════════════════════════════════════ */
+
+const W_COL = 56;
+const W_EXP = 220;
+
+/* Estrutura de navegação com submenus */
 const NAV_ITEMS = [
-  { href: 'index.html',               icon: '🏠', label: 'Dashboard'    },
-  { href: 'clientes.html',            icon: '🏢', label: 'Clientes'     },
-  { href: 'implantacao.html',         icon: '🚀', label: 'Implantação'  },
-  { href: 'tarefas.html',             icon: '📌', label: 'Tarefas'      },
-  { href: 'Checklist.html',           icon: '✅', label: 'Checklist'    },
-  { href: 'relatorios-checklist.html',icon: '📊', label: 'Relatórios'   },
-  { href: 'colaboradores.html',       icon: '👥', label: 'Colaboradores'},
+  {
+    icon: '🏠', label: 'Dashboard', href: 'index.html',
+  },
+  {
+    icon: '📁', label: 'Projetos', group: true,
+    children: [
+      { href: 'clientes.html',     icon: '🏢', label: 'Clientes'    },
+      { href: 'implantacao.html',  icon: '🚀', label: 'Implantação' },
+      { href: 'projeto.html',      icon: '📋', label: 'Projeto'     },
+    ],
+  },
+  {
+    icon: '✅', label: 'Instalação', group: true,
+    children: [
+      { href: 'Checklist.html',            icon: '☑️', label: 'Checklist'  },
+      { href: 'relatorios-checklist.html', icon: '📊', label: 'Relatórios' },
+    ],
+  },
+  {
+    icon: '📌', label: 'Tarefas', href: 'tarefas.html',
+  },
+  {
+    icon: '👥', label: 'Equipe', href: 'colaboradores.html',
+  },
 ];
 
-/* ── Larguras ── */
-const W_COLLAPSED = 56;   /* px — só ícone */
-const W_EXPANDED  = 200;  /* px — ícone + label */
-
 const SIDEBAR_CSS = `
-  /* ── Reset e base ── */
-  #gr7-sidebar-overlay{
-    position:fixed;inset:0;background:rgba(0,0,0,.5);
-    z-index:1099;display:none;
-  }
-  #gr7-sidebar-overlay.open{ display:block; }
+  /* ── Overlay mobile ── */
+  #gr7-sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1099;display:none}
+  #gr7-sidebar-overlay.open{display:block}
 
-  /* ── Sidebar principal ── */
+  /* ── Sidebar ── */
   #gr7-sidebar{
     position:fixed;top:0;left:0;bottom:0;
-    width:${W_COLLAPSED}px;
+    width:${W_COL}px;
     background:#0e1018;
     border-right:1px solid #252738;
     z-index:1100;
     display:flex;flex-direction:column;
-    overflow:hidden;
-    transition:width .25s cubic-bezier(.4,0,.2,1),
-               box-shadow .25s ease;
+    overflow:visible;
+    transition:width .22s cubic-bezier(.4,0,.2,1), box-shadow .22s ease;
     will-change:width;
   }
-
-  /* Expandido por hover (desktop) */
   #gr7-sidebar.expanded{
-    width:${W_EXPANDED}px;
-    box-shadow:4px 0 32px rgba(0,0,0,.45);
+    width:${W_EXP}px;
+    box-shadow:6px 0 40px rgba(0,0,0,.5);
   }
 
-  /* Mobile: slide-in via classe .open (override tudo) */
-  @media(max-width:899px){
-    #gr7-sidebar{
-      width:${W_EXPANDED}px !important;
-      transform:translateX(-100%);
-      transition:transform .28s cubic-bezier(.4,0,.2,1) !important;
-      box-shadow:none !important;
-    }
-    #gr7-sidebar.open{
-      transform:translateX(0) !important;
-      box-shadow:4px 0 32px rgba(0,0,0,.6) !important;
-    }
-  }
-
-  /* ── Logo / marca ── */
+  /* ── Logo ── */
   .gsb-logo{
-    display:flex;align-items:center;gap:12px;
-    padding:14px 9px 14px;
+    display:flex;align-items:center;
+    padding:10px 9px;height:56px;
     border-bottom:1px solid #252738;
-    flex-shrink:0;min-height:56px;
-    overflow:hidden;
+    flex-shrink:0;overflow:hidden;
   }
   .gsb-mark{
     width:38px;height:38px;flex-shrink:0;
@@ -274,102 +271,75 @@ const SIDEBAR_CSS = `
     border-radius:11px;
     display:flex;align-items:center;justify-content:center;
     font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:#fff;
+    transition:transform .2s;
   }
+  #gr7-sidebar.expanded .gsb-mark{ transform:scale(.92); }
   .gsb-brand-wrap{
-    opacity:0;transform:translateX(-6px);
-    transition:opacity .2s ease .05s, transform .2s ease .05s;
-    white-space:nowrap;overflow:hidden;
+    margin-left:12px;opacity:0;transform:translateX(-6px);
+    transition:opacity .18s .04s, transform .18s .04s;
+    white-space:nowrap;overflow:hidden;flex:1;min-width:0;
   }
-  #gr7-sidebar.expanded .gsb-brand-wrap{
-    opacity:1;transform:translateX(0);
-  }
-  .gsb-brand    {font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#dde1f0;}
-  .gsb-brand-sub{font-size:10px;color:#5a5e78;margin-top:1px;}
+  #gr7-sidebar.expanded .gsb-brand-wrap{opacity:1;transform:translateX(0);}
+  .gsb-brand    {font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#dde1f0;}
+  .gsb-brand-sub{font-size:9px;color:#5a5e78;margin-top:1px;letter-spacing:.3px;}
 
-  /* ── Navegação ── */
+  /* ── Scroll área ── */
   .gsb-nav{
-    padding:10px 0;flex:1;
-    overflow-y:auto;overflow-x:hidden;
-    display:flex;flex-direction:column;gap:2px;
+    padding:8px 0;flex:1;
+    overflow-y:auto;overflow-x:visible;
+    display:flex;flex-direction:column;
     scrollbar-width:none;
   }
   .gsb-nav::-webkit-scrollbar{display:none;}
 
-  .gsb-section{
-    font-family:'IBM Plex Mono',monospace;font-size:9px;
-    letter-spacing:2px;text-transform:uppercase;
-    color:#5a5e78;
-    padding:10px 0 4px;
-    text-align:center;
-    opacity:0;
-    transition:opacity .15s ease;
-    white-space:nowrap;overflow:hidden;
-  }
-  #gr7-sidebar.expanded .gsb-section{
-    opacity:1;
-    padding:10px 18px 4px;
-    text-align:left;
-  }
-
-  /* ── Item de menu ── */
+  /* ── Item simples ── */
   .gsb-item{
-    display:flex;align-items:center;gap:0;
-    padding:10px 0;
-    justify-content:center;
-    border-radius:0;
+    position:relative;
+    display:flex;align-items:center;
+    height:44px;
     text-decoration:none;
     color:#8a8faa;
     font-size:13px;font-weight:500;
-    transition:background .15s,color .15s,padding .25s,gap .25s,justify-content .25s;
     font-family:'Outfit',sans-serif;
+    cursor:pointer;
+    overflow:visible;
+    transition:background .14s, color .14s;
     white-space:nowrap;
-    overflow:hidden;
-    position:relative;
   }
-  .gsb-item:hover{ background:#161820; color:#dde1f0; }
-  .gsb-item.active{
-    background:rgba(129,140,248,.12);
-    color:#818cf8;font-weight:600;
-  }
-  /* Linha indicadora ativa (esquerda) */
+  .gsb-item:hover,.gsb-item.submenu-open{ background:#161820; color:#dde1f0; }
+  .gsb-item.active{ background:rgba(129,140,248,.12); color:#818cf8; font-weight:600; }
   .gsb-item.active::before{
-    content:'';
-    position:absolute;left:0;top:6px;bottom:6px;
-    width:3px;border-radius:0 3px 3px 0;
-    background:#818cf8;
+    content:'';position:absolute;left:0;top:6px;bottom:6px;
+    width:3px;border-radius:0 3px 3px 0;background:#818cf8;
   }
 
   /* Ícone */
   .gsb-item-icon{
-    font-size:18px;flex-shrink:0;
-    width:${W_COLLAPSED}px;
-    text-align:center;
-    transition:width .25s;
+    width:${W_COL}px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:17px;
   }
 
-  /* Label — oculto colapsado, visível expandido */
+  /* Label */
   .gsb-item-label{
-    flex:1;
-    opacity:0;
-    transform:translateX(-4px);
-    transition:opacity .18s ease .04s, transform .18s ease .04s;
-    overflow:hidden;
+    flex:1;min-width:0;overflow:hidden;
+    opacity:0;transform:translateX(-5px);
+    transition:opacity .16s .03s, transform .16s .03s;
   }
-  #gr7-sidebar.expanded .gsb-item-label{
-    opacity:1;transform:translateX(0);
-  }
-  #gr7-sidebar.expanded .gsb-item{
-    justify-content:flex-start;
-    padding:10px 0;
-    gap:0;
-  }
-  #gr7-sidebar.expanded .gsb-item-icon{
-    width:${W_COLLAPSED}px;
-  }
+  #gr7-sidebar.expanded .gsb-item-label{opacity:1;transform:translateX(0);}
 
-  /* Tooltip no modo colapsado */
-  .gsb-item[data-tip]{position:relative;}
-  .gsb-item[data-tip]:not(.gsb-expanded-mode)::after{
+  /* Seta grupo */
+  .gsb-item-arrow{
+    width:20px;flex-shrink:0;margin-right:8px;
+    font-size:10px;color:#5a5e78;
+    opacity:0;transition:opacity .16s, transform .18s;
+    display:flex;align-items:center;justify-content:center;
+  }
+  #gr7-sidebar.expanded .gsb-item-arrow{opacity:1;}
+  .gsb-item.submenu-open .gsb-item-arrow{transform:rotate(90deg);color:#818cf8;}
+
+  /* ── Tooltip colapsado ── */
+  .gsb-item::after{
     content:attr(data-tip);
     position:absolute;left:calc(100% + 10px);top:50%;
     transform:translateY(-50%);
@@ -379,100 +349,158 @@ const SIDEBAR_CSS = `
     white-space:nowrap;pointer-events:none;
     opacity:0;transition:opacity .15s;
     z-index:9999;font-family:'Outfit',sans-serif;
+    display:none;
   }
-  .gsb-item[data-tip]:hover::after{opacity:1;}
-  /* Oculta tooltip quando expandido */
-  #gr7-sidebar.expanded .gsb-item[data-tip]::after{display:none;}
+  #gr7-sidebar:not(.expanded) .gsb-item[data-tip]:not(.has-children)::after{ display:block; }
+  #gr7-sidebar:not(.expanded) .gsb-item[data-tip]:hover::after{ opacity:1; }
 
-  /* ── Rodapé / usuário ── */
+  /* ── Submenu dropdown ── */
+  .gsb-submenu{
+    position:absolute;
+    left:${W_COL}px;
+    top:0;
+    min-width:180px;
+    background:#0e1018;
+    border:1px solid #252738;
+    border-radius:0 12px 12px 0;
+    padding:6px 0;
+    z-index:9998;
+    box-shadow:8px 4px 32px rgba(0,0,0,.6);
+    opacity:0;pointer-events:none;
+    transform:translateX(-6px);
+    transition:opacity .16s, transform .16s;
+  }
+  /* Quando expandido, submenu aparece ancorado à largura do sidebar */
+  #gr7-sidebar.expanded .gsb-submenu{
+    left:${W_EXP}px;
+    border-radius:12px;
+  }
+  .gsb-item.submenu-open .gsb-submenu{
+    opacity:1;pointer-events:auto;transform:translateX(0);
+  }
+  .gsb-sub-item{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 16px;
+    text-decoration:none;
+    color:#8a8faa;font-size:13px;font-family:'Outfit',sans-serif;
+    transition:background .12s, color .12s;
+    white-space:nowrap;
+  }
+  .gsb-sub-item:hover{ background:#161820; color:#dde1f0; }
+  .gsb-sub-item.active{ color:#818cf8; background:rgba(129,140,248,.1); }
+  .gsb-sub-item-icon{ font-size:15px;width:20px;text-align:center;flex-shrink:0; }
+  /* Título do grupo no topo do submenu */
+  .gsb-sub-title{
+    font-family:'IBM Plex Mono',monospace;font-size:9px;
+    letter-spacing:1.5px;text-transform:uppercase;
+    color:#5a5e78;padding:6px 16px 4px;
+    border-bottom:1px solid #1e2030;margin-bottom:2px;
+  }
+
+  /* ── Rodapé ── */
   .gsb-footer{
-    padding:10px 0 10px;
-    border-top:1px solid #252738;
+    padding:8px 0 8px;border-top:1px solid #252738;
     flex-shrink:0;overflow:hidden;
   }
   .gsb-user{
-    display:flex;align-items:center;gap:0;
-    padding:8px 0;justify-content:center;
-    border-radius:0;background:#161820;
-    margin:0 0 6px;
-    overflow:hidden;transition:padding .25s,gap .25s,justify-content .25s;
-  }
-  #gr7-sidebar.expanded .gsb-user{
-    gap:10px;padding:8px 10px;justify-content:flex-start;
-    border-radius:10px;margin:0 8px 6px;
+    display:flex;align-items:center;
+    height:44px;padding:0;
+    overflow:hidden;
   }
   .gsb-user-av{
-    width:30px;height:30px;border-radius:8px;flex-shrink:0;
+    width:${W_COL}px;height:44px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .gsb-av-inner{
+    width:30px;height:30px;border-radius:8px;
     display:flex;align-items:center;justify-content:center;
     font-family:'Syne',sans-serif;font-size:11px;font-weight:800;
   }
   .gsb-user-info{
     flex:1;min-width:0;
     opacity:0;transform:translateX(-4px);
-    transition:opacity .18s ease .05s,transform .18s ease .05s;
+    transition:opacity .16s .04s, transform .16s .04s;
   }
   #gr7-sidebar.expanded .gsb-user-info{opacity:1;transform:translateX(0);}
   .gsb-user-name{font-size:12px;font-weight:600;color:#dde1f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .gsb-user-role{font-size:10px;color:#5a5e78;margin-top:1px;}
-
-  /* Botão sair */
-  .gsb-logout{
-    display:flex;align-items:center;justify-content:center;gap:6px;
-    width:calc(100% - 0px);padding:8px 0;
-    border-radius:0;border:none;
-    border-top:1px solid #252738;
+  .gsb-logout-btn{
+    display:flex;align-items:center;justify-content:center;
+    height:36px;width:100%;
+    border:none;border-top:1px solid #252738;
     background:transparent;color:#5a5e78;
     font-size:12px;cursor:pointer;
-    font-family:'Outfit',sans-serif;transition:color .15s, background .15s;
-    overflow:hidden;
+    font-family:'Outfit',sans-serif;
+    transition:color .14s, background .14s;
+    gap:6px;
   }
-  .gsb-logout:hover{background:#161820;color:#f87171;}
-  .gsb-logout-label{
+  .gsb-logout-btn:hover{background:#161820;color:#f87171;}
+  .gsb-logout-lbl{
     opacity:0;transform:translateX(-4px);
-    transition:opacity .18s ease .05s,transform .18s ease .05s;
+    transition:opacity .16s .04s, transform .16s .04s;
     white-space:nowrap;
   }
-  #gr7-sidebar.expanded .gsb-logout-label{opacity:1;transform:translateX(0);}
-  #gr7-sidebar.expanded .gsb-logout{
-    width:calc(100% - 16px);margin:0 8px;
-    border-radius:8px;border:1px solid #252738;
-    border-top:none;padding:7px 12px;
-  }
+  #gr7-sidebar.expanded .gsb-logout-lbl{opacity:1;transform:translateX(0);}
 
-  /* ── Hamburguer (mobile) ── */
+  /* ── Hamburguer mobile ── */
   #gr7-menu-btn{
     position:fixed;top:14px;left:14px;z-index:1200;
     width:38px;height:38px;border-radius:10px;
     background:#0e1018;border:1px solid #252738;
-    display:none; /* oculto em desktop */
-    flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    display:none;flex-direction:column;
+    align-items:center;justify-content:center;gap:5px;
     cursor:pointer;transition:border-color .15s;
   }
   #gr7-menu-btn:hover{border-color:#818cf8;}
-  #gr7-menu-btn span{
-    display:block;width:18px;height:2px;
-    background:#8a8faa;border-radius:2px;transition:all .2s;
-  }
+  #gr7-menu-btn span{display:block;width:18px;height:2px;background:#8a8faa;border-radius:2px;}
 
   /* ── Body offset ── */
-  body{ padding-left:${W_COLLAPSED}px !important; }
+  body{padding-left:${W_COL}px !important;}
 
   @media(max-width:899px){
-    #gr7-menu-btn{ display:flex !important; }
-    body{ padding-left:0 !important; }
+    #gr7-menu-btn{display:flex !important;}
+    body{padding-left:0 !important;}
+    #gr7-sidebar{
+      width:${W_EXP}px !important;
+      transform:translateX(-100%);
+      transition:transform .25s cubic-bezier(.4,0,.2,1) !important;
+      box-shadow:none !important;overflow:hidden !important;
+    }
+    #gr7-sidebar.open{
+      transform:translateX(0) !important;
+      box-shadow:6px 0 40px rgba(0,0,0,.6) !important;
+    }
+    /* Mobile: labels sempre visíveis */
+    .gsb-item-label,.gsb-brand-wrap,.gsb-user-info,.gsb-logout-lbl,.gsb-item-arrow{
+      opacity:1 !important;transform:none !important;
+    }
+    /* Submenu mobile: posicionado abaixo do item */
+    .gsb-submenu{
+      position:static !important;
+      border-radius:0 !important;
+      border:none !important;
+      box-shadow:none !important;
+      background:#161820 !important;
+      padding:0 !important;
+      left:auto !important;
+      display:none;
+    }
+    .gsb-item.submenu-open .gsb-submenu{
+      display:block;
+      opacity:1 !important;pointer-events:auto !important;transform:none !important;
+    }
+    .gsb-sub-item{padding-left:${W_COL}px !important;}
   }
 `;
 
-/* ── Iniciais ── */
 function ini(n) {
   const p = (n || '').trim().split(' ');
-  return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : (n || '?').slice(0,2).toUpperCase();
+  return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : (n || '?').slice(0, 2).toUpperCase();
 }
 
 function injectSidebar() {
   if (document.getElementById('gr7-sidebar')) return;
 
-  /* Estilos */
   const styleEl = document.createElement('style');
   styleEl.textContent = SIDEBAR_CSS;
   document.head.appendChild(styleEl);
@@ -481,8 +509,31 @@ function injectSidebar() {
   const isAdmin = session && session.perfil === 'admin';
   const curPage = location.pathname.split('/').pop() || 'index.html';
 
-  /* Nav items */
+  /* Verifica se algum filho está ativo */
+  function childActive(item) {
+    return item.children && item.children.some(c => c.href === curPage);
+  }
+
+  /* Monta HTML dos itens */
   const navHTML = NAV_ITEMS.map(item => {
+    if (item.group) {
+      const active = childActive(item) ? ' active' : '';
+      const childrenHTML = item.children.map(ch => {
+        const ca = ch.href === curPage ? ' active' : '';
+        return `<a class="gsb-sub-item${ca}" href="${ch.href}">
+          <span class="gsb-sub-item-icon">${ch.icon}</span>${ch.label}
+        </a>`;
+      }).join('');
+      return `<div class="gsb-item has-children${active}" data-tip="${item.label}" tabindex="0">
+        <span class="gsb-item-icon">${item.icon}</span>
+        <span class="gsb-item-label">${item.label}</span>
+        <span class="gsb-item-arrow">›</span>
+        <div class="gsb-submenu">
+          <div class="gsb-sub-title">${item.label}</div>
+          ${childrenHTML}
+        </div>
+      </div>`;
+    }
     const active = curPage === item.href ? ' active' : '';
     return `<a class="gsb-item${active}" href="${item.href}" data-tip="${item.label}">
       <span class="gsb-item-icon">${item.icon}</span>
@@ -490,27 +541,21 @@ function injectSidebar() {
     </a>`;
   }).join('');
 
-  /* Bloco do usuário */
   const userBlock = session ? `
     <div class="gsb-user">
-      <div class="gsb-user-av" style="background:${(session.cor||'#818cf8')}22;color:${session.cor||'#818cf8'}">${ini(session.nome)}</div>
+      <div class="gsb-user-av">
+        <div class="gsb-av-inner" style="background:${(session.cor||'#818cf8')}22;color:${session.cor||'#818cf8'}">${ini(session.nome)}</div>
+      </div>
       <div class="gsb-user-info">
         <div class="gsb-user-name">${session.nome}</div>
         <div class="gsb-user-role">${isAdmin ? '👑 Admin' : '👤 Colaborador'}</div>
       </div>
     </div>
-    <button class="gsb-logout" onclick="GR7Auth&&GR7Auth.logout()">
-      <span>⬅</span>
-      <span class="gsb-logout-label">Sair do sistema</span>
+    <button class="gsb-logout-btn" onclick="GR7Auth&&GR7Auth.logout()">
+      <span>⬅</span><span class="gsb-logout-lbl">Sair do sistema</span>
     </button>
-  ` : `
-    <button class="gsb-logout" onclick="window.location.href='login.html'">
-      <span>⬅</span>
-      <span class="gsb-logout-label">Fazer login</span>
-    </button>
-  `;
+  ` : '';
 
-  /* Sidebar DOM */
   const sidebar = document.createElement('div');
   sidebar.id = 'gr7-sidebar';
   sidebar.innerHTML = `
@@ -521,19 +566,14 @@ function injectSidebar() {
         <div class="gsb-brand-sub">Sistema de Instalações</div>
       </div>
     </div>
-    <nav class="gsb-nav">
-      <div class="gsb-section">Menu</div>
-      ${navHTML}
-    </nav>
+    <nav class="gsb-nav">${navHTML}</nav>
     <div class="gsb-footer">${userBlock}</div>
   `;
 
-  /* Overlay (mobile) */
   const overlay = document.createElement('div');
   overlay.id = 'gr7-sidebar-overlay';
   overlay.onclick = closeSidebar;
 
-  /* Hamburguer (mobile) */
   const menuBtn = document.createElement('div');
   menuBtn.id = 'gr7-menu-btn';
   menuBtn.setAttribute('aria-label', 'Abrir menu');
@@ -544,38 +584,92 @@ function injectSidebar() {
   document.body.prepend(overlay);
   document.body.prepend(sidebar);
 
-  /* ── Hover expand/collapse (desktop) ── */
-  let _hoverTimer = null;
+  /* ══ Lógica de interação ══ */
+  let _expandTimer   = null;
+  let _collapseTimer = null;
+  let _openGroup     = null;
 
+  /* Expand/colapsa sidebar no hover (desktop) */
   sidebar.addEventListener('mouseenter', () => {
-    clearTimeout(_hoverTimer);
-    sidebar.classList.add('expanded');
+    clearTimeout(_collapseTimer);
+    _expandTimer = setTimeout(() => sidebar.classList.add('expanded'), 0);
   });
-
   sidebar.addEventListener('mouseleave', () => {
-    /* Pequeno delay para não piscar ao mover entre itens */
-    _hoverTimer = setTimeout(() => {
-      /* Só colapsa no modo desktop */
+    clearTimeout(_expandTimer);
+    _collapseTimer = setTimeout(() => {
       if (window.innerWidth >= 900) {
         sidebar.classList.remove('expanded');
+        closeAllSubmenus();
       }
-    }, 80);
+    }, 100);
   });
+
+  /* Dropdown por hover nos itens com filhos */
+  sidebar.querySelectorAll('.gsb-item.has-children').forEach(item => {
+    let _subTimer = null;
+
+    item.addEventListener('mouseenter', () => {
+      clearTimeout(_subTimer);
+      closeAllSubmenus();
+      item.classList.add('submenu-open');
+      _openGroup = item;
+    });
+
+    item.addEventListener('mouseleave', e => {
+      /* Se o mouse foi para o submenu, mantém aberto */
+      const sub = item.querySelector('.gsb-submenu');
+      if (sub && sub.contains(e.relatedTarget)) return;
+      _subTimer = setTimeout(() => {
+        item.classList.remove('submenu-open');
+        if (_openGroup === item) _openGroup = null;
+      }, 120);
+    });
+
+    /* Submenu: mantém aberto enquanto mouse está nele */
+    const sub = item.querySelector('.gsb-submenu');
+    if (sub) {
+      sub.addEventListener('mouseenter', () => clearTimeout(_subTimer));
+      sub.addEventListener('mouseleave', e => {
+        if (item.contains(e.relatedTarget)) return;
+        _subTimer = setTimeout(() => {
+          item.classList.remove('submenu-open');
+        }, 80);
+      });
+    }
+
+    /* Mobile/teclado: toggle no click */
+    item.addEventListener('click', e => {
+      if (window.innerWidth < 900) {
+        e.preventDefault();
+        item.classList.toggle('submenu-open');
+      }
+    });
+  });
+
+  function closeAllSubmenus() {
+    sidebar.querySelectorAll('.gsb-item.submenu-open').forEach(el => {
+      el.classList.remove('submenu-open');
+    });
+    _openGroup = null;
+  }
 }
 
-/* ── Toggle mobile ── */
 function toggleSidebar() {
   const sb = document.getElementById('gr7-sidebar');
   const ov = document.getElementById('gr7-sidebar-overlay');
   sb.classList.toggle('open');
   ov.classList.toggle('open');
+  if (!sb.classList.contains('open')) {
+    sb.querySelectorAll('.gsb-item.submenu-open').forEach(el => el.classList.remove('submenu-open'));
+  }
 }
 function closeSidebar() {
-  document.getElementById('gr7-sidebar').classList.remove('open');
+  const sb = document.getElementById('gr7-sidebar');
+  sb.classList.remove('open');
   document.getElementById('gr7-sidebar-overlay').classList.remove('open');
+  sb.querySelectorAll('.gsb-item.submenu-open').forEach(el => el.classList.remove('submenu-open'));
 }
 
-/* Auto-inject */
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', injectSidebar);
 } else {
