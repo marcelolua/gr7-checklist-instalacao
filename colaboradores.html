@@ -42,7 +42,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 .profile-badge.admin{background:rgba(232,121,249,.12);color:var(--c5);border:1px solid rgba(232,121,249,.25)}
 .profile-badge.colab{background:rgba(56,189,248,.1);color:var(--c1);border:1px solid rgba(56,189,248,.25)}
 
-/* ── PIN CHANGE CARD ── */
+/* ── SENHA CHANGE CARD ── */
 .pin-card{background:var(--s1);border:1px solid var(--bdr);border-radius:16px;padding:26px;max-width:420px}
 .pin-card h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px}
 .field{margin-bottom:14px}
@@ -199,14 +199,14 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
     <div class="pin-card">
       <h3>🔐 Trocar PIN de acesso</h3>
       <div class="field">
-        <label>PIN atual</label>
+        <label>Senha atual</label>
         <div class="pin-input-wrap">
           <input class="pin-input" type="password" id="pinAtual" maxlength="4" placeholder="••••" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"/>
           <button class="eye-btn" onclick="toggleEye('pinAtual',this)">👁</button>
         </div>
       </div>
       <div class="field">
-        <label>Novo PIN (4 dígitos)</label>
+        <label>Nova senha (4 dígitos)</label>
         <div class="pin-input-wrap">
           <input class="pin-input" type="password" id="pinNovo" maxlength="4" placeholder="••••" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"/>
           <button class="eye-btn" onclick="toggleEye('pinNovo',this)">👁</button>
@@ -219,7 +219,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
           <button class="eye-btn" onclick="toggleEye('pinConf',this)">👁</button>
         </div>
       </div>
-      <button class="save-pin-btn" id="savePinBtn" onclick="salvarPin()">Salvar novo PIN</button>
+      <button class="save-pin-btn" id="savePinBtn" onclick="salvarPin()">Salvar nova senha</button>
       <div class="pin-msg" id="pinMsg"></div>
     </div>
 
@@ -270,14 +270,25 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
         <div class="role-opt sel-colab" id="mOptColab" onclick="selPerfil('colaborador')">👤 Colaborador</div>
       </div>
     </div>
-    <div class="mfield"><label>PIN de Acesso (4 dígitos)</label>
+    <div class="mfield">
+      <label>Usuário de login</label>
+      <input id="mUsuario" type="text" placeholder="ex: joao.silva (gerado auto se vazio)" autocapitalize="none" spellcheck="false"
+        style="width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s"/>
+    </div>
+    <div class="mfield" id="mSenhaWrap">
+      <label>Senha <span id="mSenhaHint" style="color:var(--muted);font-size:10px;font-weight:400">— obrigatória para novo colaborador</span></label>
       <div style="position:relative">
-        <input id="mPin" type="password" placeholder="••••" maxlength="4" class="pin-style"
-          oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"
-          style="width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 44px 10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:20px;letter-spacing:8px;outline:none"/>
-        <button onclick="toggleEye('mPin',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px">👁</button>
+        <input id="mSenha" type="password" placeholder="Mínimo 4 caracteres"
+          style="width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 44px 10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s"/>
+        <button onclick="toggleEye('mSenha',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px">👁</button>
       </div>
-      <div style="font-size:10px;color:var(--muted);margin-top:5px">Deixe em branco para manter o PIN atual (ao editar)</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:5px">Deixe em branco para manter a senha atual (ao editar)</div>
+    </div>
+    <!-- Botão de reset rápido de senha (visível só ao editar) -->
+    <div id="mResetWrap" style="display:none;margin-bottom:14px">
+      <button onclick="resetSenhaRapida()" style="width:100%;padding:9px;border-radius:9px;border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.07);color:#fbbf24;font-size:12px;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .15s">
+        🔑 Gerar senha temporária e copiar
+      </button>
     </div>
     <div class="mfield"><label>Cor</label><div class="color-row" id="mColors"></div></div>
     <div class="modal-btns">
@@ -346,36 +357,47 @@ function toggleEye(id,btn){
   btn.textContent=el.type==='password'?'👁':'🙈';
 }
 
-async function salvarPin(){
-  const atual=document.getElementById('pinAtual').value.trim();
-  const novo=document.getElementById('pinNovo').value.trim();
-  const conf=document.getElementById('pinConf').value.trim();
-  const msg=e=>{ document.getElementById('pinMsg').textContent=e; document.getElementById('pinMsg').className='pin-msg '+(e.startsWith('✅')?'ok':'err'); };
+async function salvarSenha(){
+  const atual = document.getElementById('pinAtual').value;
+  const novo  = document.getElementById('pinNovo').value;
+  const conf  = document.getElementById('pinConf').value;
+  const msg   = e => {
+    const el = document.getElementById('pinMsg');
+    el.textContent = e;
+    el.className = 'pin-msg ' + (e.startsWith('✅') ? 'ok' : 'err');
+  };
+  if (!session) { msg('⚠️ Sessão não encontrada.'); return; }
+  if (!atual)   { msg('⚠️ Digite a senha atual.');  return; }
+  if (novo.length < 4) { msg('⚠️ Nova senha: mínimo 4 caracteres.'); return; }
+  if (novo !== conf)   { msg('⚠️ As senhas novas não coincidem.'); return; }
 
-  if(!session){ msg('⚠️ Sessão não encontrada.'); return; }
-  if(atual.length!==4){ msg('⚠️ Digite o PIN atual (4 dígitos).'); return; }
-  if(novo.length!==4){ msg('⚠️ O novo PIN deve ter 4 dígitos.'); return; }
-  if(novo!==conf){ msg('⚠️ Os PINs novos não coincidem.'); return; }
+  const btn = document.getElementById('savePinBtn');
+  btn.disabled = true; btn.textContent = 'Verificando...';
 
-  const btn=document.getElementById('savePinBtn');
-  btn.disabled=true; btn.textContent='Verificando...';
-
-  try{
-    // Verify current PIN
-    const hashAtual=await sha256(atual);
-    const check=await dbGet(`colaboradores?id=eq.${session.id}&pin_hash=eq.${hashAtual}&select=id`);
-    if(!Array.isArray(check)||!check.length){ msg('❌ PIN atual incorreto.'); btn.disabled=false; btn.textContent='Salvar novo PIN'; return; }
-
-    // Save new PIN
-    const hashNovo=await sha256(novo);
-    await dbPatch('colaboradores',session.id,{pin_hash:hashNovo});
-    msg('✅ PIN alterado com sucesso!');
-    document.getElementById('pinAtual').value='';
-    document.getElementById('pinNovo').value='';
-    document.getElementById('pinConf').value='';
-  }catch(e){ msg('❌ '+(window.humanizeError?humanizeError(e):e.message)); }
-  btn.disabled=false; btn.textContent='Salvar novo PIN';
+  try {
+    /* Verifica senha atual (senha_hash v3 OU pin_hash legado) */
+    const hashAtual = await sha256(atual);
+    const check = await dbGet(
+      `colaboradores?id=eq.${session.id}&select=id,senha_hash,pin_hash`
+    );
+    const row = check && check[0];
+    if (!row || (row.senha_hash !== hashAtual && row.pin_hash !== hashAtual)) {
+      msg('❌ Senha atual incorreta.');
+      btn.disabled = false; btn.textContent = 'Salvar nova senha';
+      return;
+    }
+    /* Salva nova senha como senha_hash (v3) */
+    const hashNovo = await sha256(novo);
+    await dbPatch('colaboradores', session.id, { senha_hash: hashNovo });
+    msg('✅ Senha alterada com sucesso!');
+    ['pinAtual','pinNovo','pinConf'].forEach(id => document.getElementById(id).value = '');
+  } catch(e) {
+    msg('❌ ' + (window.humanizeError ? humanizeError(e) : e.message));
+  }
+  btn.disabled = false; btn.textContent = 'Salvar nova senha';
 }
+/* Mantém alias antigo para compatibilidade com HTML que chama salvarPin() */
+const salvarPin = salvarSenha;
 
 /* ── MY STATS ── */
 async function loadMyStats(){
@@ -522,18 +544,25 @@ function selPerfil(p){
 let _allColabs=[];
 async function openModal(id){
   editId=id||null;
-  document.getElementById('mPin').value='';
-  if(id){
-    document.getElementById('modalTitle').textContent='✏️ Editar Colaborador';
-    const c=_allColabs.find(x=>x.id===id)||await dbGet(`colaboradores?id=eq.${id}&select=*`).then(r=>r[0]);
-    document.getElementById('mNome').value=c.nome||'';
-    document.getElementById('mCargo').value=c.cargo||'';
-    selPerfil(c.perfil||'colaborador');
-    buildColors(c.cor||PAL[0]);
-  }else{
-    document.getElementById('modalTitle').textContent='➕ Novo Colaborador';
-    document.getElementById('mNome').value='';
-    document.getElementById('mCargo').value='';
+  document.getElementById('mSenha').value = '';
+  document.getElementById('mUsuario').value = '';
+  if (id) {
+    document.getElementById('modalTitle').textContent = '✏️ Editar Colaborador';
+    document.getElementById('mSenhaHint').textContent = '— deixe em branco para manter';
+    document.getElementById('mResetWrap').style.display = '';
+    const colab = _allColabs.find(x => x.id === id) ||
+      await dbGet(`colaboradores?id=eq.${id}&select=*`).then(r => r[0]);
+    document.getElementById('mNome').value    = colab.nome    || '';
+    document.getElementById('mCargo').value   = colab.cargo   || '';
+    document.getElementById('mUsuario').value = colab.usuario || '';
+    selPerfil(colab.perfil || 'colaborador');
+    buildColors(colab.cor || PAL[0]);
+  } else {
+    document.getElementById('modalTitle').textContent = '➕ Novo Colaborador';
+    document.getElementById('mSenhaHint').textContent = '— obrigatória para novo colaborador';
+    document.getElementById('mResetWrap').style.display = 'none';
+    document.getElementById('mNome').value  = '';
+    document.getElementById('mCargo').value = '';
     selPerfil('colaborador');
     buildColors(PAL[0]);
   }
@@ -542,20 +571,50 @@ async function openModal(id){
 function closeModal(){ document.getElementById('modalBg').classList.remove('open'); }
 
 async function saveColab(){
-  const nome=document.getElementById('mNome').value.trim();
-  const cargo=document.getElementById('mCargo').value.trim()||'Colaborador';
-  const pinRaw=document.getElementById('mPin').value.trim();
-  if(!nome){ alert('Digite o nome do colaborador.'); return; }
-  if(!editId&&pinRaw.length!==4){ alert('PIN de 4 dígitos obrigatório para novo colaborador.'); return; }
-  try{
-    const payload={nome,cargo,cor:selColor,perfil:selPerfil_};
-    if(pinRaw.length===4) payload.pin_hash=await sha256(pinRaw);
-    if(editId){ await dbPatch('colaboradores',editId,payload); }
-    else{ await dbPost('colaboradores',{...payload,ativo:true}); }
+  const nome    = document.getElementById('mNome').value.trim();
+  const cargo   = document.getElementById('mCargo').value.trim() || 'Colaborador';
+  const usuarioRaw = document.getElementById('mUsuario').value.trim();
+  const senhaRaw   = document.getElementById('mSenha').value;
+  if (!nome) { gr7Alert({title:'Campo obrigatório',message:'Digite o nome do colaborador.',icon:'✏️'}); return; }
+  if (!editId && !senhaRaw) { gr7Alert({title:'Senha obrigatória',message:'Defina uma senha para o novo colaborador.',icon:'🔒'}); return; }
+
+  /* Gera usuário automático se em branco */
+  const usuario = usuarioRaw ||
+    nome.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
+
+  try {
+    const payload = { nome, cargo, cor: selColor, perfil: selPerfil_, usuario, ativo: true };
+    if (senhaRaw) payload.senha_hash = await sha256(senhaRaw);
+    if (editId) { await dbPatch('colaboradores', editId, payload); }
+    else         { await dbPost('colaboradores', payload); }
     closeModal();
-    if(window.toast) toast('Colaborador salvo!','success');
+    toast('Colaborador salvo com sucesso!', 'success');
     loadTeam();
-  }catch(e){ alert('Erro: '+(window.humanizeError?humanizeError(e):e.message)); }
+  } catch(e) {
+    gr7Alert({title:'Erro ao salvar', message: window.humanizeError ? humanizeError(e) : e.message, icon:'❌'});
+  }
+}
+
+/* ── Reset de senha rápida (gera senha temp e copia) ── */
+async function resetSenhaRapida() {
+  if (!editId) return;
+  const colab = _allColabs.find(x => x.id === editId);
+  if (!colab) return;
+  const temp = 'gr7' + Math.floor(1000 + Math.random() * 9000);
+  const ok = await gr7Confirm({
+    title: '🔑 Redefinir senha?',
+    message: `A senha de <strong style="color:#dde1f0">${colab.nome}</strong> será redefinida para: <br><br><code style="font-family:monospace;font-size:18px;letter-spacing:4px;color:#818cf8">${temp}</code><br><br>Copie antes de confirmar.`,
+    confirmText: 'Confirmar reset', cancelText: 'Cancelar',
+  });
+  if (!ok) return;
+  try {
+    const h = await sha256(temp);
+    await dbPatch('colaboradores', editId, { senha_hash: h });
+    await navigator.clipboard.writeText(temp).catch(() => {});
+    toast(`✅ Senha redefinida: ${temp} (copiada)`, 'success');
+  } catch(e) {
+    gr7Alert({title:'Erro', message: humanizeError(e), icon:'❌'});
+  }
 }
 
 async function deleteColab(id,nome){
