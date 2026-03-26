@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GR7 — Diagnóstico de Login</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#07080d;--s1:#0e1018;--s2:#161820;--bdr:#252738;--text:#dde1f0;--muted:#5a5e78;--green:#00e5a0;--c0:#818cf8;--c4:#f87171;--c3:#fbbf24;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;padding:32px 20px;max-width:720px;margin:0 auto}
+h1{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;color:var(--c0);margin-bottom:6px}
+.sub{font-size:12px;color:var(--muted);margin-bottom:32px}
+.card{background:var(--s1);border:1px solid var(--bdr);border-radius:14px;padding:22px;margin-bottom:20px}
+.card h2{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-family:'IBM Plex Mono',monospace}
+input,select{width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:11px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;margin-bottom:14px;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--c0)}
+button{padding:10px 22px;border-radius:9px;border:none;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;margin-right:8px;margin-bottom:8px}
+.btn-primary{background:var(--c0);color:#fff}.btn-primary:hover{opacity:.85}
+.btn-warn{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:var(--c3)}
+.btn-danger{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--c4)}
+.log{background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.7;min-height:60px;max-height:320px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+.log .ok{color:var(--green)}.log .err{color:var(--c4)}.log .warn{color:var(--c3)}.log .info{color:var(--c0)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.badge.ok{background:rgba(0,229,160,.12);color:var(--green)}
+.badge.err{background:rgba(248,113,113,.12);color:var(--c4)}
+.badge.warn{background:rgba(251,191,36,.12);color:var(--c3)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+td,th{padding:8px 10px;text-align:left;border-bottom:1px solid var(--bdr)}
+th{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.5px}
+td:first-child{color:var(--muted)}
+.mono{font-family:'IBM Plex Mono',monospace}
+</style>
+</head>
+<body>
+
+<h1>🔧 GR7 — Diagnóstico de Login</h1>
+<p class="sub">Use esta página para identificar exatamente o problema de acesso. Não expõe senhas — apenas hashes.</p>
+
+<!-- STEP 1: Conexão -->
+<div class="card">
+  <h2>1. Teste de Conexão Supabase</h2>
+  <button class="btn-primary" onclick="testarConexao()">▶ Testar conexão</button>
+  <div class="log" id="logConexao">Clique em "Testar conexão" para começar...</div>
+</div>
+
+<!-- STEP 2: Listar colaboradores -->
+<div class="card">
+  <h2>2. Colaboradores Cadastrados</h2>
+  <button class="btn-primary" onclick="listarColabs()">▶ Listar colaboradores</button>
+  <div class="log" id="logColabs">—</div>
+  <div id="tabelaColabs" style="margin-top:14px"></div>
+</div>
+
+<!-- STEP 3: Testar login -->
+<div class="card">
+  <h2>3. Testar Login Passo a Passo</h2>
+  <div class="row">
+    <div>
+      <label>Usuário ou nome</label>
+      <input id="testLogin" type="text" placeholder="ex: joao ou joao.silva"/>
+    </div>
+    <div>
+      <label>Senha</label>
+      <input id="testSenha" type="password" placeholder="senha a testar"/>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="testarLogin()">▶ Testar login</button>
+  <button class="btn-warn" onclick="mostrarHash()">🔑 Ver hash da senha digitada</button>
+  <div class="log" id="logLogin">—</div>
+</div>
+
+<!-- STEP 4: Redefinir senha direto -->
+<div class="card">
+  <h2>4. Redefinir Senha (Emergência)</h2>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Selecione o colaborador e defina uma nova senha diretamente via API.</p>
+  <select id="selectColab"><option value="">— selecione o colaborador —</option></select>
+  <label>Nova senha</label>
+  <input id="novaSenha" type="password" placeholder="nova senha (mínimo 4 caracteres)"/>
+  <button class="btn-danger" onclick="redefinirSenha()">⚠️ Redefinir senha agora</button>
+  <div class="log" id="logReset">—</div>
+</div>
+
+<script>
+const SURL = 'https://nhzjkahbkeusgntheyug.supabase.co';
+const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oemprYWhia2V1c2dudGhleXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjYwMDQsImV4cCI6MjA4ODg0MjAwNH0.hB2bJBMoJoztuNrb4xCRIgWmwMlayBpVOMWq3mI4nH4';
+const SH = {'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY};
+
+let _colabs = [];
+
+function log(elId, msg, type='') {
+  const el = document.getElementById(elId);
+  const cls = type ? `<span class="${type}">` : '<span>';
+  el.innerHTML += cls + escHtml(msg) + '</span>\n';
+  el.scrollTop = el.scrollHeight;
+}
+function clearLog(id) { document.getElementById(id).innerHTML = ''; }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function sha256(txt) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function norm(s) { return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
+
+/* ── 1. Testar conexão ── */
+async function testarConexao() {
+  clearLog('logConexao');
+  log('logConexao','Testando conexão com Supabase...','info');
+  try {
+    const r = await fetch(SURL + '/rest/v1/colaboradores?select=id&limit=1', {headers: SH});
+    log('logConexao', `HTTP ${r.status} ${r.statusText}`, r.ok ? 'ok' : 'err');
+    if (r.ok) {
+      const d = await r.json();
+      log('logConexao', '✅ Conexão OK. Supabase responde corretamente.', 'ok');
+      log('logConexao', `Registros encontrados: ${JSON.stringify(d)}`);
+    } else {
+      const t = await r.text();
+      log('logConexao', '❌ Erro: ' + t, 'err');
+    }
+  } catch(e) {
+    log('logConexao', '❌ Falha de rede: ' + e.message, 'err');
+  }
+}
+
+/* ── 2. Listar colaboradores ── */
+async function listarColabs() {
+  clearLog('logColabs');
+  document.getElementById('tabelaColabs').innerHTML = '';
+  log('logColabs', 'Carregando colaboradores...', 'info');
+  try {
+    const r = await fetch(SURL + '/rest/v1/colaboradores?ativo=eq.true&select=id,nome,cargo,usuario,perfil,senha_hash,pin_hash&order=nome', {headers: SH});
+    if (!r.ok) { log('logColabs', 'Erro HTTP ' + r.status + ': ' + await r.text(), 'err'); return; }
+    _colabs = await r.json();
+    log('logColabs', `✅ ${_colabs.length} colaborador(es) ativo(s) encontrado(s)`, 'ok');
+
+    /* Preenche select de reset */
+    const sel = document.getElementById('selectColab');
+    sel.innerHTML = '<option value="">— selecione —</option>' + _colabs.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
+
+    /* Tabela */
+    const rows = _colabs.map(c => `<tr>
+      <td>${c.nome}</td>
+      <td class="mono">${c.usuario || '<span style="color:#f87171">NULL</span>'}</td>
+      <td>${c.perfil || '—'}</td>
+      <td>${c.senha_hash ? '<span class="badge ok">✅ OK</span>' : '<span class="badge err">❌ NULL</span>'}</td>
+      <td>${c.pin_hash  ? '<span class="badge warn">⚠️ PIN</span>' : '<span class="badge" style="background:#1e2030;color:#5a5e78">—</span>'}</td>
+    </tr>`).join('');
+    document.getElementById('tabelaColabs').innerHTML = `<table>
+      <thead><tr><th>Nome</th><th>Usuário</th><th>Perfil</th><th>Senha hash</th><th>PIN hash</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  } catch(e) {
+    log('logColabs', '❌ ' + e.message, 'err');
+  }
+}
+
+/* ── 3. Testar login passo a passo ── */
+async function testarLogin() {
+  clearLog('logLogin');
+  const login = document.getElementById('testLogin').value.trim();
+  const senha = document.getElementById('testSenha').value;
+  if (!login || !senha) { log('logLogin', '⚠️ Preencha usuário e senha', 'warn'); return; }
+
+  log('logLogin', `Login digitado: "${login}" | norm: "${norm(login)}"`, 'info');
+  log('logLogin', '');
+
+  /* Buscar colaborador */
+  log('logLogin', 'Buscando colaborador...', 'info');
+  const r = await fetch(SURL + '/rest/v1/colaboradores?ativo=eq.true&select=id,nome,usuario,senha_hash,pin_hash&order=nome', {headers: SH});
+  if (!r.ok) { log('logLogin', 'Erro HTTP: ' + r.status, 'err'); return; }
+  const lista = await r.json();
+  log('logLogin', `${lista.length} colaboradores ativos encontrados`);
+
+  /* Match */
+  const loginNorm = norm(login);
+  let match = lista.find(c => c.usuario && norm(c.usuario) === loginNorm);
+  if (match) { log('logLogin', `✅ Match por campo "usuario": ${match.nome} (usuario=${match.usuario})`, 'ok'); }
+  else {
+    log('logLogin', 'Sem match por campo "usuario". Tentando por nome...', 'warn');
+    match = lista.find(c => norm(c.nome) === loginNorm);
+    if (match) log('logLogin', `✅ Match por "nome": ${match.nome}`, 'ok');
+    else {
+      match = lista.find(c => norm(c.nome).split(' ')[0] === loginNorm);
+      if (match) log('logLogin', `✅ Match por primeiro nome: ${match.nome}`, 'ok');
+      else {
+        log('logLogin', `❌ Nenhum colaborador encontrado para "${login}"`, 'err');
+        log('logLogin', '');
+        log('logLogin', 'Usuários/nomes disponíveis:', 'warn');
+        lista.forEach(c => log('logLogin', `  • nome: "${c.nome}" | usuario: "${c.usuario || 'NULL'}" | norm: "${norm(c.nome)}"`));
+        return;
+      }
+    }
+  }
+
+  log('logLogin', '');
+  log('logLogin', `Colaborador encontrado: ${match.nome} (id: ${match.id})`);
+  log('logLogin', `  senha_hash: ${match.senha_hash ? match.senha_hash.slice(0,20)+'...' : 'NULL ❌'}`, match.senha_hash ? 'ok' : 'err');
+  log('logLogin', `  pin_hash:   ${match.pin_hash   ? match.pin_hash.slice(0,20)+'...'   : 'NULL'}`, 'info');
+
+  if (!match.senha_hash && !match.pin_hash) {
+    log('logLogin', '', '');
+    log('logLogin', '❌ PROBLEMA: colaborador sem senha cadastrada!', 'err');
+    log('logLogin', '→ Use a seção 4 abaixo para definir uma nova senha.', 'warn');
+    return;
+  }
+
+  /* Hash da senha digitada */
+  const hash = await sha256(senha);
+  log('logLogin', '');
+  log('logLogin', `Hash da senha digitada: ${hash.slice(0,20)}...`, 'info');
+
+  let ok = false;
+  if (match.senha_hash && match.senha_hash === hash) {
+    log('logLogin', '✅ senha_hash CONFERE!', 'ok');
+    ok = true;
+  } else if (match.senha_hash) {
+    log('logLogin', `❌ senha_hash NÃO confere`, 'err');
+    log('logLogin', `   Esperado: ${match.senha_hash.slice(0,20)}...`, 'err');
+    log('logLogin', `   Recebido: ${hash.slice(0,20)}...`, 'err');
+  }
+
+  if (!ok && match.pin_hash && match.pin_hash === hash) {
+    log('logLogin', '✅ pin_hash CONFERE (fallback v2)!', 'ok');
+    ok = true;
+  } else if (!ok && match.pin_hash) {
+    log('logLogin', '❌ pin_hash também não confere (fallback v2)', 'err');
+  }
+
+  log('logLogin', '');
+  if (ok) log('logLogin', '✅ LOGIN VÁLIDO — a senha está correta!', 'ok');
+  else     log('logLogin', '❌ SENHA INCORRETA — redefina a senha na seção 4 abaixo.', 'err');
+}
+
+/* ── Ver hash ── */
+async function mostrarHash() {
+  const senha = document.getElementById('testSenha').value;
+  if (!senha) { log('logLogin', '⚠️ Digite uma senha primeiro', 'warn'); return; }
+  const h = await sha256(senha);
+  clearLog('logLogin');
+  log('logLogin', `SHA-256 de "${senha.replace(/./g,'•')}":`);
+  log('logLogin', h, 'info');
+  log('logLogin', '\nCopie esse hash e execute no Supabase SQL Editor:', 'warn');
+  log('logLogin', `UPDATE colaboradores SET senha_hash='${h}' WHERE nome='NOME_DO_COLABORADOR';`);
+}
+
+/* ── 4. Redefinir senha ── */
+async function redefinirSenha() {
+  clearLog('logReset');
+  const id = document.getElementById('selectColab').value;
+  const nova = document.getElementById('novaSenha').value;
+  if (!id) { log('logReset', '⚠️ Selecione um colaborador', 'warn'); return; }
+  if (nova.length < 4) { log('logReset', '⚠️ Senha deve ter pelo menos 4 caracteres', 'warn'); return; }
+
+  const colab = _colabs.find(c => String(c.id) === String(id));
+  if (!colab) { log('logReset', '⚠️ Colaborador não encontrado na lista — clique em "Listar" primeiro', 'warn'); return; }
+
+  const h = await sha256(nova);
+  log('logReset', `Redefinindo senha de: ${colab.nome}...`, 'info');
+  log('logReset', `Hash: ${h.slice(0,20)}...`);
+
+  try {
+    const r = await fetch(`${SURL}/rest/v1/colaboradores?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {...SH, 'Prefer': 'return=representation'},
+      body: JSON.stringify({ senha_hash: h }),
+    });
+    if (!r.ok) {
+      log('logReset', '❌ Erro HTTP ' + r.status + ': ' + await r.text(), 'err');
+      return;
+    }
+    log('logReset', `✅ Senha de "${colab.nome}" redefinida com sucesso!`, 'ok');
+    log('logReset', `Nova senha: ${nova}`, 'ok');
+    log('logReset', '→ Teste agora na seção 3 acima.', 'info');
+    document.getElementById('novaSenha').value = '';
+    listarColabs(); /* atualiza tabela */
+  } catch(e) {
+    log('logReset', '❌ Erro: ' + e.message, 'err');
+  }
+}
+
+/* Carrega lista ao abrir */
+window.onload = () => { testarConexao(); listarColabs(); };
+</script>
+</body>
+</html>

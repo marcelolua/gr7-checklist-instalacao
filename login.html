@@ -96,7 +96,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   <div class="msg" id="msg"></div>
 </div>
 
-<div class="version">GR7 · v3.0</div>
+<div class="version">GR7 · v3.1 &nbsp;·&nbsp; <a href="gr7-debug.html" style="color:var(--muted);text-decoration:none" title="Diagnóstico">🔧</a></div>
 
 <script>
 let tries=0,locked=false,lockTimer=null;
@@ -141,27 +141,38 @@ async function doLogin(){
   btn.disabled=true;btn.textContent='Verificando...';setMsg('','');
 
   try{
-    const user=await GR7Auth.doLogin(usuario,senha);
-    if(user){
+    const user=const res = await GR7Auth.doLogin(usuario, senha);
+
+    if(res.sucesso){
       setMsg('✅ Acesso liberado!','ok');
       btn.textContent='✅ Entrando...';
-      localStorage.setItem('gr7_current_user',user.nome);
+      localStorage.setItem('gr7_current_user', res.usuario.nome);
       setTimeout(()=>{
         const redir=sessionStorage.getItem('gr7_redirect')||'index.html';
         sessionStorage.removeItem('gr7_redirect');
         window.location.href=redir;
       },600);
-    }else{
-      tries++;
-      document.getElementById('inpSenha').value='';
-      shakeField('inpSenha');
-      if(tries>=3){startLock();}
-      else{
-        const left=3-tries;
-        setMsg(`❌ Usuário ou senha incorretos. ${left} tentativa${left>1?'s':''} restante${left>1?'s':''}.`,'err');
-        btn.disabled=false;btn.textContent='Entrar →';
-      }
+      return;
     }
+    /* Trata erros específicos com mensagens claras */
+    document.getElementById('inpSenha').value='';
+    shakeField('inpSenha');
+    btn.disabled=false; btn.textContent='Entrar →';
+    if(res.erro==='sem_senha'){
+      setMsg('⚠️ Sem senha definida. Contate o administrador.','err');
+      return;
+    }
+    if(res.erro==='conexao'){
+      setMsg('⚠️ Erro de conexão. Verifique a internet.','err');
+      return;
+    }
+    tries++;
+    if(tries>=3){startLock();return;}
+    const left=3-tries;
+    const errMsg=res.erro==='usuario_nao_encontrado'
+      ? `❌ Usuário não encontrado. ${left} tentativa${left>1?'s':''} restante.`
+      : `❌ Senha incorreta. ${left} tentativa${left>1?'s':''} restante.`;
+    setMsg(errMsg,'err');
   }catch(e){
     setMsg('⚠️ Erro de conexão. Tente novamente.','err');
     btn.disabled=false;btn.textContent='Entrar →';
