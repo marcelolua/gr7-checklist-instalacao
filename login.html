@@ -8,308 +8,157 @@
 <style>
 :root{--bg:#07080d;--s1:#0e1018;--s2:#161820;--s3:#1e2030;--bdr:#252738;--text:#dde1f0;--muted:#5a5e78;--green:#00e5a0;--c0:#818cf8;--c1:#38bdf8;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;}
 *{margin:0;padding:0;box-sizing:border-box}
+html{height:100%}
 body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
-.blob{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;opacity:.12}
-.blob1{width:700px;height:700px;top:-250px;left:-200px;background:var(--c0)}
-.blob2{width:500px;height:500px;bottom:-200px;right:-100px;background:var(--c5)}
+.blob{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0}
+.blob1{width:700px;height:700px;top:-250px;left:-200px;background:var(--c0);opacity:.12}
+.blob2{width:500px;height:500px;bottom:-200px;right:-100px;background:var(--c5);opacity:.1}
 
 .card{position:relative;z-index:10;background:var(--s1);border:1px solid var(--bdr);border-radius:24px;padding:44px 40px;width:100%;max-width:400px;margin:20px;animation:slideUp .45s cubic-bezier(.4,0,.2,1)}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c0),var(--c5));border-radius:24px 24px 0 0}
 @keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 
-.logo{display:flex;align-items:center;gap:14px;margin-bottom:32px}
-.logo-mark{width:50px;height:50px;background:linear-gradient(135deg,var(--c0),var(--c5));border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;color:#fff;box-shadow:0 0 30px rgba(129,140,248,.4);flex-shrink:0}
+.logo{display:flex;align-items:center;gap:14px;margin-bottom:36px}
+.logo-mark{width:50px;height:50px;background:linear-gradient(135deg,var(--c0),var(--c5));border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;color:#fff;box-shadow:0 0 30px rgba(129,140,248,.35);flex-shrink:0}
 .logo-text h1{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.3px}
 .logo-text p{font-size:12px;color:var(--muted);margin-top:2px}
 
-.lbl{display:block;font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
-.select-wrap{position:relative;margin-bottom:22px}
-.user-select{width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:11px;padding:12px 40px 12px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;appearance:none;cursor:pointer;transition:border-color .2s}
-.user-select:focus{border-color:var(--c0)}
-.select-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:12px}
+.field{margin-bottom:20px}
+.lbl{display:block;font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px;font-family:'IBM Plex Mono',monospace}
+.input-wrap{position:relative}
+.inp{width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:11px;padding:13px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+.inp:focus{border-color:var(--c0);box-shadow:0 0 0 3px rgba(129,140,248,.12)}
+.inp::placeholder{color:var(--muted)}
+.inp.err-shake{animation:shake .4s ease}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;transition:color .15s}
+.eye-btn:hover{color:var(--text)}
 
-.pin-section{margin-bottom:4px}
-.pin-dots{display:flex;gap:12px;justify-content:center;margin:12px 0 18px}
-.dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--bdr);background:transparent;transition:all .2s}
-.dot.on{background:var(--c0);border-color:var(--c0);box-shadow:0 0 12px rgba(129,140,248,.55);transform:scale(1.1)}
-.dot.err{background:var(--c4);border-color:var(--c4);box-shadow:0 0 12px rgba(248,113,113,.5)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 
-.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.key{background:var(--s2);border:1px solid var(--bdr);border-radius:11px;padding:15px 10px;text-align:center;font-family:'Syne',sans-serif;font-size:22px;font-weight:700;cursor:pointer;transition:all .15s;user-select:none;-webkit-tap-highlight-color:transparent}
-.key:hover{background:var(--s3);border-color:rgba(129,140,248,.4);color:var(--c0)}
-.key:active{transform:scale(.92)}
-.key.del{font-family:'Outfit',sans-serif;font-size:16px;color:var(--muted)}
-.key.zero{grid-column:2}
-
-.enter-btn{width:100%;margin-top:16px;padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--c0),#6366f1);border:none;color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.4px}
-.enter-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 36px rgba(99,102,241,.45)}
+.enter-btn{width:100%;margin-top:6px;padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--c0),#6366f1);border:none;color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.4px;position:relative;overflow:hidden}
+.enter-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);opacity:0;transition:opacity .2s}
+.enter-btn:hover:not(:disabled)::after{opacity:1}
+.enter-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 36px rgba(99,102,241,.4)}
+.enter-btn:active:not(:disabled){transform:translateY(0)}
 .enter-btn:disabled{opacity:.35;cursor:default;transform:none}
 
-.msg{height:20px;text-align:center;font-size:12px;margin-top:10px;transition:all .2s}
+.msg{min-height:20px;text-align:center;font-size:12px;margin:12px 0 0;transition:all .2s}
 .msg.err{color:var(--c4)}.msg.ok{color:var(--green)}
 
-.lock-bar{display:none;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:12px 16px;text-align:center;font-size:12px;color:var(--c4);margin-top:12px}
+.lock-bar{display:none;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:12px 16px;text-align:center;font-size:12px;color:var(--c4);margin-top:14px}
 .lock-bar.show{display:block}
 
-/* Denied banner */
-.denied{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--c4);margin-bottom:20px;text-align:center;display:none}
+.denied{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--c4);margin-bottom:22px;text-align:center;display:none}
 .denied.show{display:block}
 
-.version{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;z-index:10}
+.version{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;z-index:10;white-space:nowrap}
+
+/* Mobile */
+@media(max-width:480px){.card{padding:32px 24px;margin:16px}.logo-mark{width:42px;height:42px;font-size:13px}}
 </style>
-<script>
-/* ═══════════════════════════════════════════════════════════
-   GR7 — auth.js  •  Sistema de Autenticação Central
-   ═══════════════════════════════════════════════════════════ */
-(function(){
 
-  const SURL='https://nhzjkahbkeusgntheyug.supabase.co';
-  const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oemprYWhia2V1c2dudGhleXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjYwMDQsImV4cCI6MjA4ODg0MjAwNH0.hB2bJBMoJoztuNrb4xCRIgWmwMlayBpVOMWq3mI4nH4';
-  const SH={'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY};
-  const SESSION_KEY='gr7_session';
-  const SESSION_TTL=8*60*60*1000; // 8h
-  const MAX_TRIES=3;
-  const LOCK_TIME=30*1000; // 30s
-
-  /* ── Hash SHA-256 ── */
-  async function sha256(txt){
-    const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(txt));
-    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  }
-
-  /* ── Sessão ── */
-  function getSession(){
-    try{
-      const s=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
-      if(!s)return null;
-      if(Date.now()-s.ts>SESSION_TTL){sessionStorage.removeItem(SESSION_KEY);return null;}
-      return s;
-    }catch{return null;}
-  }
-  function setSession(user){
-    sessionStorage.setItem(SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));
-  }
-  function clearSession(){sessionStorage.removeItem(SESSION_KEY);}
-
-  /* ── API pública ── */
-  window.GR7Auth={
-    getSession,
-    isAdmin:()=>(getSession()||{}).perfil==='admin',
-    isLogged:()=>!!getSession(),
-    logout(){clearSession();window.location.href='login.html';},
-
-    /* Protege a página — redireciona se não logado */
-    require(adminOnly){
-      const s=getSession();
-      if(!s){
-        sessionStorage.setItem('gr7_redirect',window.location.href);
-        window.location.href='login.html';
-        return false;
-      }
-      if(adminOnly&&s.perfil!=='admin'){
-        window.location.href='login.html?denied=1';
-        return false;
-      }
-      return true;
-    },
-
-    /* Injeta barra de sessão no topo do body */
-    injectSessionBar(){
-      const s=getSession();
-      if(!s)return;
-      const bar=document.createElement('div');
-      bar.id='gr7-session-bar';
-      bar.innerHTML=`
-        <div class="gsb-inner">
-          <div class="gsb-av" style="background:${s.cor}22;color:${s.cor}">${ini(s.nome)}</div>
-          <div class="gsb-info">
-            <span class="gsb-name">${s.nome}</span>
-            <span class="gsb-role">${s.cargo}</span>
-          </div>
-          <div class="gsb-badge ${s.perfil==='admin'?'admin':'colab'}">${s.perfil==='admin'?'👑 Admin':'👤 Colaborador'}</div>
-          <button class="gsb-logout" onclick="GR7Auth.logout()">Sair →</button>
-        </div>`;
-      const style=document.createElement('style');
-      style.textContent=`
-        #gr7-session-bar{position:fixed;top:0;left:0;right:0;z-index:9000;background:#0e1018;border-bottom:1px solid #252738;padding:0 24px}
-        .gsb-inner{display:flex;align-items:center;gap:12px;height:44px;max-width:1400px;margin:0 auto}
-        .gsb-av{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;flex-shrink:0}
-        .gsb-name{font-size:13px;font-weight:600;color:#dde1f0}
-        .gsb-role{font-size:11px;color:#5a5e78;margin-left:8px}
-        .gsb-badge{padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.5px;flex-shrink:0}
-        .gsb-badge.admin{background:rgba(232,121,249,.12);color:#e879f9;border:1px solid rgba(232,121,249,.2)}
-        .gsb-badge.colab{background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.2)}
-        .gsb-logout{margin-left:auto;padding:5px 12px;border-radius:7px;border:1px solid #252738;background:transparent;color:#5a5e78;font-size:11px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
-        .gsb-logout:hover{border-color:#f87171;color:#f87171}
-        body{padding-top:44px!important}`;
-      document.head.appendChild(style);
-      document.body.prepend(bar);
-    },
-
-    /* Esconde elementos com data-admin-only se não for admin */
-    applyPermissions(){
-      const admin=this.isAdmin();
-      document.querySelectorAll('[data-admin-only]').forEach(el=>{
-        el.style.display=admin?'':'none';
-      });
-      document.querySelectorAll('[data-colab-only]').forEach(el=>{
-        el.style.display=admin?'none':'';
-      });
-    },
-
-    /* Login — chama do login.html */
-    async doLogin(colaboradorId,pin){
-      const hash=await sha256(pin);
-      const r=await fetch(`${SURL}/rest/v1/colaboradores?id=eq.${colaboradorId}&pin_hash=eq.${hash}&ativo=eq.true&select=id,nome,cargo,cor,perfil`,{headers:SH});
-      const data=await r.json();
-      if(!Array.isArray(data)||!data.length)return null;
-      const u=data[0];
-      setSession(u);
-      return u;
-    },
-
-    /* Carrega lista de colaboradores para o select de login */
-    async loadColaboradores(){
-      const r=await fetch(`${SURL}/rest/v1/colaboradores?ativo=eq.true&select=id,nome,cargo,cor,perfil&order=nome`,{headers:SH});
-      return r.json();
-    }
-  };
-
-  function ini(n){const p=(n||'').trim().split(' ');return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():(n||'??').slice(0,2).toUpperCase();}
-
-})();
-
-</script>
-<script>
-/* ── Polyfill: garante que funções do sidebar.js existam mesmo sem ele ── */
-if(typeof humanizeError==='undefined') window.humanizeError=function(e){return(e&&e.message)||String(e)||'Erro desconhecido';};
-if(typeof gr7Skeletons==='undefined') window.gr7Skeletons={clientTable:function(){return''},implantCards:function(){return''},projetoShell:function(){return''},colabCols:function(){return''},userPills:function(){return''},clientRows:function(){return''},rankingRows:function(){return''},collaboratorCards:function(){return''}};
-if(typeof gr7Alert==='undefined') window.gr7Alert=function(o){alert((o&&o.title?o.title+': ':'')+((o&&o.message)||''));return Promise.resolve();};
-if(typeof gr7Confirm==='undefined') window.gr7Confirm=function(o){return Promise.resolve(confirm((o&&o.title?o.title+'\n':'')+((o&&o.message)||'')));};
-if(typeof gr7DirtyGuard==='undefined') window.gr7DirtyGuard=function(){return{destroy:function(){}};};
-if(typeof toast==='undefined') window.toast=function(m){console.log(m);};
-</script>
+<script src="auth.js"></script>
 </head>
 <body>
-<div class="blob blob1"></div><div class="blob blob2"></div>
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
 
 <div class="card">
   <div class="denied" id="deniedMsg">🚫 Acesso restrito. Faça login como administrador.</div>
 
   <div class="logo">
     <div class="logo-mark">GR7</div>
-    <div class="logo-text"><h1>Bem-vindo</h1><p>Identifique-se para continuar</p></div>
-  </div>
-
-  <label class="lbl">Selecione seu usuário</label>
-  <div class="select-wrap">
-    <select class="user-select" id="userSelect">
-      <option value="">— escolha seu nome —</option>
-    </select>
-    <div class="select-arrow">▼</div>
-  </div>
-
-  <div class="pin-section">
-    <label class="lbl">PIN de acesso (4 dígitos)</label>
-    <div class="pin-dots">
-      <div class="dot" id="d0"></div>
-      <div class="dot" id="d1"></div>
-      <div class="dot" id="d2"></div>
-      <div class="dot" id="d3"></div>
-    </div>
-    <div class="numpad">
-      <div class="key" onclick="addPin(1)">1</div><div class="key" onclick="addPin(2)">2</div><div class="key" onclick="addPin(3)">3</div>
-      <div class="key" onclick="addPin(4)">4</div><div class="key" onclick="addPin(5)">5</div><div class="key" onclick="addPin(6)">6</div>
-      <div class="key" onclick="addPin(7)">7</div><div class="key" onclick="addPin(8)">8</div><div class="key" onclick="addPin(9)">9</div>
-      <div class="key del" onclick="delPin()">⌫</div>
-      <div class="key zero" onclick="addPin(0)">0</div>
+    <div class="logo-text">
+      <h1>Bem-vindo</h1>
+      <p>Identifique-se para continuar</p>
     </div>
   </div>
+
+  <div class="field">
+    <label class="lbl" for="inpUser">Usuário</label>
+    <div class="input-wrap">
+      <input class="inp" id="inpUser" type="text" autocomplete="username" placeholder="seu.usuario" spellcheck="false" autocapitalize="none"/>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="lbl" for="inpSenha">Senha</label>
+    <div class="input-wrap">
+      <input class="inp" id="inpSenha" type="password" autocomplete="current-password" placeholder="••••••••"/>
+      <button class="eye-btn" id="eyeBtn" type="button" onclick="toggleSenha()" title="Mostrar/ocultar senha">👁</button>
+    </div>
+  </div>
+
+  <button class="enter-btn" id="enterBtn" onclick="doLogin()">Entrar →</button>
 
   <div class="lock-bar" id="lockBar">🔒 Muitas tentativas — aguarde <span id="lockCount">30</span>s</div>
   <div class="msg" id="msg"></div>
-  <button class="enter-btn" id="enterBtn" onclick="doLogin()">Entrar →</button>
 </div>
 
-<div class="version">GR7 · v2.0</div>
+<div class="version">GR7 · v3.0</div>
 
 <script>
-let pin='',tries=0,locked=false,lockTimer=null;
+let tries=0,locked=false,lockTimer=null;
 
-/* ── Verificar se já logado ── */
+/* Já logado → redireciona */
 if(GR7Auth.isLogged()){
   const redir=sessionStorage.getItem('gr7_redirect')||'index.html';
   sessionStorage.removeItem('gr7_redirect');
   window.location.href=redir;
 }
-
-/* ── Denied message ── */
 if(new URLSearchParams(location.search).get('denied')){
   document.getElementById('deniedMsg').classList.add('show');
 }
 
-/* ── Carregar colaboradores ── */
-async function loadUsers(){
-  try{
-    const sel=document.getElementById('userSelect');
-    sel.innerHTML='<option value="">— carregando... —</option>';
-    const data=await GR7Auth.loadColaboradores();
-    if(!Array.isArray(data)||!data.length){
-      sel.innerHTML='<option value="">⚠️ Nenhum colaborador cadastrado</option>';
-      return;
-    }
-    sel.innerHTML='<option value="">— escolha seu nome —</option>'+
-      data.map(u=>`<option value="${u.id}">${u.nome}${u.perfil==='admin'?' 👑':''}</option>`).join('');
-  }catch(e){
-    document.getElementById('userSelect').innerHTML='<option value="">⚠️ Erro ao carregar</option>';
-  }
+function toggleSenha(){
+  const inp=document.getElementById('inpSenha');
+  const btn=document.getElementById('eyeBtn');
+  if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
+  else{inp.type='password';btn.textContent='👁';}
 }
-loadUsers();
 
-/* ── PIN ── */
-function updateDots(){
-  for(let i=0;i<4;i++){
-    const d=document.getElementById('d'+i);
-    d.className='dot'+(i<pin.length?' on':'');
-  }
+function setMsg(txt,type){
+  const m=document.getElementById('msg');
+  m.textContent=txt;m.className='msg'+(type?' '+type:'');
 }
-function addPin(n){
-  if(locked||pin.length>=4)return;
-  pin+=n;updateDots();
-  setMsg('','');
-  if(pin.length===4)document.getElementById('enterBtn').focus();
-}
-function delPin(){if(locked)return;pin=pin.slice(0,-1);updateDots();}
-function setMsg(txt,type){const m=document.getElementById('msg');m.textContent=txt;m.className='msg'+(type?' '+type:'');}
 
-/* ── Login ── */
+function shakeField(id){
+  const el=document.getElementById(id);
+  el.classList.remove('err-shake');
+  requestAnimationFrame(()=>el.classList.add('err-shake'));
+  setTimeout(()=>el.classList.remove('err-shake'),500);
+}
+
 async function doLogin(){
   if(locked)return;
-  const id=document.getElementById('userSelect').value;
-  if(!id){setMsg('⚠️ Selecione seu nome primeiro','err');return;}
-  if(pin.length<4){setMsg('⚠️ Digite os 4 dígitos do PIN','err');return;}
+  const usuario=document.getElementById('inpUser').value.trim();
+  const senha=document.getElementById('inpSenha').value;
+  if(!usuario){setMsg('⚠️ Informe o usuário','err');shakeField('inpUser');return;}
+  if(!senha){setMsg('⚠️ Informe a senha','err');shakeField('inpSenha');return;}
+
   const btn=document.getElementById('enterBtn');
-  btn.disabled=true;btn.textContent='Verificando...';
+  btn.disabled=true;btn.textContent='Verificando...';setMsg('','');
+
   try{
-    const user=await GR7Auth.doLogin(id,pin);
+    const user=await GR7Auth.doLogin(usuario,senha);
     if(user){
       setMsg('✅ Acesso liberado!','ok');
       btn.textContent='✅ Entrando...';
-      // Salvar nome em localStorage para compatibilidade com Checklist
       localStorage.setItem('gr7_current_user',user.nome);
       setTimeout(()=>{
         const redir=sessionStorage.getItem('gr7_redirect')||'index.html';
         sessionStorage.removeItem('gr7_redirect');
         window.location.href=redir;
-      },700);
+      },600);
     }else{
-      tries++;pin='';updateDots();
+      tries++;
+      document.getElementById('inpSenha').value='';
+      shakeField('inpSenha');
       if(tries>=3){startLock();}
       else{
         const left=3-tries;
-        setMsg(`❌ PIN incorreto. ${left} tentativa${left>1?'s':''} restante${left>1?'s':''}...`,'err');
-        shakeDots();
+        setMsg(`❌ Usuário ou senha incorretos. ${left} tentativa${left>1?'s':''} restante${left>1?'s':''}.`,'err');
         btn.disabled=false;btn.textContent='Entrar →';
       }
     }
@@ -317,15 +166,6 @@ async function doLogin(){
     setMsg('⚠️ Erro de conexão. Tente novamente.','err');
     btn.disabled=false;btn.textContent='Entrar →';
   }
-}
-
-function shakeDots(){
-  const wrap=document.querySelector('.pin-dots');
-  wrap.style.animation='none';
-  requestAnimationFrame(()=>{wrap.style.animation='shake .4s ease';});
-  setTimeout(()=>wrap.style.animation='',500);
-  for(let i=0;i<4;i++){const d=document.getElementById('d'+i);d.className='dot err';}
-  setTimeout(updateDots,500);
 }
 
 function startLock(){
@@ -340,21 +180,19 @@ function startLock(){
     if(s<=0){
       clearInterval(lockTimer);locked=false;
       document.getElementById('lockBar').classList.remove('show');
-      document.getElementById('enterBtn').disabled=false;
-      document.getElementById('enterBtn').textContent='Entrar →';
+      const btn=document.getElementById('enterBtn');
+      btn.disabled=false;btn.textContent='Entrar →';
     }
   },1000);
 }
 
-/* ── Teclado ── */
-document.addEventListener('keydown',e=>{
-  if(e.key>='0'&&e.key<='9')addPin(parseInt(e.key));
-  else if(e.key==='Backspace')delPin();
-  else if(e.key==='Enter')doLogin();
+/* Teclado: Tab entre campos, Enter submete */
+document.getElementById('inpUser').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){document.getElementById('inpSenha').focus();}
 });
-
-/* ── CSS shake ── */
-document.head.insertAdjacentHTML('beforeend',`<style>@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}</style>`);
+document.getElementById('inpSenha').addEventListener('keydown',e=>{
+  if(e.key==='Enter')doLogin();
+});
 </script>
 </body>
 </html>

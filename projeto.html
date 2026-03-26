@@ -138,375 +138,29 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .breadcrumb a:hover{color:var(--text)}
 .breadcrumb-sep{opacity:.4;font-size:10px}
 .breadcrumb-current{color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px}
+
+/* ── MOBILE IMPROVEMENTS v3 ── */
+@media(max-width:900px){
+  .shell,.page-wrap{padding:0 16px 60px!important}
+  header{padding:20px 0 24px!important;gap:12px}
+  .summary{grid-template-columns:1fr 1fr!important}
+  .sc-num{font-size:32px!important}
+  .toolbar,.hd-right{flex-wrap:wrap;gap:8px}
+  .search-wrap{min-width:160px!important}
+}
+@media(max-width:600px){
+  .summary{grid-template-columns:1fr!important}
+  .cards,.cards-grid{grid-template-columns:1fr!important}
+  .cl-row{grid-template-columns:1fr 90px!important}
+  .cl-row>*:nth-child(n+3){display:none!important}
+  .rk-row{grid-template-columns:36px 36px 1fr 60px!important}
+  .rk-row>*:nth-child(n+5){display:none!important}
+  .shell{padding:0 12px 60px!important}
+}
 </style>
-<script>
-/* ═══ GR7 auth.js — inline ═══ */
-/* ═══════════════════════════════════════════════════════════
-   GR7 — auth.js  •  Sistema de Autenticação Central
-   ═══════════════════════════════════════════════════════════ */
-(function(){
 
-  const SURL='https://nhzjkahbkeusgntheyug.supabase.co';
-  const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oemprYWhia2V1c2dudGhleXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjYwMDQsImV4cCI6MjA4ODg0MjAwNH0.hB2bJBMoJoztuNrb4xCRIgWmwMlayBpVOMWq3mI4nH4';
-  const SH={'Content-Type':'application/json','apikey':SKEY,'Authorization':'Bearer '+SKEY};
-  const SESSION_KEY='gr7_session';
-  const SESSION_TTL=8*60*60*1000; // 8h
-  const MAX_TRIES=3;
-  const LOCK_TIME=30*1000; // 30s
-
-  /* ── Hash SHA-256 ── */
-  async function sha256(txt){
-    const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(txt));
-    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  }
-
-  /* ── Sessão ── */
-  function getSession(){
-    try{
-      const s=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
-      if(!s)return null;
-      if(Date.now()-s.ts>SESSION_TTL){sessionStorage.removeItem(SESSION_KEY);return null;}
-      return s;
-    }catch{return null;}
-  }
-  function setSession(user){
-    sessionStorage.setItem(SESSION_KEY,JSON.stringify({...user,ts:Date.now()}));
-  }
-  function clearSession(){sessionStorage.removeItem(SESSION_KEY);}
-
-  /* ── API pública ── */
-  window.GR7Auth={
-    getSession,
-    isAdmin:()=>(getSession()||{}).perfil==='admin',
-    isLogged:()=>!!getSession(),
-    logout(){clearSession();window.location.href='login.html';},
-
-    /* Protege a página — redireciona se não logado */
-    require(adminOnly){
-      const s=getSession();
-      if(!s){
-        sessionStorage.setItem('gr7_redirect',window.location.href);
-        window.location.href='login.html';
-        return false;
-      }
-      if(adminOnly&&s.perfil!=='admin'){
-        window.location.href='login.html?denied=1';
-        return false;
-      }
-      return true;
-    },
-
-    /* Injeta barra de sessão no topo do body */
-    injectSessionBar(){
-      const s=getSession();
-      if(!s)return;
-      const bar=document.createElement('div');
-      bar.id='gr7-session-bar';
-      bar.innerHTML=`
-        <div class="gsb-inner">
-          <div class="gsb-av" style="background:${s.cor}22;color:${s.cor}">${ini(s.nome)}</div>
-          <div class="gsb-info">
-            <span class="gsb-name">${s.nome}</span>
-            <span class="gsb-role">${s.cargo}</span>
-          </div>
-          <div class="gsb-badge ${s.perfil==='admin'?'admin':'colab'}">${s.perfil==='admin'?'👑 Admin':'👤 Colaborador'}</div>
-          <button class="gsb-logout" onclick="GR7Auth.logout()">Sair →</button>
-        </div>`;
-      const style=document.createElement('style');
-      style.textContent=`
-        #gr7-session-bar{position:fixed;top:0;left:0;right:0;z-index:9000;background:#0e1018;border-bottom:1px solid #252738;padding:0 24px}
-        .gsb-inner{display:flex;align-items:center;gap:12px;height:44px;max-width:1400px;margin:0 auto}
-        .gsb-av{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;flex-shrink:0}
-        .gsb-name{font-size:13px;font-weight:600;color:#dde1f0}
-        .gsb-role{font-size:11px;color:#5a5e78;margin-left:8px}
-        .gsb-badge{padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.5px;flex-shrink:0}
-        .gsb-badge.admin{background:rgba(232,121,249,.12);color:#e879f9;border:1px solid rgba(232,121,249,.2)}
-        .gsb-badge.colab{background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.2)}
-        .gsb-logout{margin-left:auto;padding:5px 12px;border-radius:7px;border:1px solid #252738;background:transparent;color:#5a5e78;font-size:11px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
-        .gsb-logout:hover{border-color:#f87171;color:#f87171}
-        body{padding-top:44px!important}`;
-      document.head.appendChild(style);
-      document.body.prepend(bar);
-    },
-
-    /* Esconde elementos com data-admin-only se não for admin */
-    applyPermissions(){
-      const admin=this.isAdmin();
-      document.querySelectorAll('[data-admin-only]').forEach(el=>{
-        el.style.display=admin?'':'none';
-      });
-      document.querySelectorAll('[data-colab-only]').forEach(el=>{
-        el.style.display=admin?'none':'';
-      });
-    },
-
-    /* Login — chama do login.html */
-    async doLogin(colaboradorId,pin){
-      const hash=await sha256(pin);
-      const r=await fetch(`${SURL}/rest/v1/colaboradores?id=eq.${colaboradorId}&pin_hash=eq.${hash}&ativo=eq.true&select=id,nome,cargo,cor,perfil`,{headers:SH});
-      const data=await r.json();
-      if(!Array.isArray(data)||!data.length)return null;
-      const u=data[0];
-      setSession(u);
-      return u;
-    },
-
-    /* Carrega lista de colaboradores para o select de login */
-    async loadColaboradores(){
-      const r=await fetch(`${SURL}/rest/v1/colaboradores?ativo=eq.true&select=id,nome,cargo,cor,perfil&order=nome`,{headers:SH});
-      return r.json();
-    }
-  };
-
-  function ini(n){const p=(n||'').trim().split(' ');return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():(n||'??').slice(0,2).toUpperCase();}
-
-})();
-
-</script>
-<script>
-/* ═══ GR7 sidebar.js — inline ═══ */
-/* ═══════════════════════════════════════════════════════════════
-   GR7 — sidebar.js  •  Menu lateral + utilitários globais
-   ═══════════════════════════════════════════════════════════════ */
-(function(){
-
-/* ══════════════════════════════════════
-   1. UTILITÁRIOS GLOBAIS
-══════════════════════════════════════ */
-window.humanizeError = function(e){
-  if(!e) return 'Erro desconhecido';
-  const msg = e.message || e.hint || e.details || String(e);
-  if(msg.includes('Failed to fetch')) return 'Sem conexão com o servidor.';
-  if(msg.includes('column') && msg.includes('does not exist')) return 'Coluna não encontrada — execute o SQL de migração no Supabase.';
-  if(msg.includes('JWT')) return 'Chave de API inválida.';
-  return msg.slice(0,120);
-};
-
-window.toast = function(msg, type){
-  let el = document.getElementById('gr7-toast');
-  if(!el){
-    el = document.createElement('div');
-    el.id = 'gr7-toast';
-    el.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#161820;border:1px solid #252738;border-radius:12px;padding:13px 18px;font-size:13px;color:#dde1f0;z-index:99999;opacity:0;transform:translateY(10px);transition:all .3s;max-width:320px;font-family:Outfit,sans-serif;pointer-events:none';
-    document.body.appendChild(el);
-  }
-  el.textContent = msg;
-  el.style.borderColor = type==='success'?'rgba(0,229,160,.4)':type==='error'?'rgba(248,113,113,.4)':'#252738';
-  el.style.color = type==='success'?'#00e5a0':type==='error'?'#f87171':'#dde1f0';
-  el.style.opacity = '1'; el.style.transform = 'translateY(0)';
-  clearTimeout(el._t);
-  el._t = setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(10px)'; }, 3000);
-};
-
-window.gr7Alert = function({title='', message='', icon='ℹ️'}={}){
-  return new Promise(resolve => {
-    const bg = _makeModalBg();
-    bg.innerHTML = `<div style="${_modalBox()}">
-      <div style="font-size:32px;margin-bottom:12px">${icon}</div>
-      <div style="font-family:Syne,sans-serif;font-size:17px;font-weight:700;margin-bottom:8px">${title}</div>
-      <div style="font-size:13px;color:#8a8faa;margin-bottom:22px;line-height:1.6">${message}</div>
-      <div style="display:flex;justify-content:flex-end">
-        <button id="_gr7ok" style="${_btnStyle('#818cf8')}">OK</button>
-      </div></div>`;
-    document.body.appendChild(bg);
-    bg.querySelector('#_gr7ok').onclick = () => { bg.remove(); resolve(); };
-  });
-};
-
-window.gr7Confirm = function({title='', message='', confirmText='Confirmar', cancelText='Cancelar', danger=false, icon='❓'}={}){
-  return new Promise(resolve => {
-    const bg = _makeModalBg();
-    const btnColor = danger ? '#f87171' : '#818cf8';
-    bg.innerHTML = `<div style="${_modalBox()}">
-      <div style="font-size:32px;margin-bottom:12px">${icon}</div>
-      <div style="font-family:Syne,sans-serif;font-size:17px;font-weight:700;margin-bottom:8px">${title}</div>
-      <div style="font-size:13px;color:#8a8faa;margin-bottom:22px;line-height:1.6">${message}</div>
-      <div style="display:flex;gap:10px;justify-content:flex-end">
-        <button id="_gr7no" style="${_btnStyle('#252738',true)}">${cancelText}</button>
-        <button id="_gr7yes" style="${_btnStyle(btnColor)}">${confirmText}</button>
-      </div></div>`;
-    document.body.appendChild(bg);
-    bg.querySelector('#_gr7yes').onclick = () => { bg.remove(); resolve(true); };
-    bg.querySelector('#_gr7no').onclick  = () => { bg.remove(); resolve(false); };
-  });
-};
-
-window.gr7DirtyGuard = function({fieldIds=[], closeFn=()=>{}, interceptEl=[], confirmOpts={}}={}){
-  const initVals = {};
-  fieldIds.forEach(id => { const el=document.getElementById(id); if(el) initVals[id]=el.value; });
-  function isDirty(){ return fieldIds.some(id=>{ const el=document.getElementById(id); return el&&el.value!==initVals[id]; }); }
-  async function intercept(e){
-    // Só fecha se clicou EXATAMENTE neste elemento (não em filhos)
-    if(e && e.target !== e.currentTarget) return;
-    if(!isDirty()){ closeFn(); return; }
-    e && e.preventDefault && e.preventDefault();
-    const ok = await gr7Confirm({...{title:'Descartar?',message:'Alterações serão perdidas.',confirmText:'Descartar',cancelText:'Continuar'},...confirmOpts});
-    if(ok) closeFn();
-  }
-  const handlers = [];
-  interceptEl.forEach(el => {
-    if(!el) return;
-    const fn = e => { intercept(e); };
-    el.addEventListener('click', fn);
-    handlers.push({el, fn});
-  });
-  return { destroy(){ handlers.forEach(({el,fn})=>el.removeEventListener('click',fn)); } };
-};
-
-/* ── Skeletons ── */
-function _sk(w,h,r=8){ return `<div style="width:${w};height:${h}px;border-radius:${r}px;background:linear-gradient(90deg,#161820 25%,#1e2030 50%,#161820 75%);background-size:200% 100%;animation:skshimmer 1.4s infinite;flex-shrink:0"></div>`; }
-if(!document.getElementById('_skshimmer-style')){
-  const s=document.createElement('style');
-  s.id='_skshimmer-style';
-  s.textContent='@keyframes skshimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}';
-  document.head.appendChild(s);
-}
-window.gr7Skeletons = {
-  userPills(n=4){ return Array(n).fill(0).map(()=>`<div style="display:flex;align-items:center;gap:12px;background:#161820;border:1px solid #252738;border-radius:12px;padding:12px 14px">${_sk('38px',38,10)}${_sk('60%',14)}</div>`).join(''); },
-  clientRows(n=5){ return Array(n).fill(0).map(()=>`<div style="display:grid;grid-template-columns:1fr 120px 130px 110px;gap:12px;padding:13px 24px;border-bottom:1px solid #252738">${_sk('180px',14)}${_sk('80px',14)}${_sk('110px',10,99)}${_sk('60px',5,99)}</div>`).join(''); },
-  clientTable(n=5){ return Array(n).fill(0).map(()=>`<div style="display:grid;grid-template-columns:1fr 100px 120px 80px 60px;gap:12px;padding:13px 18px;border-bottom:1px solid #252738;align-items:center">${_sk('160px',14)}${_sk('70px',12)}${_sk('90px',10,99)}${_sk('50px',5,99)}${_sk('50px',14)}</div>`).join(''); },
-  implantCards(n=8){ return Array(n).fill(0).map(()=>`<div style="background:#0e1018;border:1.5px solid #252738;border-radius:18px;padding:28px 16px 18px;display:flex;flex-direction:column;align-items:center;gap:12px">${_sk('80px',80,99)}${_sk('100px',14)}${_sk('60px',10,99)}</div>`).join(''); },
-  projetoShell(){ return `<div style="padding:40px;text-align:center;color:#5a5e78">Carregando projeto...</div>`; },
-  colabCols(n=3){ return Array(n).fill(0).map(()=>`<div style="background:#0e1018;border:1px solid #252738;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px">${_sk('80%',16)}${_sk('100%',8,99)}${_sk('60%',12)}</div>`).join(''); },
-  rankingRows(n=5){ return Array(n).fill(0).map(()=>`<div style="display:grid;grid-template-columns:46px 44px 1fr 200px 64px;gap:12px;padding:14px 24px;border-bottom:1px solid #252738;align-items:center">${_sk('30px',30,8)}${_sk('36px',36,10)}${_sk('140px',14)}${_sk('100%',7,99)}${_sk('40px',14)}</div>`).join(''); },
-  collaboratorCards(n=3){ return Array(n).fill(0).map(()=>`<div style="background:#0e1018;border:1px solid #252738;border-radius:14px;overflow:hidden"><div style="padding:20px 20px 16px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #252738">${_sk('48px',48,14)}${_sk('120px',16)}</div><div style="padding:16px 20px">${_sk('100%',7,99)}</div></div>`).join(''); },
-};
-
-function _makeModalBg(){
-  const bg=document.createElement('div');
-  bg.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:99000;backdrop-filter:blur(4px);padding:20px';
-  return bg;
-}
-function _modalBox(){ return 'background:#0e1018;border:1px solid #252738;border-radius:20px;padding:32px;width:100%;max-width:420px;text-align:center;color:#dde1f0;font-family:Outfit,sans-serif'; }
-function _btnStyle(bg, outline=false){ return `padding:9px 22px;border-radius:9px;border:1px solid ${bg};background:${outline?'transparent':bg};color:${outline?'#8a8faa':'#fff'};font-family:Outfit,sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s`; }
-
-/* ══════════════════════════════════════
-   2. SIDEBAR HTML + STYLES
-══════════════════════════════════════ */
-const NAV_ITEMS = [
-  { href:'index.html',              icon:'🏠', label:'Dashboard'    },
-  { href:'clientes.html',           icon:'🏢', label:'Clientes'     },
-  { href:'implantacao.html',        icon:'🚀', label:'Implantação'  },
-  { href:'tarefas.html',            icon:'📌', label:'Tarefas'      },
-  { href:'Checklist.html',          icon:'✅', label:'Checklist'    },
-  { href:'relatorios-checklist.html',icon:'📊',label:'Relatórios'  },
-  { href:'colaboradores.html',      icon:'👥', label:'Colaboradores', adminOnly: false },
-];
-
-const SIDEBAR_CSS = `
-  #gr7-sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1099;display:none}
-  #gr7-sidebar-overlay.open{display:block}
-  #gr7-sidebar{position:fixed;top:0;left:0;bottom:0;width:200px;background:#0e1018;border-right:1px solid #252738;z-index:1100;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
-  #gr7-sidebar.open{transform:translateX(0)}
-  .gsb-logo{display:flex;align-items:center;gap:12px;padding:22px 18px 18px;border-bottom:1px solid #252738;flex-shrink:0}
-  .gsb-mark{width:38px;height:38px;background:linear-gradient(135deg,#818cf8,#e879f9);border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:#fff;flex-shrink:0}
-  .gsb-brand{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#dde1f0}
-  .gsb-brand-sub{font-size:10px;color:#5a5e78;margin-top:1px}
-  .gsb-nav{padding:14px 10px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px}
-  .gsb-section{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#5a5e78;padding:10px 8px 6px;margin-top:4px}
-  .gsb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;text-decoration:none;color:#8a8faa;font-size:13px;font-weight:500;transition:all .18s;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:'Outfit',sans-serif}
-  .gsb-item:hover{background:#161820;color:#dde1f0}
-  .gsb-item.active{background:rgba(129,140,248,.12);color:#818cf8;font-weight:600}
-  .gsb-item-icon{font-size:16px;flex-shrink:0;width:22px;text-align:center}
-  .gsb-footer{padding:14px 10px;border-top:1px solid #252738;flex-shrink:0}
-  .gsb-user{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:#161820;margin-bottom:8px}
-  .gsb-user-av{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;flex-shrink:0}
-  .gsb-user-info{flex:1;min-width:0}
-  .gsb-user-name{font-size:12px;font-weight:600;color:#dde1f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .gsb-user-role{font-size:10px;color:#5a5e78;margin-top:1px}
-  .gsb-logout{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;border-radius:8px;border:1px solid #252738;background:transparent;color:#5a5e78;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
-  .gsb-logout:hover{border-color:#f87171;color:#f87171}
-  #gr7-menu-btn{position:fixed;top:14px;left:14px;z-index:1098;width:38px;height:38px;border-radius:10px;background:#0e1018;border:1px solid #252738;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:border-color .15s}
-  #gr7-menu-btn:hover{border-color:#818cf8}
-  #gr7-menu-btn span{display:block;width:18px;height:2px;background:#8a8faa;border-radius:2px;transition:all .2s}
-  body{padding-left:0!important}
-  @media(min-width:900px){
-    #gr7-sidebar{transform:translateX(0)!important}
-    #gr7-sidebar-overlay{display:none!important}
-    #gr7-menu-btn{display:none!important}
-    body{padding-left:200px!important}
-  }
-`;
-
-function injectSidebar(){
-  // Style
-  const styleEl = document.createElement('style');
-  styleEl.textContent = SIDEBAR_CSS;
-  document.head.appendChild(styleEl);
-
-  const session = (window.GR7Auth && GR7Auth.getSession()) || null;
-  const isAdmin = session && session.perfil === 'admin';
-  const curPage = location.pathname.split('/').pop() || 'index.html';
-
-  function ini(n){ const p=(n||'').trim().split(' '); return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():(n||'?').slice(0,2).toUpperCase(); }
-
-  const navHTML = NAV_ITEMS.map(item => {
-    const active = curPage === item.href ? ' active' : '';
-    return `<a class="gsb-item${active}" href="${item.href}">
-      <span class="gsb-item-icon">${item.icon}</span>${item.label}
-    </a>`;
-  }).join('');
-
-  const userBlock = session ? `
-    <div class="gsb-user">
-      <div class="gsb-user-av" style="background:${(session.cor||'#818cf8')}22;color:${session.cor||'#818cf8'}">${ini(session.nome)}</div>
-      <div class="gsb-user-info">
-        <div class="gsb-user-name">${session.nome}</div>
-        <div class="gsb-user-role">${isAdmin?'👑 Admin':'👤 Colaborador'}</div>
-      </div>
-    </div>
-    <button class="gsb-logout" onclick="GR7Auth&&GR7Auth.logout()">Sair do sistema →</button>
-  ` : '';
-
-  // Sidebar element
-  const sidebar = document.createElement('div');
-  sidebar.id = 'gr7-sidebar';
-  sidebar.innerHTML = `
-    <div class="gsb-logo">
-      <div class="gsb-mark">GR7</div>
-      <div><div class="gsb-brand">GR7</div><div class="gsb-brand-sub">Sistema de Instalações</div></div>
-    </div>
-    <nav class="gsb-nav">
-      <div class="gsb-section">Menu</div>
-      ${navHTML}
-    </nav>
-    <div class="gsb-footer">${userBlock}</div>
-  `;
-
-  // Overlay + hamburger
-  const overlay = document.createElement('div');
-  overlay.id = 'gr7-sidebar-overlay';
-  overlay.onclick = closeSidebar;
-
-  const menuBtn = document.createElement('div');
-  menuBtn.id = 'gr7-menu-btn';
-  menuBtn.innerHTML = '<span></span><span></span><span></span>';
-  menuBtn.onclick = toggleSidebar;
-
-  document.body.prepend(menuBtn);
-  document.body.prepend(overlay);
-  document.body.prepend(sidebar);
-}
-
-function toggleSidebar(){
-  document.getElementById('gr7-sidebar').classList.toggle('open');
-  document.getElementById('gr7-sidebar-overlay').classList.toggle('open');
-}
-function closeSidebar(){
-  document.getElementById('gr7-sidebar').classList.remove('open');
-  document.getElementById('gr7-sidebar-overlay').classList.remove('open');
-}
-
-// Auto-inject when DOM ready
-if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', injectSidebar);
-} else {
-  injectSidebar();
-}
-
-})();
-
-</script>
+<script src="auth.js"></script>
+<script src="sidebar.js"></script>
 </head>
 <body>
 <div class="blob blob1"></div><div class="blob blob2"></div>
@@ -901,6 +555,20 @@ async function addNota(){
 }
 
 if(clienteId)load();
+
+/* Realtime polling 15s */
+let _projHash='';
+setInterval(async()=>{
+  try{
+    const r=await fetch(GR7Auth.SURL+'/rest/v1/clientes_gr7?select=id&order=id.desc&limit=1',{headers:GR7Auth.SH});
+    if(r.ok){const d=await r.json();const h=JSON.stringify(d);if(_projHash&&h!==_projHash&&typeof loadProjeto==='function'){loadProjeto();toast('⚡ Dados atualizados','success');}  _projHash=h;}
+  }catch{}
+},15000);
+
+/* Realtime — sidebar.js gr7Realtime helper */
+gr7Realtime.watch('clientes_gr7', function(){
+  if(typeof loadProjeto==='function'){loadProjeto();toast('⚡ Dados atualizados','success');}
+}, 15000);
 </script>
 </body>
 </html>
