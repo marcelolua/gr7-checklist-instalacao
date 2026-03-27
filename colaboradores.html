@@ -266,8 +266,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
     <div class="mfield"><label>Cargo</label><input id="mCargo" type="text" placeholder="Ex: Técnico, Instalador"/></div>
     <div class="mfield"><label>Perfil de Acesso</label>
       <div class="role-row">
-        <div class="role-opt" id="mOptAdmin" onclick="selPerfil('admin')">👑 Administrador</div>
-        <div class="role-opt sel-colab" id="mOptColab" onclick="selPerfil('colaborador')">👤 Colaborador</div>
+        <div class="role-opt" id="mOptAdmin" onclick="event.stopPropagation();selPerfil('admin')">👑 Administrador</div>
+        <div class="role-opt sel-colab" id="mOptColab" onclick="event.stopPropagation();selPerfil('colaborador')">👤 Colaborador</div>
       </div>
     </div>
     <div class="mfield">
@@ -280,7 +280,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
       <div style="position:relative">
         <input id="mSenha" type="password" placeholder="Mínimo 4 caracteres"
           style="width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 44px 10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s"/>
-        <button onclick="toggleEye('mSenha',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px">👁</button>
+        <button onclick="event.stopPropagation();toggleEye('mSenha',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px">👁</button>
       </div>
       <div style="font-size:10px;color:var(--muted);margin-top:5px">Deixe em branco para manter a senha atual (ao editar)</div>
     </div>
@@ -531,7 +531,7 @@ let editId=null, selColor=PAL[0], selPerfil_='colaborador';
 function buildColors(sel){
   selColor=sel||PAL[0];
   document.getElementById('mColors').innerHTML=PAL.map(c=>`
-    <div class="color-dot${c===selColor?' sel':''}" style="background:${c}" onclick="pickColor('${c}',this)"></div>`).join('');
+    <div class="color-dot${c===selColor?' sel':''}" style="background:${c}" onclick="event.stopPropagation();pickColor('${c}',this)"></div>`).join('');
 }
 function pickColor(c,el){selColor=c;document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
 
@@ -636,7 +636,18 @@ async function loadPage(){
   if(isAdmin) dbGet('colaboradores?ativo=eq.true&select=id,nome,cargo,cor,perfil&order=nome').then(d=>_allColabs=d).catch(()=>{});
 }
 
-document.getElementById('modalBg').onclick=e=>{ if(e.target===e.currentTarget) closeModal(); };
+/* Fecha modal apenas clicando no fundo escuro — não em filhos */
+(function(){
+  const bg = document.getElementById('modalBg');
+  let _downOnBg = false;
+  bg.addEventListener('mousedown', e => {
+    _downOnBg = e.target === bg;
+  });
+  bg.addEventListener('click', e => {
+    if (_downOnBg && e.target === bg) closeModal();
+    _downOnBg = false;
+  });
+})();
 
 loadPage();
 
