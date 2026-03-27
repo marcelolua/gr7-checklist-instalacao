@@ -165,8 +165,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 .add-user-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--s2);border:1px dashed rgba(129,140,248,.35);border-radius:12px;padding:14px;color:var(--c0);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;grid-column:span 1}
 .add-user-btn:hover{background:rgba(129,140,248,.08);border-color:rgba(129,140,248,.6)}
 /* ── MODAL ── */
-.umodal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(4px)}
-.umodal-bg.open{display:flex}
+.umodal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);visibility:hidden;opacity:0;pointer-events:none;transition:opacity .15s,visibility .15s}
+.umodal-bg.open{visibility:visible;opacity:1;pointer-events:none}
+.umodal-bg.open > .umodal{pointer-events:auto}
 .umodal{background:var(--s1);border:1px solid var(--bdr);border-radius:20px;padding:32px;width:100%;max-width:460px;margin:20px}
 .umodal h2{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;margin-bottom:22px}
 .ufield{margin-bottom:16px}
@@ -427,8 +428,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 <div class="umodal-bg" id="umodalBg">
   <div class="umodal">
     <h2 id="umodalTitle">Novo Colaborador</h2>
-    <div class="ufield"><label>Nome</label><input id="uNome" type="text" placeholder="Ex: João Silva"/></div>
-    <div class="ufield"><label>Cargo</label><input id="uCargo" type="text" placeholder="Ex: Técnico, Instalador"/></div>
+    <div class="ufield"><label>Nome</label><input id="uNome" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Ex: João Silva"/></div>
+    <div class="ufield"><label>Cargo</label><input id="uCargo" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Ex: Técnico, Instalador"/></div>
     <div class="ufield"><label>Cor</label><div class="color-grid" id="colorGrid"></div></div>
     <div class="umodal-btns">
       <button class="btn btn-cancel" onclick="closeUModal()">Cancelar</button>
@@ -512,6 +513,7 @@ function pickColor(c,el){
   el.classList.add('sel');
 }
 
+let _umodalOpenedAt = 0;
 function openUModal(id){
   editingUserId=id||null;
   if(id){
@@ -528,10 +530,12 @@ function openUModal(id){
     buildColorGrid(PALETTE[USERS.length%PALETTE.length]);
   }
   document.getElementById('umodalBg').classList.add('open');
+  _umodalOpenedAt = Date.now();
   _initColaboradorGuard();
 }
 function closeUModal(){
   if(_colaboradorGuard){_colaboradorGuard.destroy();_colaboradorGuard=null;}
+  if(Date.now() - _umodalOpenedAt < 300) return;
   document.getElementById('umodalBg').classList.remove('open');
 }
 // click-fora do umodal é gerenciado pelo dirty guard
