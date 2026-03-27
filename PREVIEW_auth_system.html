@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GR7 — PRÉVIA: Sistema de Autenticação</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#07080d;--s1:#0e1018;--s2:#161820;--s3:#1e2030;--bdr:#252738;
+  --text:#dde1f0;--muted:#5a5e78;--r:14px;
+  --green:#00e5a0;--green2:#059669;
+  --c0:#818cf8;--c1:#38bdf8;--c2:#34d399;--c3:#fbbf24;--c4:#f87171;--c5:#e879f9;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+.blob{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0;opacity:.12}
+.blob1{width:700px;height:700px;top:-200px;left:-100px;background:var(--c0)}
+.blob2{width:500px;height:500px;bottom:-200px;right:-100px;background:var(--c5)}
+
+/* ─── PREVIEW BANNER ─── */
+.preview-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#fbbf24,#f97316);color:#000;text-align:center;padding:10px 16px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:12px}
+.preview-banner span{opacity:.7}
+
+/* ─── MAIN LAYOUT ─── */
+.shell{position:relative;z-index:10;padding:70px 44px 80px;max-width:1300px;margin:0 auto}
+.page-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:6px}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:40px}
+.sec{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:18px;margin-top:48px}
+.sec:first-of-type{margin-top:0}
+
+/* ─── NAV TABS ─── */
+.tabs{display:flex;gap:8px;margin-bottom:36px;flex-wrap:wrap}
+.tab{padding:10px 22px;border-radius:10px;border:1px solid var(--bdr);background:var(--s1);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.tab.active{background:rgba(129,140,248,.12);border-color:var(--c0);color:var(--c0)}
+.tab-pane{display:none}.tab-pane.active{display:block}
+
+/* ─── INFO BOX ─── */
+.info-box{background:rgba(129,140,248,.06);border:1px solid rgba(129,140,248,.2);border-radius:12px;padding:18px 22px;margin-bottom:32px;font-size:13px;line-height:1.7;color:var(--text)}
+.info-box strong{color:var(--c0)}
+.info-box ul{padding-left:18px;margin-top:8px}
+.info-box ul li{margin-bottom:4px}
+
+/* ─── SQL BOX ─── */
+.sql-box{background:#0a0c14;border:1px solid #1e2240;border-radius:12px;padding:22px 24px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.8;overflow-x:auto;position:relative}
+.sql-copy{position:absolute;top:12px;right:12px;background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:5px 12px;font-size:11px;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Outfit',sans-serif}
+.sql-copy:hover{border-color:var(--c0);color:var(--c0)}
+.kw{color:#818cf8}.cm{color:#4a5080;font-style:italic}.str{color:#34d399}.num{color:#fbbf24}.type{color:#38bdf8}
+
+/* ─── LOGIN PREVIEW ─── */
+.login-wrap{display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap}
+.login-preview-box{flex:1;min-width:300px;max-width:480px;background:var(--s1);border:1px solid var(--bdr);border-radius:20px;padding:40px;position:relative;overflow:hidden}
+.login-preview-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c0),var(--c5))}
+.lp-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:28px}
+.lp-logo{display:flex;align-items:center;gap:14px;margin-bottom:32px}
+.lp-mark{width:52px;height:52px;background:linear-gradient(135deg,var(--c0),var(--c5));border-radius:15px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:16px;color:#fff;box-shadow:0 0 30px rgba(129,140,248,.4)}
+.lp-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
+.lp-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.lp-label{font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;display:block}
+.lp-select-wrap{position:relative;margin-bottom:20px}
+.lp-select{width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;appearance:none;cursor:pointer;transition:border-color .2s}
+.lp-select:focus{border-color:var(--c0)}
+.lp-select-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);font-size:12px}
+.lp-pin-wrap{margin-bottom:24px}
+.lp-pin-dots{display:flex;gap:10px;margin-top:10px;justify-content:center}
+.lp-pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--bdr);background:transparent;transition:all .2s}
+.lp-pin-dot.filled{background:var(--c0);border-color:var(--c0);box-shadow:0 0 10px rgba(129,140,248,.5)}
+.lp-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.lp-num{background:var(--s2);border:1px solid var(--bdr);border-radius:10px;padding:14px;text-align:center;font-family:'Syne',sans-serif;font-size:20px;font-weight:700;cursor:pointer;transition:all .15s;user-select:none}
+.lp-num:hover{background:var(--s3);border-color:var(--c0);color:var(--c0)}
+.lp-num:active{transform:scale(.93)}
+.lp-num.del{font-size:14px;color:var(--muted)}
+.lp-num.zero{grid-column:2}
+.lp-btn-enter{width:100%;margin-top:18px;padding:14px;border-radius:11px;background:linear-gradient(135deg,var(--c0),var(--c5));border:none;color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.5px}
+.lp-btn-enter:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 12px 32px rgba(129,140,248,.4)}
+.lp-btn-enter:disabled{opacity:.4;cursor:default;transform:none}
+.lp-err{color:var(--c4);font-size:12px;text-align:center;margin-top:12px;height:18px;transition:all .2s}
+.lp-err.shake{animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.lp-success{background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.25);border-radius:10px;padding:14px;text-align:center;font-size:13px;color:var(--green);display:none}
+.lp-success.show{display:block}
+
+/* ─── ROLE EXPLAIN ─── */
+.roles-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;flex:1;min-width:280px}
+.role-card{background:var(--s1);border:1px solid var(--bdr);border-radius:16px;padding:22px;position:relative;overflow:hidden}
+.role-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.role-card.admin::before{background:linear-gradient(90deg,var(--c5),var(--c4))}
+.role-card.colab::before{background:linear-gradient(90deg,var(--c1),var(--c0))}
+.role-icon{font-size:28px;margin-bottom:10px}
+.role-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px}
+.role-desc{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6}
+.perm-list{display:flex;flex-direction:column;gap:7px}
+.perm-row{display:flex;align-items:center;gap:8px;font-size:12px}
+.perm-icon{width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.perm-icon.ok{background:rgba(0,229,160,.15);color:var(--green)}
+.perm-icon.no{background:rgba(248,113,113,.12);color:var(--c4)}
+.perm-icon.warn{background:rgba(251,191,36,.12);color:var(--c3)}
+
+/* ─── MODAL PREVIEW ─── */
+.modal-preview{background:var(--s1);border:1.5px solid var(--bdr);border-radius:20px;padding:30px;max-width:440px;position:relative;overflow:hidden}
+.modal-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c0),var(--c5))}
+.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.modal-field{margin-bottom:14px}
+.modal-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.modal-input{width:100%;background:var(--s2);border:1px solid var(--bdr);border-radius:9px;padding:10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none}
+.modal-input:focus{border-color:var(--c0)}
+.role-toggle{display:flex;gap:8px}
+.role-opt{flex:1;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px;text-align:center;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s}
+.role-opt.sel-admin{background:rgba(232,121,249,.1);border-color:rgba(232,121,249,.4);color:var(--c5)}
+.role-opt.sel-colab{background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.35);color:var(--c1)}
+.modal-btns{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+.mbtn{padding:9px 20px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s;font-family:'Outfit',sans-serif}
+.mbtn.cancel{background:transparent;border-color:var(--bdr);color:var(--muted)}
+.mbtn.save{background:var(--c0);border-color:var(--c0);color:#fff}
+.mbtn.save:hover{opacity:.85}
+.pin-field-wrap{position:relative}
+.pin-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px}
+
+/* ─── SESSION BAR PREVIEW ─── */
+.session-bar{background:var(--s1);border:1px solid var(--bdr);border-radius:14px;padding:14px 22px;display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.sb-avatar{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;flex-shrink:0}
+.sb-info{flex:1;min-width:0}
+.sb-name{font-size:14px;font-weight:600}
+.sb-role{font-size:11px;color:var(--muted);margin-top:2px}
+.sb-badge{padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.5px}
+.sb-badge.admin{background:rgba(232,121,249,.12);color:var(--c5);border:1px solid rgba(232,121,249,.25)}
+.sb-badge.colab{background:rgba(56,189,248,.1);color:var(--c1);border:1px solid rgba(56,189,248,.25)}
+.sb-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bdr);background:transparent;color:var(--muted);transition:all .15s;font-family:'Outfit',sans-serif}
+.sb-btn:hover{border-color:var(--c4);color:var(--c4)}
+
+/* ─── FLOW STEPS ─── */
+.flow{display:flex;gap:0;flex-wrap:wrap;align-items:stretch;margin:24px 0}
+.flow-step{background:var(--s1);border:1px solid var(--bdr);border-radius:14px;padding:20px;flex:1;min-width:180px;position:relative}
+.flow-step:not(:last-child)::after{content:'→';position:absolute;right:-18px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px;z-index:2}
+.flow-step+.flow-step{margin-left:20px}
+.flow-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:8px}
+.flow-icon{font-size:24px;margin-bottom:8px}
+.flow-label{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:4px}
+.flow-desc{font-size:11px;color:var(--muted);line-height:1.5}
+@media(max-width:700px){.flow{flex-direction:column}.flow-step+.flow-step{margin-left:0;margin-top:12px}.flow-step:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-16px;transform:translateX(-50%)}.roles-grid{grid-template-columns:1fr}.login-wrap{flex-direction:column}}
+@media(max-width:900px){.shell{padding:70px 20px 60px}}
+
+/* ─── INTERACTIVE DEMO ─── */
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex-wrap:wrap}
+@media(max-width:900px){.demo-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="blob blob1"></div><div class="blob blob2"></div>
+
+<div class="preview-banner">
+  ⚠️ PRÉVIA — SISTEMA DE AUTENTICAÇÃO GR7 &nbsp;|&nbsp; <span>Visualize como ficará antes de aplicar ao projeto</span>
+</div>
+
+<div class="shell">
+  <h1 class="page-title">🔐 Sistema de Autenticação e Permissões</h1>
+  <p class="page-sub">Prévia completa — veja como o sistema funcionará antes de ser aplicado ao projeto</p>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('fluxo')">1. Fluxo de Acesso</div>
+    <div class="tab" onclick="showTab('login')">2. Tela de Login (Demo)</div>
+    <div class="tab" onclick="showTab('permissoes')">3. Permissões por Perfil</div>
+    <div class="tab" onclick="showTab('cadastro')">4. Cadastro de Colaboradores</div>
+    <div class="tab" onclick="showTab('sql')">5. SQL Supabase</div>
+  </div>
+
+  <!-- ══════════ TAB 1: FLUXO ══════════ -->
+  <div class="tab-pane active" id="tab-fluxo">
+    <div class="info-box">
+      <strong>Como o sistema funcionará:</strong> Ao abrir qualquer página do sistema GR7, o colaborador verá uma tela de login. Ele seleciona seu nome na lista e digita seu PIN de 4 dígitos. O sistema valida e libera o acesso conforme o perfil: <strong>Administrador</strong> tem acesso total, <strong>Colaborador</strong> tem acesso restrito às suas funções.
+    </div>
+
+    <p class="sec">Fluxo de acesso</p>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">PASSO 01</div>
+        <div class="flow-icon">🚀</div>
+        <div class="flow-label">Acessa o Sistema</div>
+        <div class="flow-desc">Usuário abre qualquer página do GR7</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">PASSO 02</div>
+        <div class="flow-icon">🔐</div>
+        <div class="flow-label">Tela de Login</div>
+        <div class="flow-desc">Seleciona nome e digita PIN de 4 dígitos</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">PASSO 03</div>
+        <div class="flow-icon">✅</div>
+        <div class="flow-label">Validação</div>
+        <div class="flow-desc">Supabase valida o PIN do colaborador</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">PASSO 04</div>
+        <div class="flow-icon">🛡️</div>
+        <div class="flow-label">Acesso Liberado</div>
+        <div class="flow-desc">Telas bloqueadas/liberadas por perfil</div>
+      </div>
+    </div>
+
+    <p class="sec">Sessão ativa — como aparece no sistema</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Após login, uma barra de sessão aparece no topo de cada página mostrando quem está logado:</p>
+
+    <div class="session-bar">
+      <div class="sb-avatar" style="background:#e879f922;color:#e879f9">AD</div>
+      <div class="sb-info">
+        <div class="sb-name">Anderson Diretor</div>
+        <div class="sb-role">Administrador · Sessão iniciada às 09:14</div>
+      </div>
+      <div class="sb-badge admin">👑 ADMIN</div>
+      <button class="sb-btn">Sair →</button>
+    </div>
+
+    <div class="session-bar">
+      <div class="sb-avatar" style="background:#38bdf822;color:#38bdf8">JT</div>
+      <div class="sb-info">
+        <div class="sb-name">João Técnico</div>
+        <div class="sb-role">Colaborador · Sessão iniciada às 08:30</div>
+      </div>
+      <div class="sb-badge colab">👤 COLABORADOR</div>
+      <button class="sb-btn">Sair →</button>
+    </div>
+
+    <p class="sec">Segurança da sessão</p>
+    <div class="info-box">
+      <strong>Como a segurança funciona:</strong>
+      <ul>
+        <li>PIN de 4 dígitos armazenado como hash SHA-256 — ninguém vê o PIN real</li>
+        <li>Sessão salva em <code style="font-size:11px;background:#1e2030;padding:1px 5px;border-radius:4px">sessionStorage</code> — expira ao fechar o navegador</li>
+        <li>Sessão expira automaticamente após <strong>8 horas</strong> de inatividade</li>
+        <li>3 tentativas erradas de PIN bloqueiam o acesso por 30 segundos</li>
+        <li>Ao clicar "Sair" a sessão é destruída imediatamente</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 2: LOGIN DEMO ══════════ -->
+  <div class="tab-pane" id="tab-login">
+    <div class="info-box" style="margin-bottom:28px">
+      <strong>Demo interativa:</strong> Esta é exatamente a tela que aparecerá ao abrir o sistema. Selecione um usuário e digite um PIN (use <strong>1234</strong> para Admin ou <strong>5678</strong> para Colaborador nesta demo).
+    </div>
+
+    <div class="login-wrap">
+      <div class="login-preview-box">
+        <div class="lp-tag">GR7 — SISTEMA DE GESTÃO</div>
+        <div class="lp-logo">
+          <div class="lp-mark">GR7</div>
+          <div>
+            <div class="lp-title">Bem-vindo</div>
+            <div class="lp-sub">Identifique-se para continuar</div>
+          </div>
+        </div>
+
+        <label class="lp-label">Selecione seu usuário</label>
+        <div class="lp-select-wrap">
+          <select class="lp-select" id="demoUser" onchange="demoSelectUser()">
+            <option value="">— escolha seu nome —</option>
+            <option value="admin">👑 Anderson Diretor (Admin)</option>
+            <option value="colab">👤 João Técnico (Colaborador)</option>
+            <option value="colab2">👤 Maria Instaladora (Colaborador)</option>
+          </select>
+          <div class="lp-select-arrow">▼</div>
+        </div>
+
+        <div class="lp-pin-wrap">
+          <label class="lp-label">Digite seu PIN (4 dígitos)</label>
+          <div class="lp-pin-dots" id="pinDots">
+            <div class="lp-pin-dot" id="d0"></div>
+            <div class="lp-pin-dot" id="d1"></div>
+            <div class="lp-pin-dot" id="d2"></div>
+            <div class="lp-pin-dot" id="d3"></div>
+          </div>
+        </div>
+
+        <div class="lp-numpad">
+          <div class="lp-num" onclick="demoPin(1)">1</div>
+          <div class="lp-num" onclick="demoPin(2)">2</div>
+          <div class="lp-num" onclick="demoPin(3)">3</div>
+          <div class="lp-num" onclick="demoPin(4)">4</div>
+          <div class="lp-num" onclick="demoPin(5)">5</div>
+          <div class="lp-num" onclick="demoPin(6)">6</div>
+          <div class="lp-num" onclick="demoPin(7)">7</div>
+          <div class="lp-num" onclick="demoPin(8)">8</div>
+          <div class="lp-num" onclick="demoPin(9)">9</div>
+          <div class="lp-num del" onclick="demoBack()">⌫</div>
+          <div class="lp-num zero" onclick="demoPin(0)">0</div>
+        </div>
+
+        <div class="lp-err" id="demoErr"></div>
+        <div class="lp-success" id="demoSuccess">✅ Login realizado! Redirecionando...</div>
+        <button class="lp-btn-enter" id="demoBtn" onclick="demoLogin()">Entrar →</button>
+      </div>
+
+      <div style="flex:1;min-width:280px;display:flex;flex-direction:column;gap:16px">
+        <div class="info-box" style="margin-bottom:0">
+          <strong>PINs desta demo:</strong>
+          <ul style="margin-top:8px">
+            <li>👑 Anderson Diretor → PIN: <strong>1234</strong></li>
+            <li>👤 João Técnico → PIN: <strong>5678</strong></li>
+            <li>👤 Maria Instaladora → PIN: <strong>9999</strong></li>
+          </ul>
+        </div>
+        <div style="background:var(--s1);border:1px solid var(--bdr);border-radius:14px;padding:20px">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px">⚠️ Proteção contra força bruta</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.7">Após <strong style="color:var(--c4)">3 tentativas erradas</strong> consecutivas, o login é bloqueado por 30 segundos. O contador e o bloqueio aparecem na tela em tempo real.</div>
+          <div style="margin-top:14px;background:var(--s2);border-radius:9px;padding:12px;font-size:12px;color:var(--c4);display:flex;align-items:center;gap:8px">
+            🔒 Bloqueado por <strong>28s</strong> — Tente novamente em instantes
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 3: PERMISSÕES ══════════ -->
+  <div class="tab-pane" id="tab-permissoes">
+    <div class="info-box">
+      <strong>Dois perfis de acesso:</strong> O sistema terá exatamente dois níveis. Cada colaborador é cadastrado como <strong>Administrador</strong> ou <strong>Colaborador</strong>. O perfil define o que cada pessoa pode ver e fazer.
+    </div>
+
+    <div class="login-wrap" style="gap:24px">
+      <div class="roles-grid">
+        <div class="role-card admin" style="grid-column:1/-1">
+          <div class="role-icon">👑</div>
+          <div class="role-name" style="color:var(--c5)">Administrador</div>
+          <div class="role-desc">Acesso irrestrito a todas as funcionalidades. Pode gerenciar usuários, ver todos os dados e fazer qualquer alteração.</div>
+          <div class="perm-list">
+            <div class="perm-row"><div class="perm-icon ok">✓</div> Ver dashboard completo e ranking</div>
+            <div class="perm-row"><div class="perm-icon ok">✓</div> Adicionar / editar / remover colaboradores</div>
+            <div class="perm-row"><div class="perm-icon ok">✓</div> Definir perfil e PIN de outros usuários</div>
+            <div class="perm-row"><div class="perm-icon ok">✓</div> Cadastrar / editar / excluir clientes</div>
+            <div class="perm-row"><div class="perm-icon ok">✓</div> Editar checklists de qualquer colaborador</div>
+            <div class="perm-row"><div class="perm-icon ok">✓</div> Ver e gerar relatórios completos</div>
+            <div class="perm-row"><div class="perm-icon ok">✓</div> Alterar status de implantação (Novo/Implantando/Ativo)</div>
+            <div class="perm-row"><div class="perm-icon ok">✓</div> Gerenciar tarefas de todos os projetos</div>
+          </div>
+        </div>
+        <div class="role-card colab" style="grid-column:1/-1">
+          <div class="role-icon">👤</div>
+          <div class="role-name" style="color:var(--c1)">Colaborador</div>
+          <div class="role-desc">Acesso limitado às suas próprias tarefas e projetos. Pode trabalhar normalmente sem alterar configurações do sistema.</div>
+          <div class="perm-list">
+            <div class="perm-row"><div class="perm-icon ok">✓</div> Ver dashboard (sem dados de outros colaboradores)</div>
+            <div class="perm-row"><div class="perm-icon ok">✓</div> Acessar e preencher seu próprio checklist</div>
+            <div class="perm-row"><div class="perm-icon ok">✓</div> Ver projetos em que está atribuído</div>
+            <div class="perm-row"><div class="perm-icon ok">✓</div> Marcar tarefas como concluídas</div>
+            <div class="perm-row"><div class="perm-icon warn">⚠</div> Ver clientes (somente leitura, sem editar)</div>
+            <div class="perm-row"><div class="perm-icon no">✕</div> Não pode adicionar/remover outros usuários</div>
+            <div class="perm-row"><div class="perm-icon no">✕</div> Não pode alterar status de implantação</div>
+            <div class="perm-row"><div class="perm-icon no">✕</div> Não pode acessar checklists de outros</div>
+            <div class="perm-row"><div class="perm-icon no">✕</div> Não pode gerar relatórios globais</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="sec" style="margin-top:32px">Como as restrições aparecem na tela</p>
+    <div class="info-box">
+      Botões restritos ficam <strong style="color:var(--c4)">ocultos ou desabilitados</strong> para colaboradores. Se tentar acessar uma URL restrita diretamente, é redirecionado para o login com uma mensagem de <strong>acesso negado</strong>. Não há mensagem de erro confusa — apenas o fluxo correto.
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 4: CADASTRO ══════════ -->
+  <div class="tab-pane" id="tab-cadastro">
+    <div class="info-box">
+      <strong>Mudança no cadastro de colaboradores:</strong> O modal de cadastro ganhará dois campos novos: <strong>Perfil</strong> (Admin ou Colaborador) e <strong>PIN de acesso</strong> (4 dígitos). O administrador define o PIN ao criar o usuário; o colaborador usa esse PIN para entrar.
+    </div>
+
+    <div class="demo-grid">
+      <div>
+        <p class="sec" style="margin-top:0">Modal atualizado — Novo Colaborador</p>
+        <div class="modal-preview">
+          <div class="modal-title">➕ Novo Colaborador</div>
+
+          <div class="modal-field">
+            <label>Nome</label>
+            <input class="modal-input" type="text" placeholder="Ex: João Silva" value=""/>
+          </div>
+          <div class="modal-field">
+            <label>Cargo</label>
+            <input class="modal-input" type="text" placeholder="Ex: Técnico, Instalador" value=""/>
+          </div>
+
+          <div class="modal-field">
+            <label>Perfil de Acesso</label>
+            <div class="role-toggle">
+              <div class="role-opt" id="optAdmin" onclick="selectRole('admin')" style="cursor:pointer">👑 Administrador</div>
+              <div class="role-opt sel-colab" id="optColab" onclick="selectRole('colab')" style="cursor:pointer">👤 Colaborador</div>
+            </div>
+          </div>
+
+          <div class="modal-field">
+            <label>PIN de Acesso (4 dígitos)</label>
+            <div class="pin-field-wrap">
+              <input class="modal-input" type="password" id="pinPreview" placeholder="••••" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)" style="letter-spacing:8px;font-size:20px;padding-right:44px"/>
+              <button class="pin-toggle" onclick="togglePin()" title="Mostrar/ocultar">👁</button>
+            </div>
+          </div>
+
+          <div class="modal-field">
+            <label>Cor do Avatar</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="colorDemo">
+              <!-- filled by JS -->
+            </div>
+          </div>
+
+          <div class="modal-btns">
+            <button class="mbtn cancel">Cancelar</button>
+            <button class="mbtn save">Salvar Colaborador</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p class="sec" style="margin-top:0">Lista de colaboradores atualizada</p>
+        <div style="background:var(--s1);border:1px solid var(--bdr);border-radius:16px;overflow:hidden">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--bdr);font-family:'Syne',sans-serif;font-size:14px;font-weight:700">👥 Equipe · 3 membros</div>
+          <div id="pillsDemo" style="padding:16px;display:flex;flex-direction:column;gap:10px"></div>
+        </div>
+
+        <div class="info-box" style="margin-top:16px">
+          <strong>Alterar PIN:</strong> O administrador pode editar qualquer colaborador e definir um novo PIN a qualquer momento. O colaborador não consegue alterar o próprio PIN.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 5: SQL ══════════ -->
+  <div class="tab-pane" id="tab-sql">
+    <div class="info-box">
+      <strong>Alterações no banco de dados:</strong> São necessárias apenas <strong>2 colunas novas</strong> na tabela <code style="font-size:11px;background:#1e2030;padding:1px 6px;border-radius:4px">colaboradores</code> no Supabase. Execute o SQL abaixo no <strong>SQL Editor</strong> do seu projeto Supabase. Nenhuma outra tabela é alterada.
+    </div>
+
+    <p class="sec" style="margin-top:0">SQL para executar no Supabase (SQL Editor)</p>
+    <div class="sql-box">
+      <button class="sql-copy" onclick="copySql('sql1')">📋 Copiar</button>
+      <pre id="sql1"><span class="cm">-- ═══════════════════════════════════════════════════
+-- GR7 — Adicionar autenticação por PIN à tabela colaboradores
+-- Execute este bloco no Supabase SQL Editor
+-- ═══════════════════════════════════════════════════</span>
+
+<span class="cm">-- 1. Adicionar coluna de perfil (admin ou colaborador)</span>
+<span class="kw">ALTER TABLE</span> colaboradores
+  <span class="kw">ADD COLUMN IF NOT EXISTS</span> perfil <span class="type">TEXT</span>
+  <span class="kw">NOT NULL DEFAULT</span> <span class="str">'colaborador'</span>
+  <span class="kw">CHECK</span> (perfil <span class="kw">IN</span> (<span class="str">'admin'</span>, <span class="str">'colaborador'</span>));
+
+<span class="cm">-- 2. Adicionar coluna de PIN (hash SHA-256, 64 caracteres)</span>
+<span class="kw">ALTER TABLE</span> colaboradores
+  <span class="kw">ADD COLUMN IF NOT EXISTS</span> pin_hash <span class="type">TEXT</span>;
+
+<span class="cm">-- 3. (Opcional) Definir PIN padrão para colaboradores existentes
+--    PIN padrão: 1234  →  hash SHA-256 abaixo</span>
+<span class="kw">UPDATE</span> colaboradores
+  <span class="kw">SET</span> pin_hash = <span class="str">'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'</span>
+  <span class="kw">WHERE</span> pin_hash <span class="kw">IS NULL</span>;
+
+<span class="cm">-- 4. Verificar resultado</span>
+<span class="kw">SELECT</span> id, nome, cargo, perfil,
+       <span class="kw">CASE WHEN</span> pin_hash <span class="kw">IS NOT NULL THEN</span> <span class="str">'✅ PIN definido'</span>
+            <span class="kw">ELSE</span> <span class="str">'⚠️ Sem PIN'</span> <span class="kw">END</span> <span class="kw">AS</span> status_pin
+<span class="kw">FROM</span> colaboradores
+<span class="kw">ORDER BY</span> id;</pre>
+    </div>
+
+    <p class="sec">Arquivos do projeto que serão modificados</p>
+    <div class="info-box">
+      <strong>Resumo das mudanças por arquivo:</strong>
+      <ul>
+        <li><strong>auth.js</strong> → <em>(NOVO)</em> módulo central de autenticação: login, logout, verificação de sessão, hash de PIN</li>
+        <li><strong>login.html</strong> → <em>(NOVO)</em> tela de login standalone que redireciona para a página original</li>
+        <li><strong>sidebar.js</strong> → adicionar barra de sessão no topo + verificação de auth em cada página</li>
+        <li><strong>index.html</strong> → ocultar botões de gestão de usuários para não-admins</li>
+        <li><strong>clientes.html</strong> → desabilitar cadastro/edição para colaboradores</li>
+        <li><strong>Checklist.html</strong> → restringir acesso ao checklist do colaborador logado</li>
+        <li><strong>implantacao.html</strong> → ocultar botão de alterar status para colaboradores</li>
+        <li><strong>tarefas.html</strong> → filtrar tarefas pelo colaborador logado</li>
+        <li><strong>relatorios-checklist.html</strong> → bloquear relatórios globais para colaboradores</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── TABS ───
+function showTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const map={fluxo:0,login:1,permissoes:2,cadastro:3,sql:4};
+  document.querySelectorAll('.tab')[map[name]].classList.add('active');
+}
+
+// ─── LOGIN DEMO ───
+let demoCurrentPin='';
+const demoPins={admin:'1234',colab:'5678',colab2:'9999'};
+function updateDots(){
+  for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('filled',i<demoCurrentPin.length);
+}
+function demoPin(n){
+  if(demoCurrentPin.length>=4)return;
+  demoCurrentPin+=n;updateDots();
+  document.getElementById('demoErr').textContent='';
+  if(demoCurrentPin.length===4){setTimeout(()=>document.getElementById('demoBtn').focus(),100);}
+}
+function demoBack(){demoCurrentPin=demoCurrentPin.slice(0,-1);updateDots();}
+function demoSelectUser(){demoCurrentPin='';updateDots();document.getElementById('demoErr').textContent='';document.getElementById('demoSuccess').classList.remove('show');}
+function demoLogin(){
+  const u=document.getElementById('demoUser').value;
+  if(!u){document.getElementById('demoErr').textContent='⚠️ Selecione seu nome primeiro';return;}
+  if(demoCurrentPin.length<4){document.getElementById('demoErr').textContent='⚠️ Digite os 4 dígitos do PIN';return;}
+  if(demoCurrentPin===demoPins[u]){
+    document.getElementById('demoSuccess').classList.add('show');
+    document.getElementById('demoErr').textContent='';
+    document.getElementById('demoBtn').disabled=true;
+    document.getElementById('demoBtn').textContent='✅ Acesso liberado!';
+    setTimeout(()=>{document.getElementById('demoSuccess').classList.remove('show');document.getElementById('demoBtn').disabled=false;document.getElementById('demoBtn').textContent='Entrar →';demoCurrentPin='';updateDots();},3000);
+  }else{
+    const err=document.getElementById('demoErr');
+    err.textContent='❌ PIN incorreto. Tente novamente.';
+    err.classList.add('shake');
+    demoCurrentPin='';updateDots();
+    setTimeout(()=>err.classList.remove('shake'),400);
+  }
+}
+// keyboard support for demo
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('tab-login').classList.contains('active'))return;
+  if(e.key>='0'&&e.key<='9')demoPin(parseInt(e.key));
+  if(e.key==='Backspace')demoBack();
+  if(e.key==='Enter')demoLogin();
+});
+
+// ─── ROLE TOGGLE ───
+function selectRole(r){
+  document.getElementById('optAdmin').className='role-opt'+(r==='admin'?' sel-admin':'');
+  document.getElementById('optColab').className='role-opt'+(r==='colab'?' sel-colab':'');
+}
+
+// ─── PIN TOGGLE ───
+function togglePin(){const el=document.getElementById('pinPreview');el.type=el.type==='password'?'text':'password';}
+
+// ─── COLOR DEMO ───
+const PAL=['#818cf8','#38bdf8','#34d399','#fbbf24','#f87171','#e879f9','#fb923c','#a78bfa'];
+let selColor=PAL[1];
+function buildColorDemo(){
+  document.getElementById('colorDemo').innerHTML=PAL.map(c=>`<div onclick="pickDemo('${c}',this)" style="width:28px;height:28px;border-radius:8px;background:${c};cursor:pointer;border:2px solid ${c===selColor?'#fff':'transparent'};transition:all .15s;transform:${c===selColor?'scale(1.2)':'scale(1)'}"></div>`).join('');
+}
+function pickDemo(c,el){selColor=c;buildColorDemo();}
+buildColorDemo();
+
+// ─── PILLS DEMO ───
+const demoUsers=[
+  {name:'Anderson Diretor',cargo:'Administrador',color:'#e879f9',role:'admin'},
+  {name:'João Técnico',cargo:'Técnico',color:'#38bdf8',role:'colab'},
+  {name:'Maria Instaladora',cargo:'Instaladora',color:'#34d399',role:'colab'},
+];
+function ini(n){const p=(n||'').trim().split(' ');return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():n.slice(0,2).toUpperCase();}
+document.getElementById('pillsDemo').innerHTML=demoUsers.map(u=>`
+  <div style="display:flex;align-items:center;gap:12px;background:var(--s2);border:1px solid var(--bdr);border-radius:11px;padding:11px 14px">
+    <div style="width:36px;height:36px;border-radius:10px;background:${u.color}22;color:${u.color};display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;flex-shrink:0">${ini(u.name)}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:600">${u.name}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">${u.cargo}</div>
+    </div>
+    <div style="padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;${u.role==='admin'?'background:rgba(232,121,249,.12);color:#e879f9;border:1px solid rgba(232,121,249,.25)':'background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.25)'}">${u.role==='admin'?'👑 Admin':'👤 Colab'}</div>
+    <div style="display:flex;gap:6px">
+      <button style="width:26px;height:26px;border-radius:7px;border:1px solid var(--bdr);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center">✏️</button>
+      <button style="width:26px;height:26px;border-radius:7px;border:1px solid var(--bdr);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+  </div>`).join('');
+
+// ─── SQL COPY ───
+function copySql(id){
+  const txt=document.getElementById(id).innerText;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=document.querySelector('.sql-copy');btn.textContent='✅ Copiado!';
+    setTimeout(()=>btn.textContent='📋 Copiar',2000);
+  });
+}
+</script>
+</body>
+</html>
