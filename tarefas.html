@@ -83,8 +83,10 @@ select.fbtn option{background:var(--s2);color:var(--text)}
 .pr-baixa{--pc:var(--p-baixa)}
 
 /* MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(6px);padding:20px}
-.modal-bg.open{display:flex}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(6px);padding:20px}
+.modal-bg{visibility:hidden;opacity:0;pointer-events:none;transition:opacity .15s,visibility .15s}
+.modal-bg.open{visibility:visible;opacity:1;pointer-events:none}
+.modal-bg.open > *{pointer-events:auto}
 .modal-box{background:var(--s1);border:1px solid var(--bdr);border-radius:20px;width:100%;max-width:740px;max-height:92vh;overflow-y:auto;animation:mIn .2s ease}
 @keyframes mIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .mh{padding:24px 28px 20px;border-bottom:1px solid var(--bdr);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:sticky;top:0;background:var(--s1);z-index:1}
@@ -536,7 +538,7 @@ function abrirModal(id){
 }
 
 function fecharModal(){ document.getElementById('modalTarefa').classList.remove('open'); }
-document.getElementById('modalTarefa').addEventListener('click',function(e){ if(e.target===this) fecharModal(); });
+/* fundo não fecha modal — use botão Cancelar ou X */
 
 function selecionarPrioridade(p){
   formPrioridade = p;
