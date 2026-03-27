@@ -141,7 +141,7 @@ async function doLogin(){
   btn.disabled=true;btn.textContent='Verificando...';setMsg('','');
 
   try{
-    const user=const res = await GR7Auth.doLogin(usuario, senha);
+    const res = await GR7Auth.doLogin(usuario, senha);
 
     if(res.sucesso){
       setMsg('✅ Acesso liberado!','ok');
