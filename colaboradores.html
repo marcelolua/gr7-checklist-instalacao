@@ -250,10 +250,10 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 
 <!-- ── MODAL NOVO/EDITAR COLABORADOR (admin) ── -->
 <div class="modal-bg" id="modalBg">
-  <div class="modal" onclick="event.stopPropagation()">
+  <div class="modal" onclick="event.stopPropagation()" autocomplete="off">
     <h2 id="modalTitle">➕ Novo Colaborador</h2>
-    <div class="mfield"><label>Nome</label><input id="mNome" type="text" placeholder="Ex: João Silva"/></div>
-    <div class="mfield"><label>Cargo</label><input id="mCargo" type="text" placeholder="Ex: Técnico, Instalador"/></div>
+    <div class="mfield"><label>Nome</label><input id="mNome" type="text" placeholder="Ex: João Silva" autocomplete="off" autocorrect="off" spellcheck="false"/></div>
+    <div class="mfield"><label>Cargo</label><input id="mCargo" type="text" placeholder="Ex: Técnico, Instalador" autocomplete="off" autocorrect="off" spellcheck="false"/></div>
     <div class="mfield"><label>Perfil de Acesso</label>
       <div class="role-row">
         <div class="role-opt" id="mOptAdmin" onclick="event.stopPropagation();selPerfil('admin')">👑 Administrador</div>
@@ -262,7 +262,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
     </div>
     <div class="mfield">
       <label>Usuário de login</label>
-      <input id="mUsuario" type="text" placeholder="ex: joao.silva (gerado auto se vazio)" autocapitalize="none" spellcheck="false"
+      <input id="mUsuario" type="text" autocomplete="off" placeholder="ex: joao.silva (gerado auto se vazio)" autocapitalize="none" spellcheck="false"
         style="width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s"/>
     </div>
     <div class="mfield" id="mSenhaWrap">
