@@ -147,18 +147,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 .empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px}
 @media(max-width:700px){.shell{padding:0 16px 60px}.stats-grid{grid-template-columns:1fr 1fr}.team-grid{grid-template-columns:1fr}}
 
-/* ── MOBILE IMPROVEMENTS v3 ── */
-@media(max-width:900px){
-  .shell,.page-wrap{padding:0 16px 60px!important}
-  header{padding:20px 0 24px!important;gap:12px}
-  .summary{grid-template-columns:1fr 1fr!important}
-  .sc-num{font-size:32px!important}
-  .toolbar,.hd-right{flex-wrap:wrap;gap:8px}
-  .search-wrap{min-width:160px!important}
-}
-@media(max-width:600px){
-  .summary{grid-template-columns:1fr!important}
-  .cards,.cards-grid{grid-template-columns:1fr!important}
+.cards,.cards-grid{grid-template-columns:1fr!important}
   .cl-row{grid-template-columns:1fr 90px!important}
   .cl-row>*:nth-child(n+3){display:none!important}
   .rk-row{grid-template-columns:36px 36px 1fr 60px!important}
@@ -166,7 +155,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
   .shell{padding:0 12px 60px!important}
 }
 </style>
-<script src="auth.js"></script>
 <script src="sidebar.js"></script>
 </head>
 <body>
@@ -280,7 +268,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
       <div style="position:relative">
         <input id="mSenha" type="password" placeholder="Mínimo 4 caracteres"
           style="width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:9px;padding:10px 44px 10px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .2s"/>
-        <button onclick="event.stopPropagation();toggleEye('mSenha',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px">👁</button>
+        <button onclick="toggleEye('mSenha',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px">👁</button>
       </div>
       <div style="font-size:10px;color:var(--muted);margin-top:5px">Deixe em branco para manter a senha atual (ao editar)</div>
     </div>
@@ -629,40 +617,44 @@ async function deleteColab(id,nome){
 
 /* ── MAIN LOAD ── */
 async function loadPage(){
-  if(window.GR7Auth){ GR7Auth.require(); GR7Auth.injectSessionBar(); GR7Auth.applyPermissions(); }
+  
   renderProfile(session);
   loadMyStats();
   // Prefetch team list for modal
   if(isAdmin) dbGet('colaboradores?ativo=eq.true&select=id,nome,cargo,cor,perfil&order=nome').then(d=>_allColabs=d).catch(()=>{});
 }
 
-/* Fecha modal apenas clicando no fundo escuro — não em filhos */
+/* ── Modal backdrop — fecha só clicando NO FUNDO ESCURO, nunca em filhos ──
+   Usa mousedown+mouseup para evitar falsos positivos de drag */
 (function(){
   const bg = document.getElementById('modalBg');
-  let _downOnBg = false;
-  bg.addEventListener('mousedown', e => {
-    _downOnBg = e.target === bg;
+  let _startedOnBg = false;
+
+  bg.addEventListener('mousedown', function(e){
+    _startedOnBg = (e.target === bg);
   });
-  bg.addEventListener('click', e => {
-    if (_downOnBg && e.target === bg) closeModal();
-    _downOnBg = false;
+
+  bg.addEventListener('mouseup', function(e){
+    if(_startedOnBg && e.target === bg){
+      closeModal();
+    }
+    _startedOnBg = false;
+  });
+
+  /* Bloqueia click de subir do modal interno */
+  bg.querySelector('.modal').addEventListener('mousedown', function(e){
+    e.stopPropagation();
+  });
+  bg.querySelector('.modal').addEventListener('mouseup', function(e){
+    e.stopPropagation();
+  });
+  bg.querySelector('.modal').addEventListener('click', function(e){
+    e.stopPropagation();
   });
 })();
 
 loadPage();
 
-/* Realtime polling 15s */
-setInterval(async()=>{
-  try{
-    const r=await fetch(GR7Auth.SURL+'/rest/v1/colaboradores?select=id&order=id.desc&limit=1',{headers:GR7Auth.SH});
-    if(r.ok){const d=await r.json();const h=JSON.stringify(d);if(window._colabHash&&h!==window._colabHash){loadAll&&loadAll();}window._colabHash=h;}
-  }catch{}
-},15000);
-
-/* Realtime — sidebar.js gr7Realtime helper */
-gr7Realtime.watch('colaboradores', function(){
-  if(typeof loadAll==='function'){loadAll();toast('⚡ Dados atualizados','success');}
-}, 15000);
 </script>
 </body>
 </html>
