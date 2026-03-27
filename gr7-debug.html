@@ -40,6 +40,27 @@ td:first-child{color:var(--muted)}
 <p class="sub">Use esta página para identificar exatamente o problema de acesso. Não expõe senhas — apenas hashes.</p>
 
 <!-- STEP 1: Conexão -->
+
+<!-- QUICK FIX -->
+<div class="card" style="border-color:rgba(251,191,36,.4)">
+  <h2 style="color:var(--c3)">⚡ Correção Rápida — Definir senha agora</h2>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Não precisa do SQL. Define a senha direto aqui.</p>
+  <div class="row">
+    <div>
+      <label>Colaborador</label>
+      <select id="quickColab"><option value="">— carregando... —</option></select>
+    </div>
+    <div>
+      <label>Nova senha</label>
+      <input id="quickSenha" type="text" placeholder="ex: gr71234" autocomplete="off"/>
+    </div>
+  </div>
+  <button class="btn-primary" style="background:var(--c3);color:#000" onclick="definirSenhaRapida()">
+    ⚡ Definir senha agora
+  </button>
+  <div class="log" id="logQuick" style="margin-top:10px">—</div>
+</div>
+
 <div class="card">
   <h2>1. Teste de Conexão Supabase</h2>
   <button class="btn-primary" onclick="testarConexao()">▶ Testar conexão</button>
@@ -137,7 +158,9 @@ async function listarColabs() {
     _colabs = await r.json();
     log('logColabs', `✅ ${_colabs.length} colaborador(es) ativo(s) encontrado(s)`, 'ok');
 
-    /* Preenche select de reset */
+    /* Preenche selects de reset */
+    const selQ = document.getElementById('quickColab');
+    if(selQ) selQ.innerHTML = '<option value="">— selecione —</option>' + _colabs.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
     const sel = document.getElementById('selectColab');
     sel.innerHTML = '<option value="">— selecione —</option>' + _colabs.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
 
@@ -279,6 +302,48 @@ async function redefinirSenha() {
     listarColabs(); /* atualiza tabela */
   } catch(e) {
     log('logReset', '❌ Erro: ' + e.message, 'err');
+  }
+}
+
+
+async function definirSenhaRapida() {
+  clearLog('logQuick');
+  const sel = document.getElementById('quickColab');
+  const id  = sel.value;
+  const nome = sel.options[sel.selectedIndex]?.text || '';
+  const senha = document.getElementById('quickSenha').value.trim();
+
+  if (!id)    { log('logQuick','⚠️ Selecione o colaborador','warn'); return; }
+  if (!senha) { log('logQuick','⚠️ Digite a nova senha','warn'); return; }
+  if (senha.length < 3) { log('logQuick','⚠️ Senha muito curta (mínimo 3 caracteres)','warn'); return; }
+
+  const h = await sha256(senha);
+  log('logQuick', `Definindo senha para: ${nome}...`, 'info');
+  log('logQuick', `Hash SHA-256: ${h.slice(0,20)}...`);
+
+  // Garante usuario preenchido também
+  const usuarioGerado = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'').trim();
+
+  try {
+    const r = await fetch(`${SURL}/rest/v1/colaboradores?id=eq.${id}`, {
+      method : 'PATCH',
+      headers: {...SH, 'Prefer': 'return=minimal'},
+      body   : JSON.stringify({ senha_hash: h, usuario: usuarioGerado }),
+    });
+    if (!r.ok) {
+      log('logQuick', '❌ Erro HTTP ' + r.status + ': ' + await r.text(), 'err');
+      return;
+    }
+    log('logQuick', `✅ Senha definida com sucesso!`, 'ok');
+    log('logQuick', `   Colaborador : ${nome}`, 'ok');
+    log('logQuick', `   Usuário     : ${usuarioGerado}`, 'ok');
+    log('logQuick', `   Senha       : ${senha}`, 'ok');
+    log('logQuick', '', '');
+    log('logQuick', '→ Agora vá para login.html e entre com:', 'info');
+    log('logQuick', `   Usuário: ${usuarioGerado}  |  Senha: ${senha}`, 'info');
+    listarColabs();
+  } catch(e) {
+    log('logQuick', '❌ Erro: ' + e.message, 'err');
   }
 }
 

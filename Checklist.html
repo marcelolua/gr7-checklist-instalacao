@@ -537,28 +537,7 @@
       .info-grid { grid-template-columns: 1fr 1fr; }
       .current-user { display: none; }
     }
-  
-/* ── MOBILE IMPROVEMENTS v3 ── */
-@media(max-width:900px){
-  .shell,.page-wrap{padding:0 16px 60px!important}
-  header{padding:20px 0 24px!important;gap:12px}
-  .summary{grid-template-columns:1fr 1fr!important}
-  .sc-num{font-size:32px!important}
-  .toolbar,.hd-right{flex-wrap:wrap;gap:8px}
-  .search-wrap{min-width:160px!important}
-}
-@media(max-width:600px){
-  .summary{grid-template-columns:1fr!important}
-  .cards,.cards-grid{grid-template-columns:1fr!important}
-  .cl-row{grid-template-columns:1fr 90px!important}
-  .cl-row>*:nth-child(n+3){display:none!important}
-  .rk-row{grid-template-columns:36px 36px 1fr 60px!important}
-  .rk-row>*:nth-child(n+5){display:none!important}
-  .shell{padding:0 12px 60px!important}
-}
-</style>
-
-<script src="auth.js"></script>
+  </style>
 <script src="sidebar.js"></script>
 </head>
 
@@ -1594,16 +1573,6 @@
 
     document.getElementById('addTaskOverlay').addEventListener('click', function(e) { if (e.target === this) closeAddTask(); });
     document.getElementById('newTaskText').addEventListener('keydown', function(e) { if (e.key === 'Enter') confirmAddTask(); });
-  
-/* Realtime polling checklist 12s */
-let _ckHash='';
-setInterval(async()=>{
-  if(!window._currentClienteId)return;
-  try{
-    const r=await fetch(GR7Auth.SURL+'/rest/v1/implant_checklist?cliente_id=eq.'+_currentClienteId+'&select=id,data_conclusao&order=data_conclusao.desc&limit=1',{headers:GR7Auth.SH});
-    if(r.ok){const d=await r.json();const h=JSON.stringify(d);if(_ckHash&&h!==_ckHash){reloadChecklist&&reloadChecklist();toast('⚡ Checklist atualizado','success');}  _ckHash=h;}
-  }catch{}
-},12000);
-</script>
+  </script>
 </body>
 </html>

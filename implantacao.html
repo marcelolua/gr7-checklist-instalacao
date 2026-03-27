@@ -69,28 +69,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 @keyframes sp{to{transform:rotate(360deg)}}
 .loader{grid-column:1/-1;padding:60px;text-align:center;color:var(--muted)}
 @media(max-width:768px){.shell{padding:0 16px 60px}.summary{grid-template-columns:1fr 1fr}.cards-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
-
-/* ── MOBILE IMPROVEMENTS v3 ── */
-@media(max-width:900px){
-  .shell,.page-wrap{padding:0 16px 60px!important}
-  header{padding:20px 0 24px!important;gap:12px}
-  .summary{grid-template-columns:1fr 1fr!important}
-  .sc-num{font-size:32px!important}
-  .toolbar,.hd-right{flex-wrap:wrap;gap:8px}
-  .search-wrap{min-width:160px!important}
-}
-@media(max-width:600px){
-  .summary{grid-template-columns:1fr!important}
-  .cards,.cards-grid{grid-template-columns:1fr!important}
-  .cl-row{grid-template-columns:1fr 90px!important}
-  .cl-row>*:nth-child(n+3){display:none!important}
-  .rk-row{grid-template-columns:36px 36px 1fr 60px!important}
-  .rk-row>*:nth-child(n+5){display:none!important}
-  .shell{padding:0 12px 60px!important}
-}
 </style>
-
-<script src="auth.js"></script>
 <script src="sidebar.js"></script>
 </head>
 <body>
@@ -249,20 +228,6 @@ function renderCards(){
 function abrirProjeto(id){ window.location.href='projeto.html?id='+id; }
 document.getElementById('dateChip').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
 loadProjetos();
-
-/* Realtime polling implantacao 20s */
-let _implHash='';
-setInterval(async()=>{
-  try{
-    const r=await fetch(GR7Auth.SURL+'/rest/v1/clientes_gr7?select=id&order=updated_at.desc&limit=1',{headers:GR7Auth.SH});
-    if(r.ok){const d=await r.json();const h=JSON.stringify(d);if(_implHash&&h!==_implHash){loadClientes&&loadClientes();toast('⚡ Lista atualizada','success');}  _implHash=h;}
-  }catch{}
-},20000);
-
-/* Realtime — sidebar.js gr7Realtime helper */
-gr7Realtime.watch('clientes_gr7', function(){
-  if(typeof loadClientes==='function'){loadClientes();toast('⚡ Dados atualizados','success');}
-}, 15000);
 </script>
 </body>
 </html>
