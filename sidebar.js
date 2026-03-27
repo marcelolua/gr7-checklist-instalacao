@@ -1,46 +1,35 @@
 (function () {
-  // ─── 1. CSS ─────────────────────────────────────────────────────────────────
+  // ─── 1. CSS ────────────────────────────────────────────────────────────────
   const style = document.createElement('style');
   style.textContent = `
     :root {
-      --sb-w: 220px;
-      --sb-w-col: 56px;
-      --sb-dur: .22s;
+      --sb-w: 240px;
+      --sb-w-collapsed: 64px;
     }
 
     body {
-      padding-left: var(--sb-w-col);
-      transition: padding-left var(--sb-dur) cubic-bezier(.4,0,.2,1);
-    }
-    body.sb-expanded {
       padding-left: var(--sb-w);
+      transition: padding-left .25s cubic-bezier(.4,0,.2,1);
+    }
+    body.sb-collapsed {
+      padding-left: var(--sb-w-collapsed);
     }
 
-    /* ── Sidebar ── */
     .sidebar {
       position: fixed; top: 0; left: 0; height: 100vh;
-      width: var(--sb-w-col);
-      background: #0e1018;
+      width: var(--sb-w); background: #0e1018;
       border-right: 1px solid #1e2030;
       display: flex; flex-direction: column;
       z-index: 999;
-      transition: width var(--sb-dur) cubic-bezier(.4,0,.2,1),
-                  box-shadow var(--sb-dur) ease;
+      transition: width .25s cubic-bezier(.4,0,.2,1);
       overflow: hidden;
-      will-change: width;
     }
-    .sidebar.expanded {
-      width: var(--sb-w);
-      box-shadow: 4px 0 32px rgba(0,0,0,.55);
-    }
+    .sidebar.collapsed { width: var(--sb-w-collapsed); }
 
-    /* ── Logo ── */
     .sb-logo {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 10px;
-      height: 56px;
-      border-bottom: 1px solid #1e2030;
-      flex-shrink: 0; overflow: hidden;
+      display: flex; align-items: center; gap: 13px;
+      padding: 22px 16px 18px; border-bottom: 1px solid #1e2030;
+      flex-shrink: 0; min-width: var(--sb-w); overflow: hidden;
     }
     .sb-logo-mark {
       width: 36px; height: 36px; flex-shrink: 0;
@@ -50,169 +39,60 @@
       font-weight: 600; font-size: 13px; color: #fff;
       box-shadow: 0 0 20px rgba(129,140,248,.35);
     }
-    .sb-logo-text {
-      opacity: 0; transform: translateX(-6px);
-      transition: opacity .18s .03s, transform .18s .03s;
-      white-space: nowrap; overflow: hidden;
-    }
-    .sidebar.expanded .sb-logo-text {
-      opacity: 1; transform: translateX(0);
-    }
+    .sb-logo-text { white-space: nowrap; overflow: hidden; }
     .sb-logo-text h2 {
       font-family: 'Syne', sans-serif; font-size: 16px;
       font-weight: 800; letter-spacing: -.3px; color: #fff;
     }
     .sb-logo-text p { font-size: 10px; color: #5a5e78; margin-top: 2px; }
 
-    /* ── Nav ── */
-    .sb-nav {
-      flex: 1; padding: 8px 0;
-      overflow-y: auto; overflow-x: hidden;
-      scrollbar-width: none;
-    }
-    .sb-nav::-webkit-scrollbar { display: none; }
+    .sb-nav { flex: 1; padding: 12px 0; overflow-y: auto; overflow-x: hidden; }
 
     .sb-label {
       font-family: 'IBM Plex Mono', monospace; font-size: 9px;
       letter-spacing: 2px; text-transform: uppercase; color: #3a3e58;
-      padding: 10px 0 4px;
-      text-align: center;
-      opacity: 0;
-      transition: opacity .15s, padding .22s, text-align .22s;
-      white-space: nowrap; overflow: hidden;
+      padding: 10px 20px 4px; white-space: nowrap;
+      opacity: 1; transition: opacity .2s;
     }
-    .sidebar.expanded .sb-label {
-      opacity: 1;
-      padding: 10px 18px 4px;
-      text-align: left;
-    }
+    .sidebar.collapsed .sb-label { opacity: 0; }
 
-    /* ── Item ── */
     .sb-item {
-      display: flex; align-items: center;
-      height: 44px;
-      padding: 0;
-      color: #5a5e78; font-size: 13px; font-weight: 500;
-      cursor: pointer; text-decoration: none;
-      transition: background .13s, color .13s;
-      white-space: nowrap; overflow: hidden;
-      border-left: 2px solid transparent;
-      position: relative;
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 16px; color: #5a5e78; font-size: 13px;
+      font-weight: 500; cursor: pointer; text-decoration: none;
+      transition: all .15s; white-space: nowrap; overflow: hidden;
+      border-left: 2px solid transparent; margin: 1px 0;
     }
     .sb-item:hover { color: #dde1f0; background: rgba(255,255,255,.04); }
     .sb-item.active {
       color: #00e5a0; background: rgba(0,229,160,.07);
       border-left-color: #00e5a0;
     }
-
-    /* Ícone — sempre centrado na faixa colapsada */
     .sb-icon {
-      width: var(--sb-w-col); flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-    }
-
-    /* Texto — fade-in ao expandir */
-    .sb-text {
-      flex: 1; overflow: hidden;
-      opacity: 0; transform: translateX(-4px);
-      transition: opacity .16s .03s, transform .16s .03s;
-    }
-    .sidebar.expanded .sb-text {
-      opacity: 1; transform: translateX(0);
-    }
-
-    /* Tooltip quando colapsado */
-    .sb-item[data-tip]::after {
-      content: attr(data-tip);
-      position: absolute; left: calc(var(--sb-w-col) + 8px); top: 50%;
-      transform: translateY(-50%);
-      background: #161820; border: 1px solid #252738;
-      color: #dde1f0; font-size: 12px; font-family: 'Outfit', sans-serif;
-      padding: 5px 10px; border-radius: 8px;
-      white-space: nowrap; pointer-events: none;
-      opacity: 0; transition: opacity .15s;
-      z-index: 9999;
-    }
-    .sidebar:not(.expanded) .sb-item[data-tip]:hover::after { opacity: 1; }
-    .sidebar.expanded .sb-item[data-tip]::after { display: none; }
-
-    /* ── Footer / usuário ── */
-    .sb-footer {
-      border-top: 1px solid #1e2030;
-      padding: 10px 0;
-      flex-shrink: 0; overflow: hidden;
-    }
-    .sb-user {
-      display: flex; align-items: center;
-      height: 44px; overflow: hidden;
-    }
-    .sb-user-av {
-      width: var(--sb-w-col); flex-shrink: 0;
+      font-size: 17px; flex-shrink: 0; width: 24px;
       display: flex; align-items: center; justify-content: center;
     }
-    .sb-user-av-inner {
-      width: 30px; height: 30px; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800;
-    }
-    .sb-user-info {
-      flex: 1; min-width: 0;
-      opacity: 0; transform: translateX(-4px);
-      transition: opacity .16s .03s, transform .16s .03s;
-    }
-    .sidebar.expanded .sb-user-info { opacity: 1; transform: translateX(0); }
-    .sb-user-name {
-      font-size: 12px; font-weight: 600; color: #dde1f0;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .sb-user-role { font-size: 10px; color: #5a5e78; margin-top: 1px; }
+    .sb-text { transition: opacity .2s; }
+    .sidebar.collapsed .sb-text { opacity: 0; pointer-events: none; }
 
-    .sb-logout {
-      display: flex; align-items: center;
-      height: 36px; width: 100%;
-      border: none; border-top: 1px solid #1e2030;
-      background: transparent; color: #5a5e78;
-      font-size: 12px; cursor: pointer;
-      font-family: 'Outfit', sans-serif;
-      gap: 0; overflow: hidden;
-      transition: color .13s, background .13s;
+    .sb-footer { border-top: 1px solid #1e2030; padding: 12px 16px; flex-shrink: 0; }
+    .sb-toggle {
+      display: flex; align-items: center; gap: 12px;
+      background: transparent; border: 1px solid #1e2030;
+      border-radius: 8px; padding: 9px 12px; color: #5a5e78;
+      font-size: 12px; cursor: pointer; width: 100%;
+      transition: all .15s; white-space: nowrap; overflow: hidden;
     }
-    .sb-logout:hover { background: rgba(248,113,113,.08); color: #f87171; }
-    .sb-logout-icon {
-      width: var(--sb-w-col); flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
-    }
-    .sb-logout-text {
-      opacity: 0; transform: translateX(-4px);
-      transition: opacity .16s .03s, transform .16s .03s;
-      white-space: nowrap;
-    }
-    .sidebar.expanded .sb-logout-text { opacity: 1; transform: translateX(0); }
+    .sb-toggle:hover { border-color: #3a3e58; color: #dde1f0; }
+    .sb-toggle-icon { font-size: 15px; flex-shrink: 0; transition: transform .25s; }
+    .sidebar.collapsed .sb-toggle-icon { transform: rotate(180deg); }
+    .sb-toggle-text { transition: opacity .2s; }
+    .sidebar.collapsed .sb-toggle-text { opacity: 0; }
 
-    /* ── Mobile ── */
     @media (max-width: 700px) {
       body { padding-left: 0 !important; }
-      .sidebar {
-        width: var(--sb-w) !important;
-        transform: translateX(-100%);
-        transition: transform var(--sb-dur) cubic-bezier(.4,0,.2,1) !important;
-        box-shadow: none !important;
-      }
-      .sidebar.mobile-open {
-        transform: translateX(0) !important;
-        box-shadow: 4px 0 32px rgba(0,0,0,.65) !important;
-      }
-      .sidebar.mobile-open .sb-text,
-      .sidebar.mobile-open .sb-logo-text,
-      .sidebar.mobile-open .sb-user-info,
-      .sidebar.mobile-open .sb-logout-text {
-        opacity: 1 !important; transform: none !important;
-      }
-      .sidebar.mobile-open .sb-label {
-        opacity: 1 !important; padding: 10px 18px 4px !important; text-align: left !important;
-      }
+      .sidebar { transform: translateX(-100%); transition: transform .25s cubic-bezier(.4,0,.2,1), width .25s; }
+      .sidebar.mobile-open { transform: translateX(0); }
       .sb-overlay {
         display: none; position: fixed; inset: 0;
         background: rgba(0,0,0,.5); z-index: 998;
@@ -231,135 +111,112 @@
   `;
   document.head.appendChild(style);
 
-  // ─── 2. DADOS ────────────────────────────────────────────────────────────────
+  // ─── 2. HTML ───────────────────────────────────────────────────────────────
   const NAV_ITEMS = [
-    { href: 'index.html',               icon: '🏠', label: 'Dashboard'   },
-    { href: 'clientes.html',            icon: '🏢', label: 'Clientes'    },
-    { href: 'implantacao.html',         icon: '🚀', label: 'Implantação' },
-    { href: 'tarefas.html',             icon: '📌', label: 'Tarefas'     },
-    { href: 'Checklist.html',           icon: '✅', label: 'Checklist'   },
-    { href: 'relatorios-checklist.html',icon: '📊', label: 'Relatórios'  },
+    { href: 'index.html',               icon: '🏠', label: 'Dashboard'  },
+    { href: 'clientes.html',            icon: '🏢', label: 'Clientes'   },
+    { href: 'implantacao.html',         icon: '🚀', label: 'Implantação'},
+    { href: 'tarefas.html',             icon: '📌', label: 'Tarefas'    },
+    { href: 'Checklist.html',           icon: '✅', label: 'Checklist'  },
+    { href: 'relatorios-checklist.html',icon: '📊', label: 'Relatórios' },
   ];
 
+  // Detecta página atual — trata projeto.html como subpágina de implantacao
   const currentFile = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
-  const activeMap   = { 'projeto.html': 'implantacao.html' };
-  const activePage  = activeMap[currentFile] || currentFile;
+  const activeMap = { 'projeto.html': 'implantacao.html', 'tarefas.html': 'tarefas.html' };
+  const activePage = activeMap[currentFile] || currentFile;
 
-  function ini(n) {
-    const p = (n || '').trim().split(' ');
-    return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : (n || '?').slice(0, 2).toUpperCase();
-  }
+  const navHTML = NAV_ITEMS.map(item => {
+    const isActive = item.href.toLowerCase() === activePage;
+    return `<a class="sb-item${isActive ? ' active' : ''}" href="${item.href}">
+      <span class="sb-icon">${item.icon}</span>
+      <span class="sb-text">${item.label}</span>
+    </a>`;
+  }).join('\n');
 
-  // ─── 3. HTML ─────────────────────────────────────────────────────────────────
-  function buildSidebar() {
-    const session = window.GR7Auth ? GR7Auth.getSession() : null;
-    const isAdmin = session && session.perfil === 'admin';
-
-    const navHTML = NAV_ITEMS.map(item => {
-      const active = item.href.toLowerCase() === activePage ? ' active' : '';
-      return `<a class="sb-item${active}" href="${item.href}" data-tip="${item.label}">
-        <span class="sb-icon">${item.icon}</span>
-        <span class="sb-text">${item.label}</span>
-      </a>`;
-    }).join('\n');
-
-    const userBlock = session ? `
-      <div class="sb-user">
-        <div class="sb-user-av">
-          <div class="sb-user-av-inner" style="background:${(session.cor||'#818cf8')}22;color:${session.cor||'#818cf8'}">${ini(session.nome)}</div>
-        </div>
-        <div class="sb-user-info">
-          <div class="sb-user-name">${session.nome}</div>
-          <div class="sb-user-role">${isAdmin ? '👑 Admin' : '👤 Colaborador'}</div>
-        </div>
+  const aside = document.createElement('aside');
+  aside.className = 'sidebar';
+  aside.id = 'sidebar';
+  aside.innerHTML = `
+    <div class="sb-logo">
+      <div class="sb-logo-mark">GR7</div>
+      <div class="sb-logo-text">
+        <h2>GR7</h2>
+        <p>Sistema de Instalações</p>
       </div>
-      <button class="sb-logout" onclick="window.GR7Auth&&GR7Auth.logout()">
-        <span class="sb-logout-icon">⬅</span>
-        <span class="sb-logout-text">Sair do sistema</span>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-label">Menu</div>
+      ${navHTML}
+    </nav>
+    <div class="sb-footer">
+      <button class="sb-toggle" onclick="toggleSidebar()">
+        <span class="sb-toggle-icon">◀</span>
+        <span class="sb-toggle-text">Recolher menu</span>
       </button>
-    ` : '';
+    </div>
+  `;
 
-    const aside = document.createElement('aside');
-    aside.className = 'sidebar';
-    aside.id = 'sidebar';
-    aside.innerHTML = `
-      <div class="sb-logo">
-        <div class="sb-logo-mark">GR7</div>
-        <div class="sb-logo-text">
-          <h2>GR7</h2>
-          <p>Sistema de Instalações</p>
-        </div>
-      </div>
-      <nav class="sb-nav">
-        <div class="sb-label">Menu</div>
-        ${navHTML}
-      </nav>
-      <div class="sb-footer">${userBlock}</div>
-    `;
+  // Overlay para mobile
+  const overlay = document.createElement('div');
+  overlay.className = 'sb-overlay';
+  overlay.id = 'sbOverlay';
+  overlay.onclick = function () { closeMobileSidebar(); };
 
-    const overlay = document.createElement('div');
-    overlay.className = 'sb-overlay';
-    overlay.id = 'sbOverlay';
-    overlay.onclick = () => closeMobileSidebar();
+  // Botão hamburguer para mobile
+  const mobileBtn = document.createElement('button');
+  mobileBtn.className = 'sb-mobile-btn';
+  mobileBtn.id = 'sbMobileBtn';
+  mobileBtn.innerHTML = '☰';
+  mobileBtn.onclick = function () { openMobileSidebar(); };
 
-    const mobileBtn = document.createElement('button');
-    mobileBtn.className = 'sb-mobile-btn';
-    mobileBtn.id = 'sbMobileBtn';
-    mobileBtn.innerHTML = '☰';
-    mobileBtn.onclick = () => openMobileSidebar();
-
+  // Injeta no DOM assim que body estiver pronto
+  function inject() {
     document.body.prepend(mobileBtn);
     document.body.prepend(overlay);
     document.body.prepend(aside);
-
-    // ── Hover expand/collapse (desktop) ──
-    let _timer = null;
-
-    aside.addEventListener('mouseenter', () => {
-      clearTimeout(_timer);
-      aside.classList.add('expanded');
-      document.body.classList.add('sb-expanded');
-    });
-
-    aside.addEventListener('mouseleave', () => {
-      _timer = setTimeout(() => {
-        if (window.innerWidth > 700) {
-          aside.classList.remove('expanded');
-          document.body.classList.remove('sb-expanded');
-        }
-      }, 80);
-    });
   }
 
-  // ─── 4. MOBILE ───────────────────────────────────────────────────────────────
-  function openMobileSidebar() {
-    const aside = document.getElementById('sidebar');
-    aside.classList.add('mobile-open');
-    document.getElementById('sbOverlay').classList.add('visible');
-  }
-  function closeMobileSidebar() {
-    const aside = document.getElementById('sidebar');
-    aside.classList.remove('mobile-open');
-    document.getElementById('sbOverlay').classList.remove('visible');
+  if (document.body) {
+    inject();
+  } else {
+    document.addEventListener('DOMContentLoaded', inject);
   }
 
-  // Expõe toggle para compatibilidade
+  // ─── 3. ESTADO: collapsed / mobile ────────────────────────────────────────
+  function applyCollapsed() {
+    const isCollapsed = localStorage.getItem('sb_collapsed') === 'true';
+    aside.classList.toggle('collapsed', isCollapsed);
+    document.body.classList.toggle('sb-collapsed', isCollapsed);
+  }
+
+  // Aplica estado salvo após injeção
+  if (document.body) {
+    applyCollapsed();
+  } else {
+    document.addEventListener('DOMContentLoaded', applyCollapsed);
+  }
+
+  // ─── 4. API PÚBLICA ────────────────────────────────────────────────────────
   window.toggleSidebar = function () {
-    const aside = document.getElementById('sidebar');
-    if (window.innerWidth <= 700) {
-      aside.classList.contains('mobile-open') ? closeMobileSidebar() : openMobileSidebar();
-    }
+    aside.classList.toggle('collapsed');
+    document.body.classList.toggle('sb-collapsed');
+    localStorage.setItem('sb_collapsed', aside.classList.contains('collapsed'));
   };
 
-  // Injeta quando DOM estiver pronto
-  if (document.body) {
-    buildSidebar();
-  } else {
-    document.addEventListener('DOMContentLoaded', buildSidebar);
+  function openMobileSidebar() {
+    aside.classList.add('mobile-open');
+    overlay.classList.add('visible');
   }
 
-  // ─── 5. HUMANIZADOR DE ERROS ─────────────────────────────────────────────────
-    const ERROR_MAP = [
+  function closeMobileSidebar() {
+    aside.classList.remove('mobile-open');
+    overlay.classList.remove('visible');
+  }
+
+
+  // ─── 5. HUMANIZADOR DE ERROS ──────────────────────────────────────────────
+  const ERROR_MAP = [
     { match: /relation .* does not exist/i,         msg: 'Tabela não encontrada. Verifique a configuração do banco.' },
     { match: /column .* does not exist/i,            msg: 'Campo não encontrado. A estrutura do banco pode estar desatualizada.' },
     { match: /permission denied/i,                   msg: 'Sem permissão para realizar esta ação.' },
