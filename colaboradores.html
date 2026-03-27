@@ -120,21 +120,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:32p
 .mc-btn.danger:hover{border-color:var(--c4);color:var(--c4)}
 
 /* ── MODAL ── */
-.modal-bg{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.7);
-  display:flex;align-items:center;justify-content:center;
-  z-index:9000;backdrop-filter:blur(4px);padding:20px;
-  /* Invisível e não clicável quando fechado */
-  visibility:hidden;opacity:0;pointer-events:none;
-  transition:opacity .15s,visibility .15s;
-}
-.modal-bg.open{
-  visibility:visible;opacity:1;pointer-events:none; /* fundo NÃO clicável */
-}
-.modal-bg.open .modal{
-  pointer-events:auto; /* só o modal interno é clicável */
-}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9000;backdrop-filter:blur(4px);padding:20px;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .15s,visibility .15s}
+.modal-bg.open{visibility:visible;opacity:1;pointer-events:none}
+.modal-bg.open .modal{pointer-events:auto}
 .modal{background:var(--s1);border:1px solid var(--bdr);border-radius:20px;padding:32px;width:100%;max-width:460px;position:relative;overflow:hidden}
 .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c0),var(--c5))}
 .modal h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:22px}
@@ -638,10 +626,7 @@ async function loadPage(){
   if(isAdmin) dbGet('colaboradores?ativo=eq.true&select=id,nome,cargo,cor,perfil&order=nome').then(d=>_allColabs=d).catch(()=>{});
 }
 
-
-
-/* Modal: fundo não é clicável (pointer-events:none no CSS).
-   Fecha só pelos botões Cancelar/X explícitos. */
+/* Modal fecha só pelos botões Cancelar/Salvar */
 
 loadPage();
 
